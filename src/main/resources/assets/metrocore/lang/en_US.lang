@@ -1,0 +1,82 @@
+itemGroup.tabMetroWorld=Metropolis-Building Blocks
+
+tile.metrocore:blockCement.blockCement.name=Cement
+tile.metrocore:blockCement.blockCementBlack.name=Black Cement
+tile.metrocore:blockCement.blockCementBrown.name=Brown Cement
+tile.metrocore:blockCement.blockCementGray.name=Gray Cement
+tile.metrocore:blockCement.blockCementLightGray.name=Light Gray Cement
+tile.metrocore:blockCement.blockCementRed.name=Red Cement
+tile.metrocore:blockCement.blockCementTan.name=Tan Cement
+tile.metrocore:blockCement.blockCementTerraCotta.name=Terra Cotta Cement
+
+tile.metrocore:blockCement.blockCementPaver.name=Cement Paver
+tile.metrocore:blockCement.blockCementPaverBlack.name=Black Cement Paver
+tile.metrocore:blockCement.blockCementPaverBrown.name=Brown Cement Paver
+tile.metrocore:blockCement.blockCementPaverGray.name=Gray Cement Paver
+tile.metrocore:blockCement.blockCementPaverLightGray.name=Light Gray Cement Paver
+tile.metrocore:blockCement.blockCementPaverRed.name=Red Cement Paver
+tile.metrocore:blockCement.blockCementPaverTan.name=Tan Cement Paver
+tile.metrocore:blockCement.blockCementPaverTerraCotta.name=Terra Cotta Cement Paver
+
+tile.metrocore:polishedCement.blockPolishedCement.name=Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementBlack.name=Black Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementBrown.name=Brown Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementGray.name=Gray Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementLightGray.name=Light Gray Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementRed.name=Red Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementTan.name=Tan Polished Cement
+tile.metrocore:polishedCement.blockPolishedCementTerraCotta.name=Terra Cotta Polished Cement
+
+tile.cementSingleSlab.blockCementSlab.name=Cement Slab
+tile.cementSingleSlab.blockCementBlackSlab.name=Black Cement Slab
+tile.cementSingleSlab.blockCementBrownSlab.name=Brown Cement Slab
+tile.cementSingleSlab.blockCementGraySlab.name=Gray Cement Slab
+tile.cementSingleSlab.blockCementLightGraySlab.name=Light Gray Cement Slab
+tile.cementSingleSlab.blockCementRedSlab.name=Red Cement Slab
+tile.cementSingleSlab.blockCementTanSlab.name=Tan Cement Slab
+tile.cementSingleSlab.blockCementTerraCottaSlab.name=Terra Cotta Cement Slab
+tile.cementDoubleSlab.blockCementSlab.name=Cement Slab
+tile.cementDoubleSlab.blockCementBlackSlab.name=Black Cement Slab
+tile.cementDoubleSlab.blockCementBrownSlab.name=Brown Cement Slab
+tile.cementDoubleSlab.blockCementGraySlab.name=Gray Cement Slab
+tile.cementDoubleSlab.blockCementLightGraySlab.name=Light Gray Cement Slab
+tile.cementDoubleSlab.blockCementRedSlab.name=Red Cement Slab
+tile.cementDoubleSlab.blockCementTanSlab.name=Tan Cement Slab
+tile.cementDoubleSlab.blockCementTerraCottaSlab.name=Terra Cotta Cement Slab
+
+tile.cementPaverSingleSlab.blockCementPaverSlab.name=Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverBlackSlab.name=Black Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverBrownSlab.name=Brown Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverGraySlab.name=Gray Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverLightGraySlab.name=Light Gray Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverRedSlab.name=Red Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverTanSlab.name=Tan Cement Paver Slab
+tile.cementPaverSingleSlab.blockCementPaverTerraCottaSlab.name=Terra Cotta Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverSlab.name=Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverBlackSlab.name=Black Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverBrownSlab.name=Brown Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverGraySlab.name=Gray Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverLightGraySlab.name=Light Gray Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverRedSlab.name=Red Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverTanSlab.name=Tan Cement Paver Slab
+tile.cementPaverDoubleSlab.blockCementPaverTerraCottaSlab.name=Terra Cotta Cement Paver Slab
+
+tile.stairsCement.name=Cement Stairs
+tile.stairsCementBlack.name=Black Cement Stairs
+tile.stairsCementBrown.name=Brown Cement Stairs
+tile.stairsCementGray.name=Gray Cement Stairs
+tile.stairsCementLightGray.name=Light Gray Cement Stairs
+tile.stairsCementRed.name=Red Cement Stairs
+tile.stairsCementTan.name=Tan Cement Stairs
+tile.stairsCementTerraCotta.name=Terra Cotta Cement Stairs
+
+tile.stairsCement2.name=Etched Cement Stairs
+tile.stairsCementBlack2.name=Etched Black Cement Stairs
+tile.stairsCementBrown2.name=Etched Brown Cement Stairs
+tile.stairsCementGray2.name=Etched Gray Cement Stairs
+tile.stairsCementLightGray2.name=Etched Light Gray Cement Stairs
+tile.stairsCementRed2.name=Etched Red Cement Stairs
+tile.stairsCementTan2.name=Etched Tan Cement Stairs
+tile.stairsCementTerraCotta2.name=Etched Terra Cotta Cement Stairs
+
+item.itemDoorGlass.name=Glass Door
