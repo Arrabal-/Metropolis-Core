@@ -50,7 +50,8 @@ public class MetropolisDataHandler {
                         return saveLocation;
                     }
                     catch (Exception e){
-                        FMLLog.log(Level.ERROR, "MetropolisCore failed trying to locate world save directory", e);
+                        LogHelper.error("MetropolisCore failed trying to locate world save directory");
+                        e.printStackTrace();
                     }
                 }
             }

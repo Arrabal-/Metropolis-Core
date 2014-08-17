@@ -18,6 +18,7 @@ import net.minecraft.util.IIcon;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import java.util.Random;
 
 /**
@@ -30,7 +31,7 @@ public class BlockGlassDoor extends BlockDoor {
     @SideOnly(Side.CLIENT)
     private static IIcon[] icons_low;
 
-    protected BlockGlassDoor(){
+    public BlockGlassDoor(){
         super(Material.glass);
         this.setHarvestLevel(null, 0);
         this.setStepSound(Block.soundTypeGlass);

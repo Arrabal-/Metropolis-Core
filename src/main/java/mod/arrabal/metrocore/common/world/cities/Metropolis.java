@@ -84,7 +84,7 @@ public final class Metropolis {
         int densityFactor = (int) (genDensity * (minDistanceBetween/2));
         if ((genDensity != 0) && ((chunkX % densityFactor != 0 && chunkZ % densityFactor != 0) ||
                 (genDensity == 1))) {
-            //DebugMessenger.message("Kicking out generation attempt due to density factor");
+            //LogHelper.trace("Kicking out generation attempt due to density factor");
             return;
         }
         random = getNewRandom(world, chunkX, chunkZ);
@@ -93,7 +93,7 @@ public final class Metropolis {
         int checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(maxDistanceBetween/2) : chunkZ + random.nextInt(maxDistanceBetween/2));
 
         if (checkForSpawnConflict(world, checkX, checkZ)){
-            LogHelper.debug("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
+            LogHelper.trace("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
             return;
         }
         if (isBiomeValid(world, checkX * 16 + 8, checkZ * 16 + 8, (minGenRadius * 16)/2 + 8)){
@@ -105,7 +105,7 @@ public final class Metropolis {
             int genMinZ = (checkZ * 16) - (genRadiusZ * 16);
             int genMaxZ = (checkZ * 16) + 15 + (genRadiusZ + 16);
             if (checkForGenerationConflict(world, genMinX, genMinZ, genMaxX, genMaxZ, dataHandler)){
-                LogHelper.debug("Existing urban area intersects with or is within " + minDistanceBetween + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
+                LogHelper.trace("Existing urban area intersects with or is within " + minDistanceBetween + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]");
                 return;
             }

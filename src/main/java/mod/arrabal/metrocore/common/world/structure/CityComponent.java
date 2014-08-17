@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Evan on 6/30/2014.
+ * Created by Arrabal on 6/30/2014.
  */
 public abstract class CityComponent {
 

@@ -1,12 +1,10 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.IWorldGenerator;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.handlers.data.ChunkGenerationLogger;
 import mod.arrabal.metrocore.common.handlers.data.MetropolisDataHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
-import mod.arrabal.metrocore.common.world.ChunkGenerationLogger;
 import mod.arrabal.metrocore.common.world.cities.Metropolis;
 import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
@@ -14,6 +12,8 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderHell;
 import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.world.storage.ISaveHandler;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -22,10 +22,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
-import net.minecraft.world.storage.ISaveHandler;
-import org.apache.logging.log4j.Level;
 
 
 /**
@@ -58,7 +54,8 @@ public class WorldGenerationHandler implements IWorldGenerator {
                         return saveLocation;
                     }
                     catch (Exception e){
-                        FMLLog.log(Level.ERROR, "MetropolisCore failed trying to locate world save directory", e);
+                        LogHelper.error("MetropolisCore failed trying to locate world save directory");
+                        e.printStackTrace();
                     }
                 }
             }
@@ -73,7 +70,7 @@ public class WorldGenerationHandler implements IWorldGenerator {
         if (ConfigHandler.enableCityCreation){
             int[] tuple = {chunkX,chunkZ};
             if (currentlyGenerating.contains(tuple)){
-                FMLCommonHandler.instance().getFMLLogger().log(Level.INFO, "MetropolisCore caught recursive generator call at [" + chunkX + "' " + chunkZ + "]");
+                LogHelper.info("MetropolisCore caught recursive generator call at [" + chunkX + "' " + chunkZ + "]");
             }
             else{
                 if (!getGenerationHandle(world).chunkLogger.catchChunkBug(chunkX, chunkZ)){
@@ -143,7 +140,8 @@ public class WorldGenerationHandler implements IWorldGenerator {
             }
         }
         catch (Exception e){
-            FMLLog.log(Level.ERROR, "There was a problem loading the MetropolisCore mod", e);
+            LogHelper.error("There was a problem loading the MetropolisCore mod");
+            e.printStackTrace();
         }
     }
 
