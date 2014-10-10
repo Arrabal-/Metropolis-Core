@@ -34,9 +34,9 @@ public class MetropolisStart {
         this.baseY = avgY;
         this.spawnList = spawns;
         this.random = getNewRandom(world, chunkX, chunkZ);
-        this.originBB = new MetropolisBaseBB(world, chunkX, chunkZ, random.nextInt(4), "OriginChunk");
-        this.maxBB = new MetropolisBaseBB(world, (chunkX * 16) - (radiusX * 16), (chunkZ * 16) - (radiusZ * 16),
-                (chunkX * 16) + 15 + (radiusX * 16), (chunkZ * 16) + 15 + (radiusZ + 16), "MaxDimensions");
+        this.originBB = new MetropolisBaseBB(chunkX, chunkZ, random.nextInt(4), "OriginChunk");
+        this.maxBB = new MetropolisBaseBB((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
+                (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         this.baseType = UrbanClassification.URBAN;
         this.urbanClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
         switch (random.nextInt(12)){

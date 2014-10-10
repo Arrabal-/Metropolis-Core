@@ -3,8 +3,8 @@ package mod.arrabal.metrocore.common.handlers;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
-import mod.arrabal.metrocore.common.handlers.world.*;
-import mod.arrabal.metrocore.common.world.cities.Metropolis;
+import mod.arrabal.metrocore.common.handlers.world.TerrainGenEventHandler;
+import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import net.minecraftforge.common.MinecraftForge;
 
 /**
@@ -26,7 +26,6 @@ public class MetropolisCoreHandlers {
 
     private static void registerWorldEventHandlers() {
         MinecraftForge.TERRAIN_GEN_BUS.register(new TerrainGenEventHandler());
-        MinecraftForge.EVENT_BUS.register(new WorldEventHandler());
     }
 
     private static void registerFMLEventHandlers(){

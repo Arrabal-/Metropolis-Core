@@ -2,7 +2,6 @@ package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.world.ChunkCoordIntPair;
-import net.minecraft.world.World;
 
 import java.io.Serializable;
 
@@ -16,17 +15,17 @@ public class MetropolisBaseBB extends MetropolisBoundingBox implements Serializa
     protected int startZ;
     protected int facing;  // 0 = south : +z; 1 = west : -x; 2 = north : -z; 3 = east : +x
 
-    public MetropolisBaseBB(World world, int chunkX, int chunkZ, int iFacing, String sType){
-        super(chunkX * 16, chunkZ * 16, chunkX * 16 + 15, chunkZ * 16 + 15, sType);
+    public MetropolisBaseBB(int chunkX, int chunkZ, int iFacing, String sType){
+        super(chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15, sType);
         startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
         startX = chunkX;
         startZ = chunkZ;
         facing = iFacing;
     }
 
-    public MetropolisBaseBB(World world, int minX, int minZ, int maxX, int maxZ, String sType){
+    public MetropolisBaseBB(int minX, int minZ, int maxX, int maxZ, String sType){
         super(minX, minZ, maxX, maxZ, sType);
-        startCoord = new ChunkCoordIntPair(world.getChunkFromBlockCoords(minX, minZ).xPosition, world.getChunkFromBlockCoords(minX, minZ).zPosition);
+        startCoord = new ChunkCoordIntPair(minX >> 4, minZ >> 4);
         startX = startCoord.chunkXPos;
         startZ = startCoord.chunkZPos;
         facing = 0;

@@ -1,13 +1,11 @@
 package mod.arrabal.metrocore.common.handlers.config;
 
 import cpw.mods.fml.client.event.ConfigChangedEvent;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.library.ModOptions;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraftforge.common.config.Configuration;
-import org.apache.logging.log4j.Level;
 
 import java.io.File;
 
@@ -24,8 +22,6 @@ public class ConfigHandler {
     public static boolean overrideCraftingModDependency;
     public static int enableDebugMessages;
     public static boolean enableCityCreation;
-    public static int metropolisMinDistanceBetween;
-    public static int metropolisMaxDistanceBetween;
     public static int metropolisMinGenRadius;
     public static int metropolisMaxGenRadius;
     public static double metropolisGenDensity;
@@ -56,22 +52,17 @@ public class ConfigHandler {
             // Add configuration options here
             metropolisSpawnBlockRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "SpawnAreaBlocked", 160,
                     "Sets the radius (in BLOCKS) of the area around the spawn point that is marked as invalid for city generation").getInt(160);
-            metropolisMinDistanceBetween = config.get(ModRef.CATEGORY_CITY_GENERATION, "MinDistanceBetween", 32,
-                    "Sets the minimum allowable distance (in CHUNKS) between cities that is valid for generation").getInt(32);
-            metropolisMaxDistanceBetween = config.get(ModRef.CATEGORY_CITY_GENERATION, "MaxDistanceBetween", 75,
-                    "Sets the maximum allowable distance (in CHUNKS) between cities that is valid for generation.  Currently " +
-                            "does not function properly--changing this value will influence spawn distance but does not cap it.").getInt(75);
             metropolisMinGenRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "MinGenRadius", 2,
                     "Sets the minimum allowable size (radius), in CHUNKS, for a generated city").getInt(2);
             metropolisMaxGenRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "MaxGenRadius", 5,
                     "Sets the maximum allowable size (radius), in CHUNKS, for a generated city").getInt(5);
             metropolisGenDensity = config.get(ModRef.CATEGORY_CITY_GENERATION, "GenDensity", 0.5d,
-                    "Determines the frequency with with attemps at city generation are attempted during world generation.  " +
+                    "Determines the frequency that attempts at city generation are made during world generation, and how close together they can be.  " +
                             "Set value between 0 and 1; a value of 0 will prevent any attempt at city generation and a value of 1 will" +
-                            "always test for valid city generation locations").getDouble(0.5d);
+                            "generate many tests for valid city generation locations close together").getDouble(0.5d);
             metropolisGenRarity = config.get(ModRef.CATEGORY_CITY_GENERATION, "GenRarity", 0.5d,
-                    "Determines the probability that valid city generation locations will be skipped.  Set value between 0 and 1; " +
-                            "a value of 0 will make ANY city generation highly unlikely").getDouble(0.5d);
+                    "Determines the probability that valid city generation locations will be accepted.  Set value between 0 and 1; " +
+                            "a value of 0 will prevent ANY city generation").getDouble(1.0d);
             ruinedCityPercent = config.get(ModRef.CATEGORY_CITY_GENERATION, "RuinPopulation", 0.10d,
                     "Sets the approximate % of generated urban areas that will be heavily damaged (think Mad Max)." +
                             "  Set value from 0 (no ruined cities) to 1 (all cities ruined)").getDouble(0.10d);
@@ -81,6 +72,7 @@ public class ConfigHandler {
             LogHelper.error("MetropolisCore has had a problem loading its configuration");
         } finally {
             if (config.hasChanged()) {
+                ModOptions.init();
                 config.save();
             }
         }

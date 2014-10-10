@@ -77,7 +77,7 @@ public class ChunkGenerationLogger extends WorldSavedData {
 
         xCoords.add(chunkX);
         zCoords.add(chunkZ);
-        setDirty(true);
+        this.markDirty();
 
         return false;
     }

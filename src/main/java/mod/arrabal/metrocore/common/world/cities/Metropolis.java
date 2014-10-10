@@ -2,9 +2,9 @@ package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.api.StatsHelper;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
-import mod.arrabal.metrocore.common.handlers.data.MetropolisDataHandler;
-import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.library.ModOptions;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
@@ -23,16 +23,15 @@ public final class Metropolis {
     private static List spawnList;
 
     private static BiomeDictionary.Type[] allowedBiomeTypes = {
-            BiomeDictionary.Type.FOREST, BiomeDictionary.Type.PLAINS, BiomeDictionary.Type.DESERT, BiomeDictionary.Type.FROZEN,
-            BiomeDictionary.Type.JUNGLE, BiomeDictionary.Type.WASTELAND, BiomeDictionary.Type.MAGICAL};
+            BiomeDictionary.Type.MESA, BiomeDictionary.Type.FOREST, BiomeDictionary.Type.PLAINS,
+            BiomeDictionary.Type.SANDY, BiomeDictionary.Type.SNOWY,BiomeDictionary.Type.WASTELAND};
     private static BiomeDictionary.Type[] disallowedBiomeTypes = {BiomeDictionary.Type.MOUNTAIN, BiomeDictionary.Type.SWAMP,
-            BiomeDictionary.Type.WATER, BiomeDictionary.Type.BEACH, BiomeDictionary.Type.NETHER, BiomeDictionary.Type.END,
+            BiomeDictionary.Type.OCEAN, BiomeDictionary.Type.BEACH, BiomeDictionary.Type.NETHER, BiomeDictionary.Type.END,
             BiomeDictionary.Type.MUSHROOM, BiomeDictionary.Type.HILLS};
     private static List allowedBiomeList;
     private static List disallowedBiomeTypeList;
 
     private static int minDistanceBetween;
-    private static int maxDistanceBetween;
     private static int minGenRadius;
     private static int maxGenRadius;
     private static int spawnBlockRadius;
@@ -45,23 +44,23 @@ public final class Metropolis {
     private static final int RAND_SEED = 15456985;
 
     public Metropolis() {
-        minDistanceBetween = ConfigHandler.metropolisMinDistanceBetween;
-        maxDistanceBetween = ConfigHandler.metropolisMaxDistanceBetween;
+        minDistanceBetween = ModOptions.BASE_DIST_BETWEEN_CITY;
         minGenRadius = ConfigHandler.metropolisMinGenRadius;
         maxGenRadius = ConfigHandler.metropolisMaxGenRadius;
         if (ConfigHandler.metropolisGenDensity >= 1d){
-            genDensity = 0;
+            genDensity = 1d;
         }
         if (ConfigHandler.metropolisGenDensity < 0d){
-            genDensity = 1;
+            genDensity = 0d;
         }
         else{
-            genDensity = 1d / (1d - ConfigHandler.metropolisGenDensity);
+            genDensity = 1d / ConfigHandler.metropolisGenDensity;
         }
         genRarity = ConfigHandler.metropolisGenRarity;
         spawnBlockRadius = ConfigHandler.metropolisSpawnBlockRadius;
         initBiomeLists();
         spawnList = new ArrayList();
+        spawnPointBlock = null;
     }
 
 
@@ -70,42 +69,49 @@ public final class Metropolis {
     private static MetropolisBaseBB blockSpawnArea(World world, int radius){
         int spawnMinX = world.getSpawnPoint().posX - radius;
         int spawnMinZ = world .getSpawnPoint().posZ - radius;
-        return new MetropolisBaseBB(world, spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
-    }
-
-    public static MetropolisBaseBB doBlockSpawnArea(World world){
-        return blockSpawnArea(world, spawnBlockRadius);
+        return new MetropolisBaseBB(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
     }
 
     // Called during world generation to calculate necessary variables and test location for suitability.  If spawning criteria are met
     // will call doGenerateMetropolisStart()
-    public static void generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisDataHandler dataHandler){
+    public static void generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
-        int densityFactor = (int) (genDensity * (minDistanceBetween/2));
-        if ((genDensity != 0) && ((chunkX % densityFactor != 0 && chunkZ % densityFactor != 0) ||
-                (genDensity == 1))) {
-            //LogHelper.trace("Kicking out generation attempt due to density factor");
+        int densityFactor = ModOptions.metropolisMinDistanceBetween;
+        if ((genDensity == 0 || ((chunkX % densityFactor != 0 && chunkZ % densityFactor != 0)))){
+            LogHelper.trace("Kicking out generation attempt due to density factor");
             return;
         }
+
+
         random = getNewRandom(world, chunkX, chunkZ);
 
-        int checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(maxDistanceBetween/2) : chunkX + random.nextInt(maxDistanceBetween/2));
-        int checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(maxDistanceBetween/2) : chunkZ + random.nextInt(maxDistanceBetween/2));
+        double testForPlayer = (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4;
+        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, testForPlayer);
+        int checkX, checkZ;
+
+        if (entityplayer != null) {
+            checkX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
+            checkZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
+        }
+        else {
+            checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift));
+            checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift));
+        }
 
         if (checkForSpawnConflict(world, checkX, checkZ)){
             LogHelper.trace("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
             return;
         }
-        if (isBiomeValid(world, checkX * 16 + 8, checkZ * 16 + 8, (minGenRadius * 16)/2 + 8)){
+        if (isBiomeValid(world, (checkX << 4) + 8, (checkZ << 4) + 8, (minGenRadius << 4)/2 + 8)){
 
             int genRadiusX = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
             int genRadiusZ = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
-            int genMinX = (checkX * 16) - (genRadiusX * 16);
-            int genMaxX = (checkX * 16) + 15 + (genRadiusX * 16);
-            int genMinZ = (checkZ * 16) - (genRadiusZ * 16);
-            int genMaxZ = (checkZ * 16) + 15 + (genRadiusZ + 16);
-            if (checkForGenerationConflict(world, genMinX, genMinZ, genMaxX, genMaxZ, dataHandler)){
-                LogHelper.trace("Existing urban area intersects with or is within " + minDistanceBetween + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
+            int genMinX = (checkX << 4) - (genRadiusX << 4);
+            int genMaxX = (checkX << 4) + 15 + (genRadiusX << 4);
+            int genMinZ = (checkZ << 4) - (genRadiusZ << 4);
+            int genMaxZ = (checkZ << 4) + 15 + (genRadiusZ << 4);
+            if (checkForGenerationConflict(genMinX, genMinZ, genMaxX, genMaxZ, handler)){
+                LogHelper.trace("Existing urban area intersects with or is within " + densityFactor + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]");
                 return;
             }
@@ -118,8 +124,8 @@ public final class Metropolis {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
                 //temporary for testing
-                WorldGenerationHandler.addToBlacklistMap(new MetropolisBaseBB(world, genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
-                doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ);
+                handler.addToBlacklistMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
+                doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
             }
             else {
                 String sString = "";
@@ -131,20 +137,21 @@ public final class Metropolis {
 
     }
 
-    private static void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius){
-        // determine spawn list
+    private static void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius, MetropolisGenerationContainer handler){
+        // TODO: determine spawn list
         MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, spawnList);
-        WorldGenerationHandler.cityStartMap.put(start.getStartKey(), start);
+        handler.addToStartMap(start);
     }
 
     private static boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
-        MetropolisBaseBB checkSpawnBlock = blockSpawnArea(world, spawnBlockRadius);
-        return checkSpawnBlock.isVecInside(chunkX * 16, 64, chunkZ * 16);
+        if (spawnPointBlock == null){
+            spawnPointBlock = blockSpawnArea(world, spawnBlockRadius);
+        }
+        return spawnPointBlock.isVecInside(chunkX << 4, 64, chunkZ << 4);
     }
 
-    private static boolean checkForGenerationConflict(World world, int minPosX, int minPosZ, int maxPosX, int maxPosZ, MetropolisDataHandler dataHandler){
-        return WorldGenerationHandler.checkUrbanGenerationConflict(world, new MetropolisBaseBB(world, minPosX, minPosZ,
-                maxPosX, maxPosZ,"GenerationCheck"), dataHandler);
+    private static boolean checkForGenerationConflict(int minPosX, int minPosZ, int maxPosX, int maxPosZ, MetropolisGenerationContainer handler){
+        return handler.doConflictCheck(new MetropolisBaseBB(minPosX, minPosZ,maxPosX, maxPosZ,"GenerationCheck"));
     }
 
     @SuppressWarnings("unchecked")
@@ -240,8 +247,8 @@ public final class Metropolis {
 
     public static Random getNewRandom(World world, int chunkX, int chunkZ){
         Random random = new Random(world.getSeed());
-        long l = (chunkX / maxDistanceBetween) * (random.nextLong()+ 1L);
-        long l2 = (chunkZ / maxDistanceBetween) * (random.nextLong() + 1L);
+        long l = (chunkX / ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L);
+        long l2 = (chunkZ / ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L);
         long l3 = (l * l2) * (random.nextLong()+1L);
         random.setSeed(l3 ^ world.getSeed());
         return random;
