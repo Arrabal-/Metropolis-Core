@@ -8,3 +8,8 @@ gradle
 options.txt
 config
 run
+.idea
+logs
+mods
+resourcepacks
+saves
