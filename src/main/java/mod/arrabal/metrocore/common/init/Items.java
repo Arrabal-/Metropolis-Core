@@ -7,11 +7,12 @@ import net.minecraft.item.Item;
 /**
  * Created by Arrabal on 12/23/13.
  */
+
 public class Items {
 
     public static void init() {
 
-        //Doors
+        //Doors here
         registerItem(new ItemGlassDoor().setUnlocalizedName("itemDoorGlass"));
     }
 

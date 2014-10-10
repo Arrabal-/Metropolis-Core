@@ -17,12 +17,13 @@ import net.minecraft.item.ItemBlock;
 /**
  * Created by Arrabal on 12/19/13.
  */
+
 @GameRegistry.ObjectHolder(ModRef.MOD_ID)
 public class Blocks {
 
     //public static Block doorGlass;
 
-    //Blocks
+    //Blocks for future use
     public static Block cementBlock;
     public static Block polishedCementBlock;
     

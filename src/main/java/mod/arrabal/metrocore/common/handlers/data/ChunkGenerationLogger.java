@@ -9,6 +9,8 @@ import java.util.ArrayList;
 /**
  * Created by Arrabal on 6/16/2014.
  */
+
+//need to document
 public class ChunkGenerationLogger extends WorldSavedData {
 
     private final ArrayList<Integer> xCoords;
