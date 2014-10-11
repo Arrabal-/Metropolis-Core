@@ -7,6 +7,9 @@ import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
  */
 public class ModOptions {
     public static final int BASE_DIST_BETWEEN_CITY = 96;
+    public static final String DEBUG_OFF = "off";
+    public static final String DEBUG_ON = "on";
+    public static final String DEBUG_TRACE = "trace";
 
     public static int metropolisMinDistanceBetween;
     public static int metropolisAxisSpawnLength;

@@ -40,8 +40,7 @@ public class MetropolisGenerationContainer {
             if (this.dataHandler.isGenMapEmpty()){
                 this.dataHandler.setGenMap(this.cityMap.getBoundingBoxMap());
             }
-            Metropolis.generateMetropolis(random, chunkX, chunkZ, world, this);
-            return true;
+            return Metropolis.generateMetropolis(random, chunkX, chunkZ, world, this);
         }
         return false;
     }
@@ -78,7 +77,7 @@ public class MetropolisGenerationContainer {
 
     public void addToBlacklistMap(MetropolisBaseBB urbanArea) {
         this.dataHandler.addToBoundingBoxMap(urbanArea);
-        //this.cityMap.saveBoundingBoxData(urbanArea);
+        this.cityMap.saveBoundingBoxData(urbanArea);
     }
 
     public void addToStartMap(MetropolisStart start){

@@ -17,10 +17,11 @@ public class ConfigHandler {
     public static File worldFile;
 
     public static Configuration config;
+    private static String[] validDebugValues = {ModOptions.DEBUG_OFF,ModOptions.DEBUG_ON,ModOptions.DEBUG_TRACE};
 
     //configuration variables
     public static boolean overrideCraftingModDependency;
-    public static int enableDebugMessages;
+    public static String enableDebugMessages;
     public static boolean enableCityCreation;
     public static int metropolisMinGenRadius;
     public static int metropolisMaxGenRadius;
@@ -43,9 +44,8 @@ public class ConfigHandler {
             //mod options
             overrideCraftingModDependency = config.get(ModRef.CATEGORY_MOD_MECHANICS, "DependencyOverrides", false,
                     "Enable to allow crafting recipes without MetropolisResources mod.  Having mod installed deprecates this setting").getBoolean(false);
-            enableDebugMessages = config.get(ModRef.CATEGORY_MOD_MECHANICS, "EnableDebugMessages", 0,
-                    "Enable to generate internal debug messages.  0 - disables debug messages; 1 - enables debug messages in the log; " +
-                            "2 - enables debug and trace messages in the log.  Probably don't want to do this unless you like console spam.").getInt(0);
+            enableDebugMessages = config.get(ModRef.CATEGORY_MOD_MECHANICS, "DebugMode", "off",
+                    "Enable to generate internal debug messages.", validDebugValues).getString();
             enableCityCreation = config.get(ModRef.CATEGORY_MOD_MECHANICS, "EnableCityGeneration", true,
                     "Disable to prevent ANY cities from spawning in the world.  This is a core mod feature, so only disable if you really mean it.").getBoolean(true);
 

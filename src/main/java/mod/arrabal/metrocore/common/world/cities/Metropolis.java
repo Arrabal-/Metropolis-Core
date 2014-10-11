@@ -52,11 +52,15 @@ public final class Metropolis {
         }
         if (ConfigHandler.metropolisGenDensity < 0d){
             genDensity = 0d;
-        }
-        else{
+        } else{
             genDensity = 1d / ConfigHandler.metropolisGenDensity;
         }
         genRarity = ConfigHandler.metropolisGenRarity;
+        if (genRarity > 1d) {
+            genRarity = 1.0d;
+        } else if (genRarity < 0d){
+            genRarity = 0d;
+        }
         spawnBlockRadius = ConfigHandler.metropolisSpawnBlockRadius;
         initBiomeLists();
         spawnList = new ArrayList();
@@ -74,21 +78,20 @@ public final class Metropolis {
 
     // Called during world generation to calculate necessary variables and test location for suitability.  If spawning criteria are met
     // will call doGenerateMetropolisStart()
-    public static void generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
+    public static boolean generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
         int densityFactor = ModOptions.metropolisMinDistanceBetween;
         if ((genDensity == 0 || ((chunkX % densityFactor != 0 && chunkZ % densityFactor != 0)))){
             LogHelper.trace("Kicking out generation attempt due to density factor");
-            return;
+            return false;
         }
 
 
         random = getNewRandom(world, chunkX, chunkZ);
 
-        double testForPlayer = (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4;
-        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, testForPlayer);
-        int checkX, checkZ;
+        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
 
+        int checkX, checkZ;
         if (entityplayer != null) {
             checkX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
             checkZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
@@ -97,10 +100,9 @@ public final class Metropolis {
             checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift));
             checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift));
         }
-
         if (checkForSpawnConflict(world, checkX, checkZ)){
             LogHelper.trace("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
-            return;
+            return false;
         }
         if (isBiomeValid(world, (checkX << 4) + 8, (checkZ << 4) + 8, (minGenRadius << 4)/2 + 8)){
 
@@ -113,19 +115,18 @@ public final class Metropolis {
             if (checkForGenerationConflict(genMinX, genMinZ, genMaxX, genMaxZ, handler)){
                 LogHelper.trace("Existing urban area intersects with or is within " + densityFactor + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]");
-                return;
+                return false;
             }
-            int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ);
+            int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ, 100);
             int checkY = StatsHelper.getStaticMean(heightMap);
             int devY = StatsHelper.getStaticStandardDeviation(heightMap, checkY);
-            // insert check against genRarity to see if valid location should be thrown out to make population more scarce.  Can't be a
-            // straight randomly generated value since it will use the same value for each generation attempt.
-            if (devY < 4 /*&& random.nextDouble() <= genRarity*/) {
+            Random rarityCheck = new Random(world.getWorldTime());
+            if (devY < 4 && rarityCheck.nextDouble() <= genRarity) {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
-                //temporary for testing
                 handler.addToBlacklistMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
-                doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
+                return true;
+                //doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
             }
             else {
                 String sString = "";
@@ -134,7 +135,7 @@ public final class Metropolis {
                         genMaxX + ", " + genMaxZ + "]. Ground height deviation:  " + devY + sString);
             }
         }
-
+        return false;
     }
 
     private static void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius, MetropolisGenerationContainer handler){
@@ -232,20 +233,31 @@ public final class Metropolis {
         return false;
     }
 
-    private static int[] getGroundHeightMap(World world, int minX, int minZ, int maxX, int maxZ){
-        int blocks = (maxX - minX) * (maxZ - minZ);
-        int[] heightMap = new int[blocks];
-        int index = 0;
-        for (int i = minX; i < maxX; i++){
-            for (int j = minZ; j < maxZ; j++){
-                heightMap[index] = world.getTopSolidOrLiquidBlock(i, j) - 1;
-                index += 1;
+    public static int[] getGroundHeightMap(World world, int minX, int minZ, int maxX, int maxZ, int sampleSize){
+        //Attempting to improve efficiency by only taking a sample of the height map
+        int[] heightMap;
+        if (sampleSize > 0) {
+            heightMap = new int[sampleSize];
+            Random heightCheck = new Random(world.getWorldTime());
+            for (int i = 0; i < sampleSize; i++) {
+                heightMap[i] = world.getTopSolidOrLiquidBlock(heightCheck.nextInt(maxX - minX) + minX,
+                        heightCheck.nextInt(maxZ - minZ) + minZ) - 1;
+            }
+        } else {
+            int blocks = (maxX - minX) * (maxZ - minZ);
+            heightMap = new int[blocks];
+            int index = 0;
+            for (int i = minX; i < maxX; i++) {
+                for (int j = minZ; j < maxZ; j++) {
+                    heightMap[index] = world.getTopSolidOrLiquidBlock(i, j) - 1;
+                    index += 1;
+                }
             }
         }
         return heightMap;
     }
 
-    public static Random getNewRandom(World world, int chunkX, int chunkZ){
+    private static Random getNewRandom(World world, int chunkX, int chunkZ){
         Random random = new Random(world.getSeed());
         long l = (chunkX / ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L);
         long l2 = (chunkZ / ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L);
