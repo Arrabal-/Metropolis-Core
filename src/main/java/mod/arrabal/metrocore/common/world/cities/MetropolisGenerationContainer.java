@@ -75,7 +75,7 @@ public class MetropolisGenerationContainer {
         return this.chunkLogger.catchChunkBug(chunkX, chunkZ);
     }
 
-    public void addToBlacklistMap(MetropolisBaseBB urbanArea) {
+    public void addToGenerationMap(MetropolisBaseBB urbanArea) {
         this.dataHandler.addToBoundingBoxMap(urbanArea);
         this.cityMap.saveBoundingBoxData(urbanArea);
     }

@@ -124,9 +124,9 @@ public final class Metropolis {
             if (devY < 4 && rarityCheck.nextDouble() <= genRarity) {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
-                handler.addToBlacklistMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
+                handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
+                doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
                 return true;
-                //doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
             }
             else {
                 String sString = "";
