@@ -4,6 +4,7 @@ import mod.arrabal.metrocore.api.StatsHelper;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModOptions;
+import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.village.Village;
 import net.minecraft.world.World;
@@ -139,7 +140,13 @@ public final class Metropolis {
     }
 
     private static void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius, MetropolisGenerationContainer handler){
-        // TODO: determine spawn list
+        if (spawnList.isEmpty()){
+            spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySkeleton.class, 100, 4, 4));
+            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityZombie.class, 100, 4, 4));
+            spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySpider.class, 100, 4, 4));
+            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
+            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
+        }
         MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, spawnList);
         handler.addToStartMap(start);
     }

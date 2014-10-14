@@ -74,7 +74,7 @@ public class WorldGenerationHandler implements IWorldGenerator {
                     else{
                         //normal
                         if (handler.doGenerateSurfaceMetropolis(world, random, chunkX, chunkZ)){
-                            //TODO:  Generate Starts
+                            //maybe do something.
                         }
                     }
                     this.currentlyGenerating.remove(tuple);
