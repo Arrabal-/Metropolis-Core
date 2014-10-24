@@ -1,6 +1,5 @@
 package mod.arrabal.metrocore.common.world;
 
-import mod.arrabal.metrocore.common.world.cities.Metropolis;
 
 /**
  * Created by Arrabal on 6/11/2014.

@@ -23,7 +23,7 @@ public class TerrainGenEventHandler {
                 break;
             case 0:
                 // overworld
-                handler.doCityGeneration(event.world, event.chunkX, event.chunkZ);
+                handler.doBuildMetropolis(event.world, event.chunkX, event.chunkZ);
                 break;
             case 1:
                 // the end

@@ -20,6 +20,9 @@ import java.util.Random;
 
 /**
  * Created by Arrabal on 6/30/2014.
+ *
+ * Base class for structures and tiles used for generating and building cities.  Class
+ * is extended as part of the individual subclasses within CityComponentPieces
  */
 public abstract class CityComponent {
 

@@ -2,6 +2,7 @@ package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.api.StatsHelper;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModOptions;
 import net.minecraft.entity.monster.*;
@@ -21,7 +22,7 @@ import java.util.Random;
  */
 public final class Metropolis {
 
-    private static List spawnList;
+    private List spawnList;
 
     private static BiomeDictionary.Type[] allowedBiomeTypes = {
             BiomeDictionary.Type.MESA, BiomeDictionary.Type.FOREST, BiomeDictionary.Type.PLAINS,
@@ -126,7 +127,7 @@ public final class Metropolis {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
                 handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
-                doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ, handler);
+                handler.doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ);
                 return true;
             }
             else {
@@ -139,16 +140,18 @@ public final class Metropolis {
         return false;
     }
 
-    private static void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius, MetropolisGenerationContainer handler){
-        if (spawnList.isEmpty()){
-            spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySkeleton.class, 100, 4, 4));
-            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityZombie.class, 100, 4, 4));
-            spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySpider.class, 100, 4, 4));
-            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
-            spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
+    @SuppressWarnings("unchecked")
+    public void generateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius){
+        if (this.spawnList.isEmpty()){
+            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySkeleton.class, 100, 4, 4));
+            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityZombie.class, 100, 4, 4));
+            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySpider.class, 100, 4, 4));
+            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
+            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
         }
-        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, spawnList);
-        handler.addToStartMap(start);
+        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, this.spawnList);
+        WorldGenerationHandler.getGenContainerFromWorld(world).addToStartMap(start);
+        start.generate(world);
     }
 
     private static boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){

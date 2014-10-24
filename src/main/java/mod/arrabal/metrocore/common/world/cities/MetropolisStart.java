@@ -1,21 +1,28 @@
 package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.world.structure.CityComponent;
+import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
 /**
  * Created by Arrabal on 6/24/2014.
+ *
+ * Class container for the metadata information on the city to be spawned
  */
+
 public class MetropolisStart {
 
-    private MetropolisBaseBB originBB, maxBB;
+    private MetropolisBaseBB originBB, maxBB, footPrint;
     private ChunkCoordIntPair startCoord;
     private int maxXGenRadius, maxZGenRadius;
     private int baseY;
+    private Integer calledByX, calledByZ;
     private UrbanClassification baseType;
     private UrbanType urbanClass;
     private RoadGrid roadLayout;
@@ -23,20 +30,27 @@ public class MetropolisStart {
     private List spawnList;
     private boolean currentlyBuilding;
     private Random random;
+    private HashMap<String, CityComponent> componentMap;
 
 
     public MetropolisStart() {}
 
     public MetropolisStart(World world, int chunkX, int chunkZ, int avgY, int radiusX, int radiusZ, List spawns){
         this.startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
+        this.componentMap = new HashMap<String, CityComponent>();
         this.maxXGenRadius = radiusX;
         this.maxZGenRadius = radiusZ;
         this.baseY = avgY;
         this.spawnList = spawns;
+        this.calledByX = null;
+        this.calledByZ = null;
         this.random = getNewRandom(world, chunkX, chunkZ);
-        this.originBB = new MetropolisBaseBB(chunkX, chunkZ, random.nextInt(4), "OriginChunk");
+        int facing;
+        facing = random.nextInt(4);
+        this.originBB = new MetropolisBaseBB(chunkX, chunkZ, facing, "OriginChunk");
         this.maxBB = new MetropolisBaseBB((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
+        this.footPrint = new MetropolisBaseBB(chunkX, chunkZ, facing, "CityFootprint");
         this.baseType = UrbanClassification.URBAN;
         this.urbanClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
         switch (random.nextInt(12)){
@@ -87,13 +101,10 @@ public class MetropolisStart {
 
     public boolean generate(World world) {
 
-        return false;
-    }
+        int genChunkX, genChunkZ;
+        genChunkX = this.startCoord.chunkXPos;
+        genChunkZ = this.startCoord.chunkZPos;
 
-    public boolean generate(World world, int chunkX, int chunkZ){
-        if (!this.currentlyBuilding){
-            generate(world);
-        }
         return false;
     }
 

@@ -62,7 +62,7 @@ public class WorldGenerationHandler implements IWorldGenerator {
                 LogHelper.info("MetropolisCore caught recursive generator call at [" + chunkX + "' " + chunkZ + "]");
             }
             else{
-                MetropolisGenerationContainer handler = getGenerationContainer(world);
+                MetropolisGenerationContainer handler = getGenContainerFromWorld(world);
                 if (!handler.catchChunkBug(chunkX, chunkZ)){
                     this.currentlyGenerating.add(tuple);
                     if (world.provider instanceof WorldProviderHell){
@@ -82,20 +82,6 @@ public class WorldGenerationHandler implements IWorldGenerator {
             }
 
         }
-    }
-
-    private MetropolisGenerationContainer getGenerationContainer(World world){
-        MetropolisGenerationContainer handler = null;
-        if (!world.isRemote){
-            if (!generatorMap.containsKey(world.provider.dimensionId)){
-                handler = new MetropolisGenerationContainer(world);
-                generatorMap.put(world.provider.dimensionId,handler);
-            }
-            else{
-                handler = generatorMap.get(world.provider.dimensionId);
-            }
-        }
-        return handler;
     }
 
     public static MetropolisGenerationContainer getGenContainerFromWorld(World world){

@@ -45,12 +45,15 @@ public class MetropolisGenerationContainer {
         return false;
     }
 
-    public boolean doCityGeneration(World world, int chunkX, int chunkZ){
+    public boolean doBuildMetropolis(World world, int chunkX, int chunkZ){
+        //TODO:  Need to revise this to use the structure start class (not written yet) to actually spawn the city
         ChunkCoordIntPair genCoords = new ChunkCoordIntPair(chunkX, chunkZ);
         if (this.dataHandler.startMapContainsKey(genCoords.toString())){
             MetropolisStart start = this.dataHandler.getStartFromKey(genCoords.toString());
             if (!start.getCurrentlyBuilding()){
-                return start.generate(world);
+                //flip currently building to true
+                //call start method from structure class
+                return false; //start.generate(world);
             }
         }
         MetropolisStart start = null;
@@ -63,7 +66,11 @@ public class MetropolisGenerationContainer {
                 validGenChunk = true;
             }
         }
-        if (validGenChunk) { return start.generate(world, chunkX, chunkZ); }
+        if (validGenChunk && !start.getCurrentlyBuilding()) {
+            //flip currently building to true
+            //call start method from structure class
+            return false; //start.generate(world, chunkX, chunkZ);
+        }
         return false;
     }
 
@@ -83,4 +90,9 @@ public class MetropolisGenerationContainer {
     public void addToStartMap(MetropolisStart start){
         this.dataHandler.addToStartMap(start);
     }
+
+    public void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius) {
+        this.generator.generateMetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius);
+    }
+
 }
