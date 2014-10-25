@@ -8,43 +8,51 @@ import java.io.Serializable;
 /**
  * Created by Arrabal on 6/13/2014.
  */
-public class MetropolisBaseBB extends MetropolisBoundingBox implements Serializable{
+public class MetropolisBaseBB extends MetropolisBoundingBox {
 
-    protected transient ChunkCoordIntPair startCoord;
+    protected ChunkCoordIntPair startCoord;
     protected int startX;
     protected int startZ;
     protected int facing;  // 0 = south : +z; 1 = west : -x; 2 = north : -z; 3 = east : +x
 
     public MetropolisBaseBB(int chunkX, int chunkZ, int iFacing, String sType){
         super(chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15, sType);
-        startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
-        startX = chunkX;
-        startZ = chunkZ;
-        facing = iFacing;
+        this.startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
+        this.startX = chunkX;
+        this.startZ = chunkZ;
+        this.facing = iFacing;
+    }
+
+    public MetropolisBaseBB(int minX, int minY, int minZ, int maxX, int maxY, int maxZ, int iFacing, String sType){
+        super(minX, minY, minZ, maxX, maxY, maxZ, sType);
+        this.startCoord = new ChunkCoordIntPair(minX >> 4, minZ >> 4);
+        this.startX = startCoord.chunkXPos;
+        this.startZ = startCoord.chunkZPos;
+        this.facing = iFacing;
     }
 
     public MetropolisBaseBB(int minX, int minZ, int maxX, int maxZ, String sType){
         super(minX, minZ, maxX, maxZ, sType);
-        startCoord = new ChunkCoordIntPair(minX >> 4, minZ >> 4);
-        startX = startCoord.chunkXPos;
-        startZ = startCoord.chunkZPos;
-        facing = 0;
+        this.startCoord = new ChunkCoordIntPair(minX >> 4, minZ >> 4);
+        this.startX = startCoord.chunkXPos;
+        this.startZ = startCoord.chunkZPos;
+        this.facing = 0;
     }
 
     public MetropolisBaseBB(String sData){
         super(sData);
         String[] split = sData.split(" ");
-        startX = Integer.valueOf(split[7]);
-        startZ = Integer.valueOf(split[8]);
-        startCoord = new ChunkCoordIntPair(startX, startZ);
-        facing = Integer.valueOf(split[9]);
+        this.startX = Integer.valueOf(split[7]);
+        this.startZ = Integer.valueOf(split[8]);
+        this.startCoord = new ChunkCoordIntPair(startX, startZ);
+        this.facing = Integer.valueOf(split[9]);
     }
 
     public String coordToString(){
         return startCoord.toString();
     }
 
-    public void contractBBPlane(int contract, int direction, boolean symmetrical){
+    public void contractPlane(int contract, int direction, boolean symmetrical){
         if (symmetrical){
             if (direction == 0 || direction == 2){
                 this.minZ += contract;
@@ -71,7 +79,7 @@ public class MetropolisBaseBB extends MetropolisBoundingBox implements Serializa
         }
     }
 
-    public void contractBBHeight(int contract, int direction, boolean symmetrical){
+    public void contractHeight(int contract, int direction, boolean symmetrical){
         if (symmetrical){
             this.minY += contract;
             this.maxY -= contract;
@@ -88,8 +96,8 @@ public class MetropolisBaseBB extends MetropolisBoundingBox implements Serializa
     @Override
     public String toString(){
         return this.minX + " " + this.minY + " " + this.minZ + " " + this.maxX +
-                " " + this.maxY + " " + this.maxZ + " " + this.name + " " + startX + " " +
-                startZ + " " + facing;
+                " " + this.maxY + " " + this.maxZ + " " + this.name + " " + this.startX + " " +
+                this.startZ + " " + this.facing;
     }
 
     public int getSquaredDistance(MetropolisBaseBB mBB, boolean center){

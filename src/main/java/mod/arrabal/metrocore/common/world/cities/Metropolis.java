@@ -151,7 +151,6 @@ public final class Metropolis {
         }
         MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, this.spawnList);
         WorldGenerationHandler.getGenContainerFromWorld(world).addToStartMap(start);
-        start.generate(world);
     }
 
     private static boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
@@ -254,11 +253,11 @@ public final class Metropolis {
                         heightCheck.nextInt(maxZ - minZ) + minZ) - 1;
             }
         } else {
-            int blocks = (maxX - minX) * (maxZ - minZ);
+            int blocks = (maxX - minX + 1) * (maxZ - minZ + 1);
             heightMap = new int[blocks];
             int index = 0;
-            for (int i = minX; i < maxX; i++) {
-                for (int j = minZ; j < maxZ; j++) {
+            for (int i = minX; i < maxX + 1; i++) {
+                for (int j = minZ; j < maxZ + 1; j++) {
                     heightMap[index] = world.getTopSolidOrLiquidBlock(i, j) - 1;
                     index += 1;
                 }

@@ -773,6 +773,11 @@ public abstract class CityComponent {
         }
     }
 
+    public String getHashKey(){
+        return this.boundingBox.minX + " " + this.boundingBox.minY  + " " + this.boundingBox.minZ + " " +
+                this.boundingBox.maxX + " " + this.boundingBox.maxY + " " + this.boundingBox.maxZ;
+    }
+
     public abstract static class BlockSelector{
 
         protected Block block;

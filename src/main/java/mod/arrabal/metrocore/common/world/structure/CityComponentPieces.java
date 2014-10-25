@@ -1,9 +1,11 @@
 package mod.arrabal.metrocore.common.world.structure;
 
 import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
+import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -15,9 +17,6 @@ import java.util.Random;
  * CityComponent class
  */
 public class CityComponentPieces {
-
-    private static ArrayList cityTiles;
-    private static ArrayList buildingComponents;
 
     public static void registerCityComponents(){
 
@@ -84,14 +83,21 @@ public class CityComponentPieces {
 
             return null;
         }
+
     }
 
     public static class CitySquare extends CityComponentPieces.Metropolis {
 
         public CitySquare() {}
 
-        protected CitySquare(int tileTypeID, CityComponentPieces.Start start, Random random, int chunkX, int chunkZ) {
+        protected CitySquare(int tileTypeID, CityComponentPieces.Start start, Random random) {
             super(tileTypeID, start);
+        }
+
+        protected CitySquare(int tileTypeID, int chunkX, int chunkZ, int baseY, CityComponentPieces.Start start, Random random){
+            super(tileTypeID, start);
+            this.boundingBox = new MetropolisCityPlan(chunkX << 4, 1, chunkZ << 4, (chunkX << 4) + 15, baseY, (chunkZ << 4) + 15,
+                    random.nextInt(4), "OriginSquare");
         }
 
         @Override
@@ -104,13 +110,20 @@ public class CityComponentPieces {
 
         public boolean isRuins;
         public CityComponentPieces.CityWeight cityWeight;
-        public List weightedCityComponentList;
-        public List weightedBuildingList;
+        public HashMap<String, CityComponentPieces.Metropolis> weightedCityComponentList;
+        public HashMap<String, CityComponentPieces.Building> weightedBuildingList;
+
+        public MetropolisStart.UrbanType citySize;
+        public MetropolisStart.RoadGrid roadGrid;
+        public MetropolisBaseBB maxSize;
+        public MetropolisCityPlan cityPlan;
 
         public Start() {}
 
-        public Start(int tileTypeID, CityComponentPieces.Start cityStart, Random random, int chunkX, int chunkZ, List cityList, List buildingList) {
-            super(0, null, random, chunkX, chunkZ);
+        public Start(int tileTypeID, Random random, int chunkX, int chunkZ, int baseY, List cityList, List buildingList) {
+            super(0, chunkX, chunkZ, baseY, null, random);
+            this.cityPlan = new MetropolisCityPlan(chunkX << 4, 1, chunkZ << 4, (chunkX << 4) + 15, baseY, (chunkZ << 4) + 15,
+                    random.nextInt(4), "UrbanLayout");
         }
 
     }
@@ -137,7 +150,7 @@ public class CityComponentPieces {
         }
     }
 
-    public static class CityPlaza extends CityComponentPieces.Metropolis {
+    public static class CityPlaza extends CityComponentPieces.CitySquare {
 
         @Override
         public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
@@ -169,6 +182,15 @@ public class CityComponentPieces {
 
     }
 
+    public static class NeighborhoodAlley extends CityComponentPieces.NeighborhoodDistrict {
+
+        public NeighborhoodAlley() {}
+
+        protected NeighborhoodAlley(int tileTypeID, CityComponentPieces.Start start) {
+            super(tileTypeID, start);
+        }
+    }
+
     public static class MunicipalDistrict extends CityComponentPieces.CityPlaza {
 
     }
@@ -178,13 +200,16 @@ public class CityComponentPieces {
         protected int totalLevels;
         protected int orientation;
         protected CityComponentPieces.Start startPiece;
+        private ArrayList floorPlan;
 
         public Building() {}
 
         protected Building(int tileTypeID, int stories, int facing){
             super(tileTypeID);
-            totalLevels = stories;
-            orientation = facing;
+            this.totalLevels = stories;
+            this.orientation = facing;
+            this.floorPlan = new ArrayList();
+
         }
 
         protected CityComponent getNextBuldingLevel() {
