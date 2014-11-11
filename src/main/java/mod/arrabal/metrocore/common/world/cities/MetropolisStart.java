@@ -41,15 +41,16 @@ public class MetropolisStart {
         this.random = getNewRandom(world, chunkX, chunkZ);
         this.baseType = UrbanClassification.URBAN;
         currentlyBuilding = false;
-        List tileList = CityComponentPieces.getCityComponentWeightsLists(random, false);
-        List structureList = CityComponentPieces.getCityComponentWeightsLists(random, true);
-        this.cityLayoutStart = new CityComponentPieces.Start(0, random, chunkX, chunkZ, avgY, tileList, structureList);
+        UrbanType cityClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
+        List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, false);
+        List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, true);
+        this.cityLayoutStart = new CityComponentPieces.Start(0, getStartVariant(random, cityClass), random, chunkX, chunkZ, avgY, tileList, structureList);
         cityLayoutStart.maxSize = new MetropolisBaseBB((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
-        cityLayoutStart.citySize = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
+        cityLayoutStart.citySize = cityClass;
         cityLayoutStart.roadGrid = getRoadGridType(random);
         cityLayoutStart.isRuins = random.nextDouble() < ConfigHandler.ruinedCityPercent;
-        cityLayoutStart.weightedCityComponentList.put(cityLayoutStart.getHashKey(),cityLayoutStart);
+        cityLayoutStart.cityComponentMap.put(cityLayoutStart.getHashKey(),cityLayoutStart);
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -62,6 +63,16 @@ public class MetropolisStart {
         if (genArea < 2 * sizeThreshold) { return UrbanType.TOWN;}
         if (genArea < 4 * sizeThreshold) { return UrbanType.CITY;}
         return UrbanType.METROPOLIS;
+    }
+
+    private int getStartVariant(Random random, UrbanType cityClass){
+        if (cityClass == UrbanType.METROPOLIS) {
+            return random.nextInt(10) < 4 ? 1 : 0;
+        }
+        if (cityClass == UrbanType.CITY){
+            return random.nextInt(10)<2 ? 1 : 0;
+        }
+        return 0;
     }
 
     private RoadGrid getRoadGridType(Random rand){

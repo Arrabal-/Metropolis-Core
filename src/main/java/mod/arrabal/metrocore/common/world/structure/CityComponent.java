@@ -27,13 +27,14 @@ import java.util.Random;
 public abstract class CityComponent {
 
     protected MetropolisBaseBB boundingBox;
-    protected int tileTypeID;
+    protected int typeID;
+    protected int typeVariant;
     protected int coordBaseMode;
 
     public CityComponent() {}
 
     protected CityComponent(int componentType){
-        this.tileTypeID = componentType;
+        this.typeID = componentType;
         this.coordBaseMode = -1;
     }
 
@@ -45,8 +46,12 @@ public abstract class CityComponent {
         return this.boundingBox;
     }
 
-    public int getTileTypeID(){
-        return this.tileTypeID;
+    public int getTypeID(){
+        return this.typeID;
+    }
+
+    public int getTypeVariant() {
+        return this.typeVariant;
     }
 
     public static CityComponent findIntersecting(List tileList, MetropolisBaseBB boundingBox){
@@ -129,44 +134,47 @@ public abstract class CityComponent {
         return false;
     }
 
-    protected int getXWithOffset(int posX, int posZ)
+    // Gets a relative x position in the bounding box based on offset values for x, z, and the coordBaseMode
+    protected int getXWithOffset(int offsetX, int offsetZ)
     {
         switch (this.coordBaseMode)
         {
             case 0:
             case 2:
-                return this.boundingBox.minX + posX;
+                return this.boundingBox.minX + offsetX;
             case 1:
-                return this.boundingBox.maxX - posZ;
+                return this.boundingBox.maxX - offsetZ;
             case 3:
-                return this.boundingBox.minX + posZ;
+                return this.boundingBox.minX + offsetZ;
             default:
-                return posX;
+                return offsetX;
         }
     }
 
-    protected int getYWithOffset(int posY)
+    // Gets a relative y position in the bounding box based on offset value for y and the coordBaseMode
+    protected int getYWithOffset(int offsetY)
     {
-        return this.coordBaseMode == -1 ? posY : posY + this.boundingBox.minY;
+        return this.coordBaseMode == -1 ? offsetY : offsetY + this.boundingBox.minY;
     }
 
-    protected int getZWithOffset(int posX, int posZ)
+    // Gets a relative z position in the bounding box based on offset values for x, z, and the coordBaseMode
+    protected int getZWithOffset(int offsetX, int offsetZ)
     {
         switch (this.coordBaseMode)
         {
             case 0:
-                return this.boundingBox.minZ + posZ;
+                return this.boundingBox.minZ + offsetZ;
             case 1:
             case 3:
-                return this.boundingBox.minZ + posX;
+                return this.boundingBox.minZ + offsetX;
             case 2:
-                return this.boundingBox.maxZ - posZ;
+                return this.boundingBox.maxZ - offsetZ;
             default:
-                return posZ;
+                return offsetZ;
         }
     }
 
-    protected int getMetadataWithOffset(Block block, int meta)
+    protected int getFacingFromMeta(Block block, int meta)
     {
         if (block == Blocks.rail)
         {
@@ -583,7 +591,7 @@ public abstract class CityComponent {
 
     /**
      * arguments: World worldObj, StructureBoundingBox structBB, int minX, int minY, int minZ, int maxX, int maxY, int
-     * maxZ, boolean alwaysreplace, Random rand, StructurePieceBlockSelector blockselector
+     * maxZ, boolean alwaysreplace, Random rand, BlockSelector blockselector
      */
     protected void fillWithRandomizedBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ,
                                             int maxX, int maxY, int maxZ, boolean alwaysreplace, Random random,
@@ -744,7 +752,7 @@ public abstract class CityComponent {
 
         if (boundingBox.isVecInside(j1, k1, l1) && world.getBlock(j1, k1, l1) != Blocks.dispenser)
         {
-            world.setBlock(j1, k1, l1, Blocks.dispenser, this.getMetadataWithOffset(Blocks.dispenser, meta), 2);
+            world.setBlock(j1, k1, l1, Blocks.dispenser, this.getFacingFromMeta(Blocks.dispenser, meta), 2);
             TileEntityDispenser tileentitydispenser = (TileEntityDispenser)world.getTileEntity(j1, k1, l1);
 
             if (tileentitydispenser != null)
