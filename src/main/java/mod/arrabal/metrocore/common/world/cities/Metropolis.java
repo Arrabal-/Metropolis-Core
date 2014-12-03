@@ -8,6 +8,7 @@ import mod.arrabal.metrocore.common.library.ModOptions;
 import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.village.Village;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.common.BiomeDictionary;
@@ -128,6 +129,7 @@ public final class Metropolis {
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
                 handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
                 handler.doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ);
+                handler.currentStart = new ChunkCoordIntPair(checkX, checkZ);
                 return true;
             }
             else {

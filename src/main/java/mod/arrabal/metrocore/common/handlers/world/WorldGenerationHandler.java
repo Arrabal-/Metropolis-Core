@@ -4,6 +4,7 @@ import cpw.mods.fml.common.IWorldGenerator;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.world.cities.MetropolisGenerationContainer;
+import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderEnd;
 import net.minecraft.world.WorldProviderHell;
@@ -74,7 +75,11 @@ public class WorldGenerationHandler implements IWorldGenerator {
                     else{
                         //normal
                         if (handler.doGenerateSurfaceMetropolis(world, random, chunkX, chunkZ)){
-                            //maybe do something.
+                            if (handler.startMapContainsKey(handler.currentStart.toString())){
+                                MetropolisStart start = handler.getStartFromKey(handler.currentStart.toString());
+                            }
+                            //generate city layout
+                            //generate building layouts
                         }
                     }
                     this.currentlyGenerating.remove(tuple);

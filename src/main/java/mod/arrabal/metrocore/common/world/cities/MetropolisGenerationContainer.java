@@ -20,6 +20,8 @@ public class MetropolisGenerationContainer {
     private ChunkGenerationLogger chunkLogger;
     private CityBoundsSaveData cityMap;
 
+    public ChunkCoordIntPair currentStart;
+
     public MetropolisGenerationContainer(World world){
         this.chunkLogger = (ChunkGenerationLogger) world.perWorldStorage.loadData(ChunkGenerationLogger.class, "metropolisChunkLogger");
         if (this.chunkLogger == null) {
@@ -89,6 +91,14 @@ public class MetropolisGenerationContainer {
 
     public void addToStartMap(MetropolisStart start){
         this.dataHandler.addToStartMap(start);
+    }
+
+    public boolean startMapContainsKey(Object key){
+        return this.dataHandler.startMapContainsKey(key);
+    }
+
+    public MetropolisStart getStartFromKey(Object key){
+        return this.dataHandler.getStartFromKey(key);
     }
 
     public void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius) {

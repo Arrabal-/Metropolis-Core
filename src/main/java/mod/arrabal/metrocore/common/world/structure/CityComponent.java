@@ -69,7 +69,7 @@ public abstract class CityComponent {
     }
 
     public ChunkPosition getChunkPosition(){
-        return new ChunkPosition(this.boundingBox.getCenterX(), this.getBoundingBox().getCenterY(), this.getBoundingBox().getCenterZ());
+        return new ChunkPosition(this.boundingBox.getCenterX(), this.boundingBox.getCenterY(), this.boundingBox.getCenterZ());
     }
 
     protected boolean isLiquidInCityBoundingBox(World world, MetropolisBaseBB boundingBox)

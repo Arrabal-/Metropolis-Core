@@ -49,8 +49,7 @@ public class MetropolisStart {
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         cityLayoutStart.citySize = cityClass;
         cityLayoutStart.roadGrid = getRoadGridType(random);
-        cityLayoutStart.isRuins = random.nextDouble() < ConfigHandler.ruinedCityPercent;
-        cityLayoutStart.cityComponentMap.put(cityLayoutStart.getHashKey(),cityLayoutStart);
+        cityLayoutStart.cityComponentMap.put(cityLayoutStart.getHashKey(),cityLayoutStart); //key = min xyz max xyz -- conflicts with other usage & y is temp value
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -70,7 +69,7 @@ public class MetropolisStart {
             return random.nextInt(10) < 4 ? 1 : 0;
         }
         if (cityClass == UrbanType.CITY){
-            return random.nextInt(10)<2 ? 1 : 0;
+            return random.nextInt(10) < 2 ? 1 : 0;
         }
         return 0;
     }
