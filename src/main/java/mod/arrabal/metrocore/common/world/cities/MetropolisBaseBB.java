@@ -3,8 +3,6 @@ package mod.arrabal.metrocore.common.world.cities;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.world.ChunkCoordIntPair;
 
-import java.io.Serializable;
-
 /**
  * Created by Arrabal on 6/13/2014.
  */

@@ -1,6 +1,6 @@
 package mod.arrabal.metrocore.common.init;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.item.ItemGlassDoor;
 import net.minecraft.item.Item;
 

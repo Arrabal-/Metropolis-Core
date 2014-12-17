@@ -1,6 +1,6 @@
 package mod.arrabal.metrocore.api;
 
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraft.block.Block;
 

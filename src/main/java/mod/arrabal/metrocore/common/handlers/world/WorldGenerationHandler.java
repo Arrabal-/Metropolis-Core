@@ -1,6 +1,6 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
-import cpw.mods.fml.common.IWorldGenerator;
+import net.minecraftforge.fml.common.IWorldGenerator;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.world.cities.MetropolisGenerationContainer;

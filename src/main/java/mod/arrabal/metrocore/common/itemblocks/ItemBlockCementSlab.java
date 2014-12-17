@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
  */
 public class ItemBlockCementSlab extends ItemSlab {
     public ItemBlockCementSlab (Block block, BlockCementSlab singleSlab, BlockCementSlab doubleSlab) {
-        super(block, singleSlab, doubleSlab, block == doubleSlab);
+        super(block, singleSlab, doubleSlab);
     }
 
     @Override

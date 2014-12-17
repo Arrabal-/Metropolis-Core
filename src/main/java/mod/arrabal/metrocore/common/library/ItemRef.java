@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.library;
 
 /**
- * Created by Evan on 12/23/13.
+ * Created by Arrabal on 12/23/13.
  */
 public class ItemRef {
 

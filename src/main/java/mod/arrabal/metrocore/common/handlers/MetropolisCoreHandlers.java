@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.handlers;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.handlers.world.TerrainGenEventHandler;
 import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;

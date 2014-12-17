@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.proxy;
 
 /**
- * Created by Evan on 12/19/13.
+ * Created by Arrabal on 12/19/13.
  */
 public class ClientProxy extends CommonProxy {
 

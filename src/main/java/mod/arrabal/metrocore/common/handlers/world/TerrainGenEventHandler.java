@@ -1,6 +1,6 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import mod.arrabal.metrocore.common.world.cities.MetropolisGenerationContainer;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 

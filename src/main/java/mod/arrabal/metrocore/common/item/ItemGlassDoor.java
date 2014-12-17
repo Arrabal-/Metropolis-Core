@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.item;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.api.BlockHelper;
 import mod.arrabal.metrocore.common.library.ItemRef;
@@ -16,7 +16,7 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 
 /**
- * Created by Evan on 12/23/13.
+ * Created by Arrabal on 12/23/13.
  */
 public class ItemGlassDoor extends Item {
 

@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.block;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraft.block.Block;

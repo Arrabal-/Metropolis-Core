@@ -1,6 +1,4 @@
 # Created by .gitignore support plugin (hsz.mobi)
-gradlew
-gradlew.bat
 Metropolis-Core.iml
 Metropolis-Core.ipr
 Metropolis-Core.iws
@@ -15,3 +13,7 @@ resourcepacks
 saves
 
 .idea/workspace.xml
+.gradle
+build
+crash-reports
+.gitignore
