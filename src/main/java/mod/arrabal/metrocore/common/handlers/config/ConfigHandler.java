@@ -67,12 +67,12 @@ public class ConfigHandler {
                     "Sets the approximate % of generated urban areas that will be heavily damaged (think Mad Max)." +
                             "  Set value from 0 (no ruined cities) to 1 (all cities ruined)").getDouble(0.10d);
 
+            ModOptions.init();
             LogHelper.info("Loaded config file");
         } catch (Exception e) {
             LogHelper.error("MetropolisCore has had a problem loading its configuration");
         } finally {
-            if (config.hasChanged()) {
-                ModOptions.init();
+            if (config.hasChanged()){
                 config.save();
             }
         }

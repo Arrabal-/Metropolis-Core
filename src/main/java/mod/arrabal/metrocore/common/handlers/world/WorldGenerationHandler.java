@@ -77,6 +77,7 @@ public class WorldGenerationHandler implements IWorldGenerator {
                         if (handler.doGenerateSurfaceMetropolis(world, random, chunkX, chunkZ)){
                             if (handler.startMapContainsKey(handler.currentStart.toString())){
                                 MetropolisStart start = handler.getStartFromKey(handler.currentStart.toString());
+
                             }
                             //generate city layout
                             //generate building layouts

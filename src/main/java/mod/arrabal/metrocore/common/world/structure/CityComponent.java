@@ -38,7 +38,9 @@ public abstract class CityComponent {
         this.coordBaseMode = -1;
     }
 
-    public void buildComponent(CityComponent cityTile, List tileList, Random random) {}
+    public void buildComponent(CityComponent cityTile, Random random) {}
+
+    public void buildComponent(CityComponent cityTile, Random random, int chunkX, int chunkZ) {}
 
     public abstract boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox);
 

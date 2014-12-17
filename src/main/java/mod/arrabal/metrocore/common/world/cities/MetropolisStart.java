@@ -49,7 +49,22 @@ public class MetropolisStart {
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         cityLayoutStart.citySize = cityClass;
         cityLayoutStart.roadGrid = getRoadGridType(random);
-        cityLayoutStart.cityComponentMap.put(cityLayoutStart.getHashKey(),cityLayoutStart); //key = min xyz max xyz -- conflicts with other usage & y is temp value
+        String hashKey = chunkX + " " + chunkZ;
+        cityLayoutStart.cityComponentMap.put(hashKey,cityLayoutStart);
+        cityLayoutStart.buildComponent(cityLayoutStart, random);
+        int radiusIterations = Math.max(maxXGenRadius, maxZGenRadius);
+        CityComponent cityComponent;
+        for (int iteration = 2; iteration <= radiusIterations; iteration++) {
+            for (int buildX = -iteration; buildX <= iteration; buildX++){
+                for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
+                    int worldX, worldZ;
+                    worldX = chunkX + buildX;
+                    worldZ = chunkZ + buildZ;
+                    if (cityLayoutStart.cityComponentMap.containsKey(worldX + " " + worldZ)) continue;
+
+                }
+            }
+        }
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -106,4 +121,5 @@ public class MetropolisStart {
     public boolean getMaxBBIntersection(int xMinPos, int zMinPos, int xMaxPos, int zMaxPos){
         return this.cityLayoutStart.maxSize.intersectsWith(xMinPos, zMinPos, xMaxPos, zMaxPos);
     }
+
 }
