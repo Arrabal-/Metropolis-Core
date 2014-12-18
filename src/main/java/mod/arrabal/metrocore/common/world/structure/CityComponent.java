@@ -3,15 +3,16 @@ package mod.arrabal.metrocore.common.world.structure;
 import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDirectional;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Facing;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.WeightedRandomChestContent;
-import net.minecraft.world.ChunkPosition;
 import net.minecraft.world.World;
 
 import java.util.Iterator;
@@ -70,8 +71,8 @@ public abstract class CityComponent {
         return cityComponent;
     }
 
-    public ChunkPosition getChunkPosition(){
-        return new ChunkPosition(this.boundingBox.getCenterX(), this.boundingBox.getCenterY(), this.boundingBox.getCenterZ());
+    public BlockPos getChunkPosition(){
+        return new BlockPos(this.boundingBox.getCenterX(), this.boundingBox.getCenterY(), this.boundingBox.getCenterZ());
     }
 
     protected boolean isLiquidInCityBoundingBox(World world, MetropolisBaseBB boundingBox)
@@ -89,13 +90,11 @@ public abstract class CityComponent {
         {
             for (l1 = k; l1 <= j1; ++l1)
             {
-                if (world.getBlock(k1, j, l1).getMaterial().isLiquid())
-                {
+                if (world.getBlockState(new BlockPos(k1, j, l1)).getBlock().getMaterial().isLiquid()) {
                     return true;
                 }
 
-                if (world.getBlock(k1, i1, l1).getMaterial().isLiquid())
-                {
+                if (world.getBlockState(new BlockPos(k1, i1, l1)).getBlock().getMaterial().isLiquid()) {
                     return true;
                 }
             }
@@ -105,12 +104,12 @@ public abstract class CityComponent {
         {
             for (l1 = j; l1 <= i1; ++l1)
             {
-                if (world.getBlock(k1, l1, k).getMaterial().isLiquid())
+                if (world.getBlockState(new BlockPos(k1,l1, k)).getBlock().getMaterial().isLiquid())
                 {
                     return true;
                 }
 
-                if (world.getBlock(k1, l1, j1).getMaterial().isLiquid())
+                if (world.getBlockState(new BlockPos(k1,l1,j1)).getBlock().getMaterial().isLiquid())
                 {
                     return true;
                 }
@@ -121,12 +120,12 @@ public abstract class CityComponent {
         {
             for (l1 = j; l1 <= i1; ++l1)
             {
-                if (world.getBlock(i, l1, k1).getMaterial().isLiquid())
+                if (world.getBlockState(new BlockPos(i,l1,k1)).getBlock().getMaterial().isLiquid())
                 {
                     return true;
                 }
 
-                if (world.getBlock(l, l1, k1).getMaterial().isLiquid())
+                if (world.getBlockState(new BlockPos(l,l1,k1)).getBlock().getMaterial().isLiquid())
                 {
                     return true;
                 }
@@ -162,351 +161,11 @@ public abstract class CityComponent {
     // Gets a relative z position in the bounding box based on offset values for x, z, and the coordBaseMode
     protected int getZWithOffset(int offsetX, int offsetZ)
     {
-        switch (this.coordBaseMode)
-        {
-            case 0:
-                return this.boundingBox.minZ + offsetZ;
-            case 1:
-            case 3:
-                return this.boundingBox.minZ + offsetX;
-            case 2:
-                return this.boundingBox.maxZ - offsetZ;
-            default:
-                return offsetZ;
-        }
+
+        return 0;
     }
 
-    protected int getFacingFromMeta(Block block, int meta)
-    {
-        if (block == Blocks.rail)
-        {
-            if (this.coordBaseMode == 1 || this.coordBaseMode == 3)
-            {
-                if (meta == 1)
-                {
-                    return 0;
-                }
-
-                return 1;
-            }
-        }
-        else if (block != Blocks.wooden_door && block != Blocks.iron_door)
-        {
-            if (block != Blocks.stone_stairs && block != Blocks.oak_stairs && block != Blocks.nether_brick_stairs && block != Blocks.stone_brick_stairs && block != Blocks.sandstone_stairs)
-            {
-                if (block == Blocks.ladder)
-                {
-                    if (this.coordBaseMode == 0)
-                    {
-                        if (meta == 2)
-                        {
-                            return 3;
-                        }
-
-                        if (meta == 3)
-                        {
-                            return 2;
-                        }
-                    }
-                    else if (this.coordBaseMode == 1)
-                    {
-                        if (meta == 2)
-                        {
-                            return 4;
-                        }
-
-                        if (meta == 3)
-                        {
-                            return 5;
-                        }
-
-                        if (meta == 4)
-                        {
-                            return 2;
-                        }
-
-                        if (meta == 5)
-                        {
-                            return 3;
-                        }
-                    }
-                    else if (this.coordBaseMode == 3)
-                    {
-                        if (meta == 2)
-                        {
-                            return 5;
-                        }
-
-                        if (meta == 3)
-                        {
-                            return 4;
-                        }
-
-                        if (meta == 4)
-                        {
-                            return 2;
-                        }
-
-                        if (meta == 5)
-                        {
-                            return 3;
-                        }
-                    }
-                }
-                else if (block == Blocks.stone_button)
-                {
-                    if (this.coordBaseMode == 0)
-                    {
-                        if (meta == 3)
-                        {
-                            return 4;
-                        }
-
-                        if (meta == 4)
-                        {
-                            return 3;
-                        }
-                    }
-                    else if (this.coordBaseMode == 1)
-                    {
-                        if (meta == 3)
-                        {
-                            return 1;
-                        }
-
-                        if (meta == 4)
-                        {
-                            return 2;
-                        }
-
-                        if (meta == 2)
-                        {
-                            return 3;
-                        }
-
-                        if (meta == 1)
-                        {
-                            return 4;
-                        }
-                    }
-                    else if (this.coordBaseMode == 3)
-                    {
-                        if (meta == 3)
-                        {
-                            return 2;
-                        }
-
-                        if (meta == 4)
-                        {
-                            return 1;
-                        }
-
-                        if (meta == 2)
-                        {
-                            return 3;
-                        }
-
-                        if (meta == 1)
-                        {
-                            return 4;
-                        }
-                    }
-                }
-                else if (block != Blocks.tripwire_hook && !(block instanceof BlockDirectional))
-                {
-                    if (block == Blocks.piston || block == Blocks.sticky_piston || block == Blocks.lever || block == Blocks.dispenser)
-                    {
-                        if (this.coordBaseMode == 0)
-                        {
-                            if (meta == 2 || meta == 3)
-                            {
-                                return Facing.oppositeSide[meta];
-                            }
-                        }
-                        else if (this.coordBaseMode == 1)
-                        {
-                            if (meta == 2)
-                            {
-                                return 4;
-                            }
-
-                            if (meta == 3)
-                            {
-                                return 5;
-                            }
-
-                            if (meta == 4)
-                            {
-                                return 2;
-                            }
-
-                            if (meta == 5)
-                            {
-                                return 3;
-                            }
-                        }
-                        else if (this.coordBaseMode == 3)
-                        {
-                            if (meta == 2)
-                            {
-                                return 5;
-                            }
-
-                            if (meta == 3)
-                            {
-                                return 4;
-                            }
-
-                            if (meta == 4)
-                            {
-                                return 2;
-                            }
-
-                            if (meta == 5)
-                            {
-                                return 3;
-                            }
-                        }
-                    }
-                }
-                else if (this.coordBaseMode == 0)
-                {
-                    if (meta == 0 || meta == 2)
-                    {
-                        return Direction.rotateOpposite[meta];
-                    }
-                }
-                else if (this.coordBaseMode == 1)
-                {
-                    if (meta == 2)
-                    {
-                        return 1;
-                    }
-
-                    if (meta == 0)
-                    {
-                        return 3;
-                    }
-
-                    if (meta == 1)
-                    {
-                        return 2;
-                    }
-
-                    if (meta == 3)
-                    {
-                        return 0;
-                    }
-                }
-                else if (this.coordBaseMode == 3)
-                {
-                    if (meta == 2)
-                    {
-                        return 3;
-                    }
-
-                    if (meta == 0)
-                    {
-                        return 1;
-                    }
-
-                    if (meta == 1)
-                    {
-                        return 2;
-                    }
-
-                    if (meta == 3)
-                    {
-                        return 0;
-                    }
-                }
-            }
-            else if (this.coordBaseMode == 0)
-            {
-                if (meta == 2)
-                {
-                    return 3;
-                }
-
-                if (meta == 3)
-                {
-                    return 2;
-                }
-            }
-            else if (this.coordBaseMode == 1)
-            {
-                if (meta == 0)
-                {
-                    return 2;
-                }
-
-                if (meta == 1)
-                {
-                    return 3;
-                }
-
-                if (meta == 2)
-                {
-                    return 0;
-                }
-
-                if (meta == 3)
-                {
-                    return 1;
-                }
-            }
-            else if (this.coordBaseMode == 3)
-            {
-                if (meta == 0)
-                {
-                    return 2;
-                }
-
-                if (meta == 1)
-                {
-                    return 3;
-                }
-
-                if (meta == 2)
-                {
-                    return 1;
-                }
-
-                if (meta == 3)
-                {
-                    return 0;
-                }
-            }
-        }
-        else if (this.coordBaseMode == 0)
-        {
-            if (meta == 0)
-            {
-                return 2;
-            }
-
-            if (meta == 2)
-            {
-                return 0;
-            }
-        }
-        else
-        {
-            if (this.coordBaseMode == 1)
-            {
-                return meta + 1 & 3;
-            }
-
-            if (this.coordBaseMode == 3)
-            {
-                return meta + 3 & 3;
-            }
-        }
-
-        return meta;
-    }
-
-    protected void placeBlockAtCurrentPosition(World world, Block block, int meta, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
+    protected void placeBlockAtCurrentPosition(World world, IBlockState blockstate, int meta, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
     {
         int i1 = this.getXWithOffset(posX, posZ);
         int j1 = this.getYWithOffset(posY);
@@ -514,7 +173,7 @@ public abstract class CityComponent {
 
         if (boundingBox.isVecInside(i1, j1, k1))
         {
-            world.setBlock(i1, j1, k1, block, meta, 2);
+            world.setBlockState(new BlockPos(i1, j1, k1), blockstate, 2);
         }
     }
 
@@ -523,7 +182,7 @@ public abstract class CityComponent {
         int l = this.getXWithOffset(posX, posZ);
         int i1 = this.getYWithOffset(posY);
         int j1 = this.getZWithOffset(posX, posZ);
-        return !boundingBox.isVecInside(l, i1, j1) ? Blocks.air : world.getBlock(l, i1, j1);
+        return !boundingBox.isVecInside(l, i1, j1) ? Blocks.air : world.getBlockState(new BlockPos(l,i1,j1)).getBlock();
     }
 
     protected void fillWithAir(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
@@ -534,14 +193,14 @@ public abstract class CityComponent {
             {
                 for (int i2 = minZ; i2 <= maxZ; ++i2)
                 {
-                    this.placeBlockAtCurrentPosition(world, Blocks.air, 0, l1, k1, i2, boundingBox);
+                    this.placeBlockAtCurrentPosition(world, Blocks.air.getDefaultState(), 0, l1, k1, i2, boundingBox);
                 }
             }
         }
     }
 
     protected void fillWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
-                                  Block placeBlock, Block replaceBlock, boolean alwaysReplace)
+                                  IBlockState placeBlock, IBlockState replaceBlock, boolean alwaysReplace)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
         {
@@ -566,7 +225,7 @@ public abstract class CityComponent {
     }
 
     protected void fillWithMetadataBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY,
-                                          int maxZ, Block placeBlock, int placeBlockMetadata, Block replaceBlock, int replaceBlockMetadata,
+                                          int maxZ, IBlockState placeBlock, int placeBlockMetadata, IBlockState replaceBlock, int replaceBlockMetadata,
                                           boolean alwaysReplace)
     {
         for (int i2 = minY; i2 <= maxY; ++i2)
@@ -620,7 +279,7 @@ public abstract class CityComponent {
      * minZ, int maxX, int maxY, int maxZ, Block placeBlock, Block replaceBlock, boolean alwaysreplace
      */
     protected void randomlyFillWithBlocks(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int minX, int minY, int minZ,
-                                          int maxX, int maxY, int maxZ, Block placeBlock, Block replaceBlock, boolean alwaysreplace)
+                                          int maxX, int maxY, int maxZ, IBlockState placeBlock, IBlockState replaceBlock, boolean alwaysreplace)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
         {
@@ -644,7 +303,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void randomlyPlaceBlockAtPostion(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int posX, int posY, int posZ, Block placeBlock, int meta)
+    protected void randomlyPlaceBlockAtPostion(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int posX, int posY, int posZ, IBlockState placeBlock, int meta)
     {
         if (random.nextFloat() < randLimit)
         {
@@ -652,7 +311,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillSphereWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, Block placeBlock, boolean alwaysreplace)
+    protected void fillSphereWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean alwaysreplace)
     {
         float f = (float)(maxX - minX + 1);
         float f1 = (float)(maxY - minY + 1);
@@ -692,17 +351,19 @@ public abstract class CityComponent {
         int i1 = this.getYWithOffset(posY);
         int j1 = this.getZWithOffset(posX, posZ);
 
+        BlockPos blockpos = new BlockPos(l, i1, j1);
+
         if (boundingBox.isVecInside(l, i1, j1))
         {
-            while (!world.isAirBlock(l, i1, j1) && i1 < 255)
+            while (!world.isAirBlock(blockpos) && blockpos.getY() < 255)
             {
-                world.setBlock(l, i1, j1, Blocks.air, 0, 2);
-                ++i1;
+                world.setBlockState(blockpos, Blocks.air.getDefaultState(), 2);
+                blockpos.up();
             }
         }
     }
 
-    protected void fillCurrentPositionBlocksDownward(World world, Block placeBlock, int meta, int posX, int posY, int posZ,
+    protected void fillCurrentPositionBlocksDownward(World world, IBlockState placeBlock, int meta, int posX, int posY, int posZ,
                                  MetropolisBaseBB boundingBox)
     {
         int i1 = this.getXWithOffset(posX, posZ);
@@ -711,26 +372,29 @@ public abstract class CityComponent {
 
         if (boundingBox.isVecInside(i1, j1, k1))
         {
-            while ((world.isAirBlock(i1, j1, k1) || world.getBlock(i1, j1, k1).getMaterial().isLiquid()) && j1 > 1)
+            while ((world.isAirBlock(new BlockPos(i1,j1,k1)) || world.getBlockState(new BlockPos(i1,j1,k1)).getBlock().getMaterial().isLiquid()) && j1 > 1)
             {
-                world.setBlock(i1, j1, k1, placeBlock, meta, 2);
+                world.setBlockState(new BlockPos(i1,j1,k1), placeBlock, 2);
                 --j1;
             }
         }
     }
 
     protected boolean generateStructureChestContents(World world, MetropolisBaseBB boundingBox, Random random,
-                                                     int posX, int posY, int posZ, WeightedRandomChestContent[] chestContents,
+                                                     int posX, int posY, int posZ, List chestContents,
                                                      int maxIterations)
     {
         int i1 = this.getXWithOffset(posX, posZ);
         int j1 = this.getYWithOffset(posY);
         int k1 = this.getZWithOffset(posX, posZ);
 
-        if (boundingBox.isVecInside(i1, j1, k1) && world.getBlock(i1, j1, k1) != Blocks.chest)
+        BlockPos blockpos = new BlockPos(i1,j1,k1);
+
+        if (boundingBox.isVecInside(i1, j1, k1) && world.getBlockState(blockpos).getBlock() != Blocks.chest)
         {
-            world.setBlock(i1, j1, k1, Blocks.chest, 0, 2);
-            TileEntityChest tileentitychest = (TileEntityChest)world.getTileEntity(i1, j1, k1);
+            IBlockState iblockstate = Blocks.chest.getDefaultState();
+            world.setBlockState(new BlockPos(i1, j1, k1),Blocks.chest.correctFacing(world, blockpos, iblockstate), 2);
+            TileEntityChest tileentitychest = (TileEntityChest)world.getTileEntity(blockpos);
 
             if (tileentitychest != null)
             {
@@ -752,16 +416,12 @@ public abstract class CityComponent {
         int k1 = this.getYWithOffset(posY);
         int l1 = this.getZWithOffset(posX, posZ);
 
-        if (boundingBox.isVecInside(j1, k1, l1) && world.getBlock(j1, k1, l1) != Blocks.dispenser)
+        BlockPos blockpos = new BlockPos(j1,k1,l1);
+
+        if (boundingBox.isVecInside(j1, k1, l1) && world.getBlockState(blockpos).getBlock() != Blocks.dispenser)
         {
-            world.setBlock(j1, k1, l1, Blocks.dispenser, this.getFacingFromMeta(Blocks.dispenser, meta), 2);
-            TileEntityDispenser tileentitydispenser = (TileEntityDispenser)world.getTileEntity(j1, k1, l1);
 
-            if (tileentitydispenser != null)
-            {
-                WeightedRandomChestContent.generateDispenserContents(random, dispenserContents, tileentitydispenser, maxIterations);
-            }
-
+            //need to fix
             return true;
         }
         else
@@ -771,15 +431,17 @@ public abstract class CityComponent {
     }
 
     protected void placeDoorAtCurrentPosition(World world, MetropolisBaseBB boundingBox, Random random, int posX, int posY, int posZ,
-                                              int meta, Block doorBlock)
+                                              EnumFacing facing, Block doorBlock)
     {
         int i1 = this.getXWithOffset(posX, posZ);
         int j1 = this.getYWithOffset(posY);
         int k1 = this.getZWithOffset(posX, posZ);
 
+        BlockPos blockpos = new BlockPos(i1,j1,k1);
+
         if (boundingBox.isVecInside(i1, j1, k1))
         {
-            ItemDoor.placeDoorBlock(world, i1, j1, k1, meta, doorBlock);
+            ItemDoor.placeDoor(world, blockpos, facing.rotateYCCW(), doorBlock);
         }
     }
 
@@ -790,18 +452,18 @@ public abstract class CityComponent {
 
     public abstract static class BlockSelector{
 
-        protected Block block;
+        protected IBlockState block;
         protected int selectedBlockMetaData;
 
         protected BlockSelector()
         {
-            this.block = Blocks.air;
+            this.block = Blocks.air.getDefaultState();
         }
 
 
         public abstract void selectBlocks(Random random, int posX, int posY, int posZ, boolean doBlockSelect);
 
-        public Block getSelectedBlock()
+        public IBlockState getSelectedBlock()
         {
             return this.block;
         }

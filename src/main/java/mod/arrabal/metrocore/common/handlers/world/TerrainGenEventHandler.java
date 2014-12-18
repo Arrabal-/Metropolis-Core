@@ -17,7 +17,7 @@ public class TerrainGenEventHandler {
         //DebugMessenger.message("Captured populate post event.  Ready to inject MetropolisStart.generate.");
         MetropolisGenerationContainer handler = WorldGenerationHandler.getGenContainerFromWorld(event.world);
 
-        switch (event.world.provider.dimensionId){
+        switch (event.world.provider.getDimensionId()){
             case -1:
                 // nether
                 break;

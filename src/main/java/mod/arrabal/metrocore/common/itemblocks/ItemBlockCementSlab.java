@@ -24,7 +24,6 @@ public class ItemBlockCementSlab extends ItemSlab {
     {
         BlockCementSlab slab = (BlockCementSlab)Block.getBlockFromItem(itemStack.getItem());
 
-        //TODO:																		getFullSlabName()
-        return super.getUnlocalizedName() + "." + (new StringBuilder()).append(slab.func_150002_b(itemStack.getItemDamage())).toString();
+        return super.getUnlocalizedName() + "." + (new StringBuilder()).append(slab.getUnlocalizedName(itemStack.getItemDamage())).toString();
     }
 }

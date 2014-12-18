@@ -23,15 +23,15 @@ public class MetropolisGenerationContainer {
     public ChunkCoordIntPair currentStart;
 
     public MetropolisGenerationContainer(World world){
-        this.chunkLogger = (ChunkGenerationLogger) world.perWorldStorage.loadData(ChunkGenerationLogger.class, "metropolisChunkLogger");
+        this.chunkLogger = (ChunkGenerationLogger) world.getPerWorldStorage().loadData(ChunkGenerationLogger.class, "metropolisChunkLogger");
         if (this.chunkLogger == null) {
             this.chunkLogger = new ChunkGenerationLogger("metropolisChunkLogger");
-            world.perWorldStorage.setData("metropolisChunkLogger", this.chunkLogger);
+            world.getPerWorldStorage().setData("metropolisChunkLogger", this.chunkLogger);
         }
-        this.cityMap = (CityBoundsSaveData) world.perWorldStorage.loadData(CityBoundsSaveData.class, "metropolisCityBounds");
+        this.cityMap = (CityBoundsSaveData) world.getPerWorldStorage().loadData(CityBoundsSaveData.class, "metropolisCityBounds");
         if (this.cityMap == null){
             this.cityMap = new CityBoundsSaveData("metropolisCityBounds");
-            world.perWorldStorage.setData("metropolisCityBounds",this.cityMap);
+            world.getPerWorldStorage().setData("metropolisCityBounds",this.cityMap);
         }
         this.generator = new Metropolis();
         this.dataHandler = new MetropolisDataHandler();

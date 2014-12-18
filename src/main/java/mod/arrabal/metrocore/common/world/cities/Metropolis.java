@@ -7,6 +7,7 @@ import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModOptions;
 import net.minecraft.entity.monster.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.village.Village;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -74,8 +75,8 @@ public final class Metropolis {
 
     //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
     private static MetropolisBaseBB blockSpawnArea(World world, int radius){
-        int spawnMinX = world.getSpawnPoint().posX - radius;
-        int spawnMinZ = world .getSpawnPoint().posZ - radius;
+        int spawnMinX = world.getSpawnPoint().getX() - radius;
+        int spawnMinZ = world .getSpawnPoint().getZ() - radius;
         return new MetropolisBaseBB(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
     }
 
@@ -236,7 +237,7 @@ public final class Metropolis {
     public static boolean isVillageNear(World world, int posX, int posY, int posZ, int genRadius){
         if(world.villageCollectionObj != null){
             for (Village village : (List<Village>) world.villageCollectionObj.getVillageList()){
-                if (Math.sqrt(village.getCenter().getDistanceSquared(posX, posY, posZ)) < village.getVillageRadius() + genRadius) {
+                if (Math.sqrt(village.getCenter().distanceSq(posX, posY, posZ)) < village.getVillageRadius() + genRadius) {
                     return true;
                 }
             }
@@ -251,8 +252,10 @@ public final class Metropolis {
             heightMap = new int[sampleSize];
             Random heightCheck = new Random(world.getWorldTime());
             for (int i = 0; i < sampleSize; i++) {
-                heightMap[i] = world.getTopSolidOrLiquidBlock(heightCheck.nextInt(maxX - minX) + minX,
-                        heightCheck.nextInt(maxZ - minZ) + minZ) - 1;
+                int newX = heightCheck.nextInt(maxX - minX) + minX;
+                int newZ = heightCheck.nextInt(maxZ - minZ) + minZ;
+                BlockPos newPos = new BlockPos(newX, 0, newZ);
+                heightMap[i] = world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
             }
         } else {
             int blocks = (maxX - minX + 1) * (maxZ - minZ + 1);
@@ -260,7 +263,8 @@ public final class Metropolis {
             int index = 0;
             for (int i = minX; i < maxX + 1; i++) {
                 for (int j = minZ; j < maxZ + 1; j++) {
-                    heightMap[index] = world.getTopSolidOrLiquidBlock(i, j) - 1;
+                    BlockPos newPos = new BlockPos(i,0,j);
+                    heightMap[index] = world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
                     index += 1;
                 }
             }

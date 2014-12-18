@@ -354,8 +354,8 @@ public class CityComponentPieces {
             int chunkX, chunkZ;
             CityComponent cityComponent1, cityComponent2, cityComponent3, cityComponent4;
 
-            chunkX = this.getChunkPosition().chunkPosX >> 4;
-            chunkZ = this.getChunkPosition().chunkPosZ >> 4;
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
 
             switch(roadGrid) {
                 case GRID:

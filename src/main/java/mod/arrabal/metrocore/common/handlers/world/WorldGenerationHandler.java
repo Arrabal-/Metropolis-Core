@@ -93,12 +93,12 @@ public class WorldGenerationHandler implements IWorldGenerator {
     public static MetropolisGenerationContainer getGenContainerFromWorld(World world){
         MetropolisGenerationContainer handler = null;
         if (!world.isRemote){
-            if (!generatorMap.containsKey(world.provider.dimensionId)){
+            if (!generatorMap.containsKey(world.provider.getDimensionId())){
                 handler = new MetropolisGenerationContainer(world);
-                generatorMap.put(world.provider.dimensionId, handler);
+                generatorMap.put(world.provider.getDimensionId(), handler);
             }
             else{
-                handler = generatorMap.get(world.provider.dimensionId);
+                handler = generatorMap.get(world.provider.getDimensionId());
             }
         }
         return handler;

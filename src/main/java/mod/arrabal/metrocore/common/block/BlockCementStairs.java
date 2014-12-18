@@ -1,13 +1,12 @@
 package mod.arrabal.metrocore.common.block;
 
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockStairs;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.util.IIcon;
 
 import java.util.Arrays;
 import java.util.List;
@@ -50,11 +49,10 @@ public class BlockCementStairs extends BlockStairs {
             "blockCementPaverTerraCotta"
     };
 
-    private IIcon[] icons;
     private final Category category;
 
-    public BlockCementStairs(Block model, Category cat) {
-        super(model, 0);
+    public BlockCementStairs(Block model, Category cat, IExtendedBlockState state) {
+        super(state);
         category = cat;
         this.setHardness(3.0F);
         this.setHarvestLevel("pickaxe", 2);
@@ -63,22 +61,4 @@ public class BlockCementStairs extends BlockStairs {
         this.setCreativeTab(MetropolisCore.tabMetroWorld);
     }
 
-    @Override
-    @SideOnly(Side.CLIENT)
-    public void registerBlockIcons(IIconRegister iconRegister) {
-        icons = new IIcon[types.length];
-        for (int i = 0; i < types.length; ++i) {
-            icons[i] = iconRegister.registerIcon(ModRef.TEXTURE_LOCATION + types[i]);
-        }
-    }
-
-    @Override
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(int side, int meta) {
-        int adjCat = category.ordinal();
-        if (meta != adjCat){
-            meta = adjCat;
-        }
-        return icons[meta];
-    }
 }
