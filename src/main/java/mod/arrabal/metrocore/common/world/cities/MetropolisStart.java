@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
 import mod.arrabal.metrocore.common.world.structure.MetropolisCityPlan;
@@ -54,6 +55,10 @@ public class MetropolisStart {
         cityLayoutStart.buildComponent(cityLayoutStart, random);
         int radiusIterations = Math.max(maxXGenRadius, maxZGenRadius);
         CityComponent cityComponent;
+        LogHelper.debug("Starting build city map with start at " + hashKey);
+        LogHelper.debug("Max gen radius (x,z): " + this.maxXGenRadius + " " + this.maxZGenRadius);
+        LogHelper.debug("BaseY: " + this.baseY);
+        LogHelper.debug("City Class: " + cityClass + " " + "Road Grid: " + cityLayoutStart.roadGrid);
         for (int iteration = 2; iteration <= radiusIterations; iteration++) {
             for (int buildX = -iteration; buildX <= iteration; buildX++){
                 for (int buildZ = -iteration; buildZ <= iteration; buildZ++){

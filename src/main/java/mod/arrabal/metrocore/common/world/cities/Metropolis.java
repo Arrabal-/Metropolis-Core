@@ -85,8 +85,8 @@ public final class Metropolis {
     public static boolean generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
         int densityFactor = ModOptions.metropolisMinDistanceBetween;
-        if ((genDensity == 0 || ((chunkX % densityFactor != 0 && chunkZ % densityFactor != 0)))){
-            LogHelper.trace("Kicking out generation attempt due to density factor");
+        if ((genDensity == 0 || ((Math.abs(chunkX) % densityFactor != 0 && Math.abs(chunkZ) % densityFactor != 0)))){
+            LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
             return false;
         }
 
@@ -272,7 +272,7 @@ public final class Metropolis {
         return heightMap;
     }
 
-    private static Random getNewRandom(World world, int chunkX, int chunkZ){
+    private static Random  getNewRandom(World world, int chunkX, int chunkZ){
         Random random = new Random(world.getSeed());
         long l = (chunkX / ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L);
         long l2 = (chunkZ / ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L);

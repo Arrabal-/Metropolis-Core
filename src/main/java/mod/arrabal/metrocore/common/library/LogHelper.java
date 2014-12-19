@@ -18,7 +18,8 @@ public class LogHelper {
     }
 
     public static void debug(Object object){
-        if (ConfigHandler.enableDebugMessages == ModOptions.DEBUG_ON){
+        if (ConfigHandler.enableDebugMessages.equals(ModOptions.DEBUG_ON) ||
+                ConfigHandler.enableDebugMessages.equals(ModOptions.DEBUG_TRACE)){
             FMLLog.log(ModRef.MOD_NAME, Level.INFO, "[DEBUG]: " + String.valueOf(object));
         }
     }
@@ -40,7 +41,7 @@ public class LogHelper {
     }
 
     public static void trace(Object object){
-        if (ConfigHandler.enableDebugMessages == ModOptions.DEBUG_TRACE){
+        if (ConfigHandler.enableDebugMessages.equals(ModOptions.DEBUG_TRACE)){
             FMLLog.log(ModRef.MOD_NAME, Level.INFO, "[TRACE]: " + String.valueOf(object));
         }
     }
