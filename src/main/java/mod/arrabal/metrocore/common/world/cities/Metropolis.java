@@ -127,7 +127,7 @@ public final class Metropolis {
             int checkY = StatsHelper.getStaticMean(heightMap);
             int devY = StatsHelper.getStaticStandardDeviation(heightMap, checkY);
             Random rarityCheck = new Random(world.getWorldTime());
-            if (devY < 4 && rarityCheck.nextDouble() <= genRarity) {
+            if (devY <= ConfigHandler.metropolisMaxHeightVariation && rarityCheck.nextDouble() <= genRarity) {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
                 handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
@@ -137,7 +137,7 @@ public final class Metropolis {
             }
             else {
                 String sString = "";
-                if (devY < 4) { sString = "  Failure due to genRarity check.";}
+                if (devY <= ConfigHandler.metropolisMaxHeightVariation) { sString = "  Failure due to genRarity check.";}
                 LogHelper.debug("Failed generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Ground height deviation:  " + devY + sString);
             }
