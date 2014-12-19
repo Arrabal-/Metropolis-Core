@@ -112,6 +112,8 @@ public final class Metropolis {
 
             int genRadiusX = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
             int genRadiusZ = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
+            genRadiusX = (genRadiusZ > 3 && genRadiusX < 4) ? genRadiusX + 1 : genRadiusX;
+            genRadiusZ = (genRadiusX > 3 && genRadiusZ < 4) ? genRadiusZ + 1 : genRadiusZ;
             int genMinX = (checkX << 4) - (genRadiusX << 4);
             int genMaxX = (checkX << 4) + 15 + (genRadiusX << 4);
             int genMinZ = (checkZ << 4) - (genRadiusZ << 4);
