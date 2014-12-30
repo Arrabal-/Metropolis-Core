@@ -126,7 +126,7 @@ public final class Metropolis {
             int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ, 100);
             int checkY = StatsHelper.getStaticMean(heightMap);
             int devY = StatsHelper.getStaticStandardDeviation(heightMap, checkY);
-            Random rarityCheck = new Random(world.getWorldTime());
+            Random rarityCheck = new Random(world.getTotalWorldTime());
             if (devY <= ConfigHandler.metropolisMaxHeightVariation && rarityCheck.nextDouble() <= genRarity) {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
@@ -252,7 +252,7 @@ public final class Metropolis {
         int[] heightMap;
         if (sampleSize > 0) {
             heightMap = new int[sampleSize];
-            Random heightCheck = new Random(world.getWorldTime());
+            Random heightCheck = new Random(world.getTotalWorldTime());
             for (int i = 0; i < sampleSize; i++) {
                 int newX = heightCheck.nextInt(maxX - minX) + minX;
                 int newZ = heightCheck.nextInt(maxZ - minZ) + minZ;
