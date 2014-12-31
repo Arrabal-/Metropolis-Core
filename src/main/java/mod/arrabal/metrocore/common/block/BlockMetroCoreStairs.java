@@ -1,41 +1,28 @@
 package mod.arrabal.metrocore.common.block;
 
 import com.google.common.collect.ImmutableSet;
+import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
+import net.minecraft.block.BlockStairs;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import mod.arrabal.metrocore.MetropolisCore;
-import mod.arrabal.metrocore.common.library.ModRef;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.world.World;
 
 import java.util.List;
-import java.util.Random;
 
 /**
- * Created by Arrabal on 7/14/2014.
+ * Created by Arrabal on 12/31/2014.
  */
-public abstract class BlockMetroCore extends Block {
+public abstract class BlockMetroCoreStairs extends BlockStairs{
 
     public ImmutableSet<IBlockState> baseStates;
 
-    protected BlockMetroCore(Material material) {
-        super(material);
-        this.baseStates = BlockStateHelper.getValidStatesForProperties(this.getDefaultState(), this.getBaseProperties());
-        this.setCreativeTab(MetropolisCore.tabMetroWorld);
-    }
-
-    protected BlockMetroCore(){
-        super(Material.rock);
+    protected BlockMetroCoreStairs(IBlockState state){
+        super(state);
         this.baseStates = BlockStateHelper.getValidStatesForProperties(this.getDefaultState(), this.getBaseProperties());
         this.setCreativeTab(MetropolisCore.tabMetroWorld);
     }
@@ -70,5 +57,4 @@ public abstract class BlockMetroCore extends Block {
         String unlocalizedName = state.getBlock().getUnlocalizedName();
         return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
     }
-
 }
