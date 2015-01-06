@@ -1,17 +1,16 @@
 package mod.arrabal.metrocore.common.init;
 
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import mod.arrabal.metrocore.api.BlockHelper;
+import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.BlockCement;
-import mod.arrabal.metrocore.common.block.BlockCementSlab;
-import mod.arrabal.metrocore.common.block.BlockCementStairs;
-import mod.arrabal.metrocore.common.block.BlockGlassDoor;
-import mod.arrabal.metrocore.common.itemblocks.ItemBlockCement;
-import mod.arrabal.metrocore.common.itemblocks.ItemBlockCementSlab;
+import mod.arrabal.metrocore.common.block.BlockMetroCore;
+import mod.arrabal.metrocore.common.item.ItemBlockMetroCoreWithVariants;
+import mod.arrabal.metrocore.common.library.BlockStateHelper;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.item.ItemBlock;
 
 
 /**
@@ -23,14 +22,12 @@ public class Blocks {
 
     //public static Block doorGlass;
 
-    //Blocks for future use
-    public static Block cementBlock;
-    public static Block polishedCementBlock;
+    public static Block blockCement;
     
 
     public static void init() {
         //Blocks
-
+        blockCement = registerBlock(new BlockCement(), "cement");
 
         //Slabs
 
@@ -47,19 +44,24 @@ public class Blocks {
 
     }
 
-    public static void registerBlock(Block block)
+    public static Block registerBlock(BlockMetroCore block, String name)
     {
-        GameRegistry.registerBlock(block, block.getUnlocalizedName().replace("tile.", ""));
-    }
+        if (block.baseStates == null) block.baseStates = BlockStateHelper.getValidStatesForProperties(block.getDefaultState(), block.getBaseProperties());
+        block.setUnlocalizedName(name);
+        if (block.hasBaseProperties()){
+            GameRegistry.registerBlock(block, ItemBlockMetroCoreWithVariants.class, name);
+            for (IBlockState state : block.baseStates){
+                String stateName = block.getStateName(state, true);
+                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName);
+                MetropolisCore.proxy.registerBlockForMeshing(block, block.getMetaFromState(state), stateName);
+            }
+        } else {
+            GameRegistry.registerBlock(block, name);
 
-    public static void registerBlock(Block block, Class<? extends ItemBlock> itemBlockClass)
-    {
-        GameRegistry.registerBlock(block, itemBlockClass, block.getUnlocalizedName().replace("tile.", ""));
-    }
-
-    public static void registerBlock(Block block, Class<? extends ItemBlock> itemBlockClass, String name, Object... constructorArgs)
-    {
-        GameRegistry.registerBlock(block, itemBlockClass, name, constructorArgs);
+            ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + name);
+            MetropolisCore.proxy.registerBlockForMeshing(block, 0, name);
+        }
+        return block;
     }
 
 

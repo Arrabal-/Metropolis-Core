@@ -17,13 +17,6 @@ public class ItemBlockCement extends ItemBlock {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack itemStack) {
-        int meta = itemStack.getItemDamage();
-        BlockCement cementBlock = (BlockCement)Block.getBlockFromItem(itemStack.getItem());
-        return super.getUnlocalizedName() + "." + (new StringBuilder()).append(cementBlock.getBlockTypedName(meta)).toString();
-    }
-
-    @Override
     public int getMetadata(int damage) {
         return damage;
     }

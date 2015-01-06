@@ -41,15 +41,15 @@ public class MetropolisCore {
         ConfigHandler.init(configPath);
         MetropolisCoreHandlers.init();
         tabMetroWorld = new CreativeTabsMetroCore(CreativeTabs.getNextID(), "tabMetroWorld");
-        Blocks.init();
         Items.init();
+        Blocks.init();
         proxy.registerSounds();
-        proxy.registerRenderers();
     }
 
     //Actions taken during loading of mods
     @Mod.EventHandler
     public static void Init(FMLInitializationEvent event) {
+        proxy.registerRenderers();
         Blocks.oreRegistration();
 
 

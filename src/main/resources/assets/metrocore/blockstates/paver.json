@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "etched=false,variant=lightgray": {"model":"metrocore:ltgray_paver"},
+    "etched=true,variant=lightgray": {"model":"metrocore:etched_ltgray_paver"},
+    "etched=false,variant=gray": {"model":"metrocore:gray_paver"},
+    "etched=true,variant=gray": {"model":"metrocore:etched_gray_paver"},
+    "etched=false,variant=white": {"model":"metrocore:white_paver"},
+    "etched=true,variant=white": {"model":"metrocore:etched_white_paver"},
+    "etched=false,variant=black": {"model":"metrocore:black_paver"},
+    "etched=true,variant=black": {"model":"metrocore:etched_black_paver"},
+    "etched=false,variant=red": {"model":"metrocore:red_paver"},
+    "etched=true,variant=red": {"model":"metrocore:etched_red_paver"},
+    "etched=false,variant=tan": {"model":"metrocore:tan_paver"},
+    "etched=true,variant=tan": {"model":"metrocore:etched_tan_paver"},
+    "etched=false,variant=terracotta": {"model":"metrocore:terracotta_paver"},
+    "etched=true,variant=terracotta": {"model":"metrocore:etched_terracotta_paver"}
+  }
+}
