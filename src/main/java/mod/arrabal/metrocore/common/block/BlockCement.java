@@ -54,7 +54,7 @@ public class  BlockCement extends BlockMetroCore {
     @Override
     public String getStateName(IBlockState state, boolean fullName){
         boolean polished = (Boolean)state.getValue(POLISHED_PROP);
-        return ((fullName && polished) ? "polished_" : "") + ((CementType)state.getValue(VARIANT_PROP)).getName();
+        return (fullName && polished ? "polished_" : "") + ((CementType)state.getValue(VARIANT_PROP)).getName();
     }
 
     public static enum CementType implements IStringSerializable{

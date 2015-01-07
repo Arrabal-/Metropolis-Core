@@ -1,31 +1,31 @@
 itemGroup.tabMetroWorld=Metropolis-Building Blocks
 
-tile.metrocore:blockCement.blockCement.name=Cement
-tile.metrocore:blockCement.blockCementBlack.name=Black Cement
-tile.metrocore:blockCement.blockCementBrown.name=Brown Cement
-tile.metrocore:blockCement.blockCementGray.name=Gray Cement
-tile.metrocore:blockCement.blockCementLightGray.name=Light Gray Cement
-tile.metrocore:blockCement.blockCementRed.name=Red Cement
-tile.metrocore:blockCement.blockCementTan.name=Tan Cement
-tile.metrocore:blockCement.blockCementTerraCotta.name=Terra Cotta Cement
+tile.cement.lightgray.name=Cement
+tile.cement.black.name=Black Cement
+tile.cement.brown.name=Brown Cement
+tile.cement.gray.name=Gray Cement
+tile.cement.white.name=White Cement
+tile.cement.red.name=Red Cement
+tile.cement.tan.name=Tan Cement
+tile.cement.terracotta.name=Terra Cotta Cement
 
-tile.metrocore:blockCement.blockCementPaver.name=Cement Paver
-tile.metrocore:blockCement.blockCementPaverBlack.name=Black Cement Paver
-tile.metrocore:blockCement.blockCementPaverBrown.name=Brown Cement Paver
-tile.metrocore:blockCement.blockCementPaverGray.name=Gray Cement Paver
-tile.metrocore:blockCement.blockCementPaverLightGray.name=Light Gray Cement Paver
-tile.metrocore:blockCement.blockCementPaverRed.name=Red Cement Paver
-tile.metrocore:blockCement.blockCementPaverTan.name=Tan Cement Paver
-tile.metrocore:blockCement.blockCementPaverTerraCotta.name=Terra Cotta Cement Paver
+tile.cement.polished_lightgray.name=Polished Cement
+tile.cement.polished_black.name=Black Polished Cement
+tile.cement.polished_brown.name=Brown Polished Cement
+tile.cement.polished_gray.name=Gray Polished Cement
+tile.cement.polished_white.name=White Polished Cement
+tile.cement.polished_red.name=Red Polished Cement
+tile.cement.polished_tan.name=Tan Polished Cement
+tile.cement.polished_terracotta.name=Terra Cotta Polished Cement
 
-tile.metrocore:polishedCement.blockPolishedCement.name=Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementBlack.name=Black Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementBrown.name=Brown Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementGray.name=Gray Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementLightGray.name=Light Gray Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementRed.name=Red Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementTan.name=Tan Polished Cement
-tile.metrocore:polishedCement.blockPolishedCementTerraCotta.name=Terra Cotta Polished Cement
+tile.paver.lightgray.name=Cement Paver
+tile.paver.black.name=Black Cement Paver
+tile.paver.brown.name=Brown Cement Paver
+tile.paver.gray.name=Gray Cement Paver
+tile.paver.white.name=White Cement Paver
+tile.paver.red.name=Red Cement Paver
+tile.paver.tan.name=Tan Cement Paver
+tile.paver.terracotta.name=Terra Cotta Cement Paver
 
 tile.cementSingleSlab.blockCementSlab.name=Cement Slab
 tile.cementSingleSlab.blockCementBlackSlab.name=Black Cement Slab

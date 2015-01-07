@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.item;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
@@ -9,7 +10,7 @@ import net.minecraft.item.ItemStack;
  */
 public class ItemBlockMetroCoreWithVariants extends ItemBlock {
 
-    public ItemBlockMetroCoreWithVariants(BlockMetroCore block){
+    public ItemBlockMetroCoreWithVariants(Block block){
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
@@ -24,7 +25,7 @@ public class ItemBlockMetroCoreWithVariants extends ItemBlock {
     public String getUnlocalizedName(ItemStack stack){
         BlockMetroCore block = (BlockMetroCore)this.block;
         if (block.hasBaseProperties()){
-            return super.getUnlocalizedName() + "." + block.getStateName(block.getStateFromMeta(stack.getMetadata()), false);
+            return super.getUnlocalizedName() + "." + block.getStateName(block.getStateFromMeta(stack.getMetadata()), true);
         }
         else return super.getUnlocalizedName();
     }

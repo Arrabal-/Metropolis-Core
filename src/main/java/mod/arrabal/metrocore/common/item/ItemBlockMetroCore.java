@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.item;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
@@ -9,7 +10,7 @@ import net.minecraft.item.ItemStack;
  */
 public class ItemBlockMetroCore extends ItemBlock {
 
-    protected ItemBlockMetroCore(BlockMetroCore block){
+    protected ItemBlockMetroCore(Block block){
         super(block);
     }
 
