@@ -28,7 +28,7 @@ public class MetropolisCore {
     public static MetropolisCore instance;
 
     //Where the client and server proxy code is loaded
-    @SidedProxy(modId = ModRef.MOD_ID, clientSide = ModRef.CLIENT_PROXY_LOCATION, serverSide = ModRef.COMMON_PROXY_LOCATION)
+    @SidedProxy(modId = ModRef.MOD_ID, clientSide = ModRef.CLIENT_PROXY_LOCATION, serverSide = ModRef.SERVER_PROXY_LOCATION)
     public static IProxy proxy;
 
     public static CreativeTabs tabMetroWorld;

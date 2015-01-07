@@ -4,6 +4,7 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumWorldBlockLayer;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -25,6 +26,11 @@ public class  BlockCement extends BlockMetroCore {
         this.setHardness(3.0F);
         this.setResistance(8.0F);
     }
+
+//    @Override
+//    public EnumWorldBlockLayer getBlockLayer(){
+//        return EnumWorldBlockLayer.SOLID;
+//    }
 
     @Override
     public IBlockState getStateFromMeta(int meta){

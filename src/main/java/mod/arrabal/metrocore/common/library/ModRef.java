@@ -12,6 +12,7 @@ public class ModRef {
     public static final String PROXY_STEM = "mod.arrabal.metrocore.proxy";
     public static final String CLIENT_PROXY_LOCATION = PROXY_STEM + ".ClientProxy";
     public static final String COMMON_PROXY_LOCATION = PROXY_STEM + ".CommonProxy";
+    public static final String SERVER_PROXY_LOCATION = PROXY_STEM + ".ServerProxy";
     public static final String GUI_FACTORY_CLASS = "mod.arrabal.metrocore.client.GUI.GUIFactory";
     public static final String CATEGORY_MOD_MECHANICS = "mod_mechanics";
     public static final String CATEGORY_CITY_GENERATION = "city_generation";
