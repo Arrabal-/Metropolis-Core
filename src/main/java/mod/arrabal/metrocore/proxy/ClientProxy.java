@@ -22,10 +22,7 @@ public class ClientProxy extends CommonProxy {
     public void registerRenderers() {
         for (ModelEntry modelEntry : blocksToRegister){
             ModelHelper.registerBlock(modelEntry.block, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
-            //Item itemBlockVariants = GameRegistry.findItem(ModRef.MOD_ID, modelEntry.block.getUnlocalizedName());
-            //ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(ModRef.MOD_ID + ":" + modelEntry.name,"inventory");
-            //Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlockVariants,modelEntry.meta, itemModelResourceLocation);
-            //ModelHelper.registerItem(itemBlockVariants, modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
+            ModelHelper.registerItem(Item.getItemFromBlock(modelEntry.block), modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
         }
     }
 
