@@ -3,7 +3,7 @@ package mod.arrabal.metrocore.common.init;
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.BlockCement;
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
-import mod.arrabal.metrocore.common.item.ItemBlockMetroCoreWithVariants;
+import mod.arrabal.metrocore.common.itemblocks.ItemBlockMetroCoreWithVariants;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -52,8 +52,8 @@ public class Blocks {
             GameRegistry.registerBlock(block, ItemBlockMetroCoreWithVariants.class, name);
             for (IBlockState state : block.baseStates){
                 String stateName = block.getStateName(state, true);
-                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName);
-                MetropolisCore.proxy.registerBlockForMeshing(block, block.getMetaFromState(state), stateName);
+                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                MetropolisCore.proxy.registerBlockForMeshing(block, block.getMetaFromState(state), stateName + "_" + name);
             }
         } else {
             GameRegistry.registerBlock(block, name);

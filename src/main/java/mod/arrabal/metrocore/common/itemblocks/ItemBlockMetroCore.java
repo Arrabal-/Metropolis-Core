@@ -1,4 +1,4 @@
-package mod.arrabal.metrocore.common.item;
+package mod.arrabal.metrocore.common.itemblocks;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
 import net.minecraft.block.Block;

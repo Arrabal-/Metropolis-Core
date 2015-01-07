@@ -1,8 +1,13 @@
 package mod.arrabal.metrocore.proxy;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
+import mod.arrabal.metrocore.common.init.Blocks;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.library.ModelHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.item.Item;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
 
@@ -17,6 +22,10 @@ public class ClientProxy extends CommonProxy {
     public void registerRenderers() {
         for (ModelEntry modelEntry : blocksToRegister){
             ModelHelper.registerBlock(modelEntry.block, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
+            //Item itemBlockVariants = GameRegistry.findItem(ModRef.MOD_ID, modelEntry.block.getUnlocalizedName());
+            //ModelResourceLocation itemModelResourceLocation = new ModelResourceLocation(ModRef.MOD_ID + ":" + modelEntry.name,"inventory");
+            //Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(itemBlockVariants,modelEntry.meta, itemModelResourceLocation);
+            //ModelHelper.registerItem(itemBlockVariants, modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
         }
     }
 

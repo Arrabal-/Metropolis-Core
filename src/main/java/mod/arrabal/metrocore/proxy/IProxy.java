@@ -7,7 +7,7 @@ import mod.arrabal.metrocore.common.block.BlockMetroCore;
  */
 public interface IProxy {
 
-    //client stuff
+    //client methods
     public void registerRenderers();
 
     public void registerBlockForMeshing(BlockMetroCore block, int meta, String name);

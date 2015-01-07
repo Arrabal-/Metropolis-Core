@@ -7,15 +7,14 @@ import mod.arrabal.metrocore.common.block.BlockMetroCore;
  */
 public class ServerProxy extends CommonProxy {
 
+    // client only methods -- does nothing on the server
     @Override
-    public void registerRenderers() {
-        // nothing as the server doesn't render anything
-    }
+    public void registerRenderers() {}
 
+    @Override
     public void registerBlockForMeshing(BlockMetroCore block, int meta, String name){}
 
     @Override
-    public void registerSounds() {
-        // nothing as the server doesn't play sounds
-    }
+    public void registerSounds() {}
+
 }

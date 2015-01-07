@@ -27,11 +27,6 @@ public class  BlockCement extends BlockMetroCore {
         this.setResistance(8.0F);
     }
 
-//    @Override
-//    public EnumWorldBlockLayer getBlockLayer(){
-//        return EnumWorldBlockLayer.SOLID;
-//    }
-
     @Override
     public IBlockState getStateFromMeta(int meta){
 
