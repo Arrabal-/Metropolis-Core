@@ -50,7 +50,6 @@ public class MetropolisCore {
     @Mod.EventHandler
     public static void Init(FMLInitializationEvent event) {
         proxy.registerRenderers();
-        //proxy.registerItemBlockRenderers();
         Blocks.oreRegistration();
 
 

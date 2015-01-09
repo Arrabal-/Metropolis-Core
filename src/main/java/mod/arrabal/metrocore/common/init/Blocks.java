@@ -5,6 +5,7 @@ import mod.arrabal.metrocore.common.block.BlockCement;
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
 import mod.arrabal.metrocore.common.itemblocks.ItemBlockMetroCoreWithVariants;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
+import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.item.Item;
@@ -23,6 +24,7 @@ public class Blocks {
     //public static Block doorGlass;
 
     public static Block blockCement;
+    public static BlockSlab blockCementSlab;
     
 
     public static void init() {

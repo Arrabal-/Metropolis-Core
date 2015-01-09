@@ -1,13 +1,9 @@
 package mod.arrabal.metrocore.proxy;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
-import mod.arrabal.metrocore.common.init.Blocks;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.library.ModelHelper;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.ArrayList;
 
