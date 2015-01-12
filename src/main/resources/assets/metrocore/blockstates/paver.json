@@ -12,6 +12,8 @@
     "etched=true,variant=red": {"model":"metrocore:etched_red_paver"},
     "etched=false,variant=tan": {"model":"metrocore:tan_paver"},
     "etched=true,variant=tan": {"model":"metrocore:etched_tan_paver"},
+    "etched=false,variant=brown": {"model":"metrocore:brown_paver"},
+    "etched=true,variant=brown": {"model":"metrocore:etched_brown_paver"},
     "etched=false,variant=terracotta": {"model":"metrocore:terracotta_paver"},
     "etched=true,variant=terracotta": {"model":"metrocore:etched_terracotta_paver"}
   }

@@ -2,6 +2,7 @@ package mod.arrabal.metrocore.common.init;
 
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.BlockCement;
+import mod.arrabal.metrocore.common.block.BlockCementPaver;
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
 import mod.arrabal.metrocore.common.itemblocks.ItemBlockMetroCoreWithVariants;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
@@ -24,12 +25,14 @@ public class Blocks {
     //public static Block doorGlass;
 
     public static Block blockCement;
+    public static Block blockCementPaver;
     public static BlockSlab blockCementSlab;
     
 
     public static void init() {
         //Blocks
         blockCement = registerBlock(new BlockCement(), "cement");
+        blockCementPaver = registerBlock(new BlockCementPaver(), "paver");
 
         //Slabs
 

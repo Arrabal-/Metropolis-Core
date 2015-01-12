@@ -27,6 +27,15 @@ tile.paver.red.name=Red Cement Paver
 tile.paver.tan.name=Tan Cement Paver
 tile.paver.terracotta.name=Terra Cotta Cement Paver
 
+tile.paver.etched_lightgray.name=Etched Cement Paver
+tile.paver.etched_black.name=Etched Black Cement Paver
+tile.paver.etched_brown.name=Etched Brown Cement Paver
+tile.paver.etched_gray.name=Etched Gray Cement Paver
+tile.paver.etched_white.name=Etched White Cement Paver
+tile.paver.etched_red.name=Etched Red Cement Paver
+tile.paver.etched_tan.name=Etched Tan Cement Paver
+tile.paver.etched_terracotta.name=Etched Terra Cotta Cement Paver
+
 tile.cementSingleSlab.blockCementSlab.name=Cement Slab
 tile.cementSingleSlab.blockCementBlackSlab.name=Black Cement Slab
 tile.cementSingleSlab.blockCementBrownSlab.name=Brown Cement Slab
