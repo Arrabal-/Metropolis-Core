@@ -44,7 +44,7 @@ public abstract class BlockMetroCoreSlab extends BlockSlab{
 
     @SideOnly(Side.CLIENT)
     protected static boolean isSlab(Block blockIn){
-        return false; // TODO:  add checks to see if it is any type of mod slab blocks
+        return (blockIn instanceof BlockMetroCoreSlab);
     }
 
     @Override
@@ -58,6 +58,13 @@ public abstract class BlockMetroCoreSlab extends BlockSlab{
 
     public boolean hasBaseProperties(){
         return getBaseProperties() != null;
+    }
+
+    @Override
+    public String getUnlocalizedName(int meta){
+        IBlockState state = this.blockState.getBaseState();
+        String unlocalizedName = state.getBlock().getUnlocalizedName();
+        return unlocalizedName;
     }
 
     public String getStateName(IBlockState state, boolean full){

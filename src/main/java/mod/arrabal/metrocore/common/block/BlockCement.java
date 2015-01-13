@@ -44,7 +44,7 @@ public class  BlockCement extends BlockMetroCore {
 
     @Override
     protected BlockState createBlockState(){
-        return new BlockState(this, new IProperty[] {VARIANT_PROP, POLISHED_PROP});
+        return new BlockState(this, new IProperty[] {VARIANT_PROP, POLISHED_PROP, });
     }
 
     @Override

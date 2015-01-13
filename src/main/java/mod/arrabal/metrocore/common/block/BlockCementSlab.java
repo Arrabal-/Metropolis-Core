@@ -1,24 +1,20 @@
 package mod.arrabal.metrocore.common.block;
 
-import mod.arrabal.metrocore.common.init.Blocks;
+import mod.arrabal.metrocore.common.init.ModBlocks;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockState;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import mod.arrabal.metrocore.MetropolisCore;
-import mod.arrabal.metrocore.api.BlockHelper;
-import mod.arrabal.metrocore.common.library.ModRef;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -31,36 +27,44 @@ import java.util.Random;
 public abstract class BlockCementSlab extends BlockMetroCoreSlab {
 
     public static final PropertyEnum VARIANT = PropertyEnum.create("variant", CementSlabType.class);
-    public static final PropertyBool SEEMLESS = PropertyBool.create("seemless");
+    public static final PropertyBool SEAMLESS = PropertyBool.create("seamless");
 
     protected BlockCementSlab(){
         super(Material.rock);
         IBlockState state = this.blockState.getBaseState();
 
         if (this.isDouble()){
-            state = state.withProperty(SEEMLESS, Boolean.valueOf(false));
+            state = state.withProperty(SEAMLESS, Boolean.valueOf(false));
         } else {
             state = state.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
         }
 
         this.setDefaultState(state.withProperty(VARIANT,CementSlabType.LIGHTGRAY));
-
+        this.setHardness(3.0F);
+        this.setResistance(3.0F);
     }
-
+    
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune){
-        return Item.getItemFromBlock(Blocks.blockCementSlab);
+        return Item.getItemFromBlock(ModBlocks.blockCementSlab);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public Item getItem(World world, BlockPos pos){
-        return Item.getItemFromBlock(Blocks.blockCementSlab);
+        return Item.getItemFromBlock(ModBlocks.blockCementSlab);
     }
 
     @Override
     public String getUnlocalizedName(int meta) {
-        return null;
+
+        return super.getUnlocalizedName(meta) + "." + BlockCementSlab.CementSlabType.byMetadata(meta).getUnlocalizedName();
+    }
+
+    @Override
+    public IProperty getVariantProperty()
+    {
+        return VARIANT;
     }
 
     @Override
@@ -69,93 +73,128 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
     }
 
     @Override
-    public IProperty getVariantProperty() {
-        return null;
-    }
-
-    @Override
     public Object getVariant(ItemStack stack) {
-        return null;
+        return BlockCementSlab.CementSlabType.byMetadata(stack.getMetadata() & 7);
     }
 
-    public static enum SlabCategory {SMOOTH, PAVER;}
-
-    private static final String[] smoothTypes = new String[] {
-            "blockCement",
-            "blockCementBlack",
-            "blockCementBrown",
-            "blockCementGray",
-            "blockCementLightGray",
-            "blockCementRed",
-            "blockCementTan",
-            "blockCementTerraCotta"
-    };
-    private static final String[] paverTypes = new String[] {
-            "blockCementPaver",
-            "blockCementPaverBlack",
-            "blockCementPaverBrown",
-            "blockCementPaverGray",
-            "blockCementPaverLightGray",
-            "blockCementPaverRed",
-            "blockCementPaverTan",
-            "blockCementPaverTerraCotta"
-    };
-
-    public BlockCementSlab(boolean isDoubleSlab, Material material, SlabCategory cat) {
-        super( material);
-        //category = cat;
-        this.setHardness(3.0F);
-        this.setResistance(3.0F);
-        this.setStepSound(Block.soundTypeStone);
-        useNeighborBrightness = true;
-        this.setHarvestLevel("pickaxe", 2);
-
-
-        if (!isDoubleSlab)
-        {
-            this.setCreativeTab(MetropolisCore.tabMetroWorld);
+    @Override
+    public void getSubBlocks(Item item, CreativeTabs creativeTab, List list){
+        if (item != Item.getItemFromBlock(ModBlocks.blockDoubleCementSlab)){
+            BlockCementSlab.CementSlabType[] types =  BlockCementSlab.CementSlabType.values();
+            int typeCount = types.length;
+            for (int i = 0; i < typeCount; ++i){
+                BlockCementSlab.CementSlabType type = types[i];
+                list.add(new ItemStack(item, 1, type.getMetadata()));
+            }
         }
     }
 
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void getSubBlocks(Item block, CreativeTabs creativeTabs, List list)
-    {
-        int max = 0;
-
-       // if (category == SlabCategory.SMOOTH) {
-            max = 8;
-        //}
-        //else if (category == SlabCategory.PAVER) {
-            //max = 8;
-        //}
-        for (int i = 0; i < max; ++i) {
-            list.add(new ItemStack(block, 1, i));
+    public IBlockState getStateFromMeta(int meta){
+        IBlockState state = this.getDefaultState().withProperty(VARIANT, CementSlabType.byMetadata(meta & 7));
+        if (this.isDouble()){
+            state = state.withProperty(SEAMLESS, Boolean.valueOf((meta & 8) != 0));
+        } else {
+            state = state.withProperty(HALF, (meta & 8) == 0 ? EnumBlockHalf.BOTTOM : EnumBlockHalf.TOP);
         }
+        return state;
+    }
+    
+    @Override
+    public int getMetaFromState(IBlockState state){
+        byte b = 0;
+        int meta = b | ((BlockCementSlab.CementSlabType)state.getValue(VARIANT)).getMetadata();
+        if (this.isDouble()) {
+            if (((Boolean) state.getValue(SEAMLESS)).booleanValue()) {
+                meta |= 8;
+            }
+        }
+        else {
+            if (state.getValue(HALF) == BlockSlab.EnumBlockHalf.TOP) {
+                meta |= 8;
+            }
+        }
+        return meta;
     }
 
-    private static int getTypeFromMeta(int meta){
-        return meta & 7;
+    @Override
+    public IProperty[] getBaseProperties() { return new IProperty[] {VARIANT};}
+
+    @Override
+    protected BlockState createBlockState()
+    {
+        return this.isDouble() ? new BlockState(this, new IProperty[] {SEAMLESS, VARIANT}): new BlockState(this, new IProperty[] {HALF, VARIANT});
+    }
+
+    @Override
+    public int damageDropped(IBlockState state){
+        return ((CementSlabType)state.getValue(VARIANT)).getMetadata();
+    }
+
+    @Override
+    public String getStateName(IBlockState state, boolean fullName){
+        boolean doubleSlab = this.isDouble();
+        return (fullName && doubleSlab ? "double_" : "") +  ((CementSlabType)state.getValue(VARIANT)).getName();
+
     }
 
     public static enum CementSlabType implements IStringSerializable {
 
-        LIGHTGRAY,
-        GRAY,
-        WHITE,
-        BLACK,
-        RED,
-        TAN,
-        BROWN,
-        TERRACOTTA;
+        LIGHTGRAY(0,"lightgray"),
+        GRAY(1,"gray"),
+        WHITE(2,"white"),
+        BLACK(3,"black"),
+        RED(4,"red"),
+        TAN(5,"tan"),
+        BROWN(6,"brown"),
+        TERRACOTTA(7,"terracotta");
+        private static final BlockCementSlab.CementSlabType[] META_LOOKUP = new BlockCementSlab.CementSlabType[values().length];
+        private final int meta;
+        private final String name;
+        private final String unlocalizedName;
+
+        private CementSlabType(int meta, String name){
+            this(meta, name, name);
+        }
+
+        private CementSlabType(int meta, String name, String unlocalIzedName){
+            this.meta = meta;
+            this.name = name;
+            this.unlocalizedName = unlocalIzedName;
+        }
+
+        public int getMetadata(){return this.meta;}
+
+        public static BlockCementSlab.CementSlabType byMetadata(int meta){
+            if (meta < 0 || meta >= META_LOOKUP.length)
+            {
+                meta = 0;
+            }
+
+            return META_LOOKUP[meta];
+        }
 
         public String getName(){
             return this.name().toLowerCase();
         }
 
+        public String getUnlocalizedName(){
+            return this.unlocalizedName;
+        }
+
         @Override
         public String toString(){
             return getName();
+        }
+
+        static{
+            BlockCementSlab.CementSlabType[] types = values();
+            int typeNum = types.length;
+
+            for (int i = 0; i < typeNum; ++i){
+                BlockCementSlab.CementSlabType variant = types[i];
+                META_LOOKUP[variant.getMetadata()] = variant;
+            }
         }
     }
 }
