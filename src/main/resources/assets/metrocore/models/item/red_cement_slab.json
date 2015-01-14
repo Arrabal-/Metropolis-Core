@@ -1,5 +1,5 @@
 {
-  "parent": "metrocore:block/lightgray_half_slab_cement",
+  "parent": "metrocore:block/red_half_slab_cement",
   "display":{
     "thirdperson":{
       "rotation": [10,-45,170],

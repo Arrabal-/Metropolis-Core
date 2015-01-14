@@ -34,14 +34,14 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
         IBlockState state = this.blockState.getBaseState();
 
         if (this.isDouble()){
-            state = state.withProperty(SEAMLESS, Boolean.valueOf(false));
+            state = state.withProperty(SEAMLESS, Boolean.valueOf(true));
         } else {
             state = state.withProperty(HALF, BlockSlab.EnumBlockHalf.BOTTOM);
         }
 
         this.setDefaultState(state.withProperty(VARIANT,CementSlabType.LIGHTGRAY));
         this.setHardness(3.0F);
-        this.setResistance(3.0F);
+        this.setResistance(10.0F);
     }
     
     @Override
@@ -133,8 +133,7 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
 
     @Override
     public String getStateName(IBlockState state, boolean fullName){
-        boolean doubleSlab = this.isDouble();
-        return (fullName && doubleSlab ? "double_" : "") +  ((CementSlabType)state.getValue(VARIANT)).getName();
+        return ((CementSlabType)state.getValue(VARIANT)).getName();
 
     }
 
@@ -157,10 +156,10 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
             this(meta, name, name);
         }
 
-        private CementSlabType(int meta, String name, String unlocalIzedName){
+        private CementSlabType(int meta, String name, String unlocalizedName){
             this.meta = meta;
             this.name = name;
-            this.unlocalizedName = unlocalIzedName;
+            this.unlocalizedName = unlocalizedName;
         }
 
         public int getMetadata(){return this.meta;}

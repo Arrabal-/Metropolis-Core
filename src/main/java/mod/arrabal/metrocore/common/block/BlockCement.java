@@ -24,7 +24,7 @@ public class  BlockCement extends BlockMetroCore {
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT_PROP, CementType.LIGHTGRAY).withProperty(POLISHED_PROP,Boolean.valueOf(false)));
         this.setHarvestLevel("pickaxe", 2);
         this.setHardness(3.0F);
-        this.setResistance(8.0F);
+        this.setResistance(10.0F);
     }
 
     @Override

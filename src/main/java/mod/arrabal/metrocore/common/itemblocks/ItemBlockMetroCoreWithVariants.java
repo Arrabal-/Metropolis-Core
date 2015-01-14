@@ -24,7 +24,6 @@ public class ItemBlockMetroCoreWithVariants extends ItemBlock {
 
     @Override
     public String getUnlocalizedName(ItemStack stack){
-        //need case to account for slabs
         if(this.block instanceof BlockMetroCoreSlab) {
             BlockMetroCoreSlab slab = (BlockMetroCoreSlab)this.block;
             if (slab.hasBaseProperties()){

@@ -62,8 +62,10 @@ public abstract class BlockMetroCoreSlab extends BlockSlab{
 
     @Override
     public String getUnlocalizedName(int meta){
-        IBlockState state = this.blockState.getBaseState();
+        IBlockState state = this.getStateFromMeta(meta);
         String unlocalizedName = state.getBlock().getUnlocalizedName();
+        //String stateName = getStateName(state, false);
+        //String unlocalizedName = super.getUnlocalizedName() + stateName;
         return unlocalizedName;
     }
 

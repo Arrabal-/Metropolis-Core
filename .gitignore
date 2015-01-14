@@ -1,0 +1,17 @@
+# Created by .ignore support plugin (hsz.mobi)
+gradlew
+gradlew.bat
+Metropolis-Core.iml
+Metropolis-Core.ipr
+Metropolis-Core.iws
+gradle
+options.txt
+config
+run
+.idea
+logs
+mods
+resourcepacks
+saves
+.idea/workspace.xml
+usernamecache.json

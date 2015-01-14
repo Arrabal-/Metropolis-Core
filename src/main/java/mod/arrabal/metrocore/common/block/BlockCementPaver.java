@@ -23,7 +23,7 @@ public class BlockCementPaver extends BlockMetroCore {
         this.setDefaultState(this.blockState.getBaseState().withProperty(VARIANT_PROP, PaverType.LIGHTGRAY).withProperty(ETCHED_PROP,Boolean.valueOf(false)));
         this.setHarvestLevel("pickaxe", 2);
         this.setHardness(3.0F);
-        this.setResistance(8.0F);
+        this.setResistance(10.0F);
     }
 
     @Override

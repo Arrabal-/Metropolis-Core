@@ -1,5 +1,9 @@
 package mod.arrabal.metrocore.common.itemblocks;
 
+import mod.arrabal.metrocore.common.block.BlockCementSlab;
+import mod.arrabal.metrocore.common.block.BlockDoubleCementSlab;
+import mod.arrabal.metrocore.common.block.BlockHalfCementSlab;
+import mod.arrabal.metrocore.common.block.BlockMetroCoreSlab;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockSlab;
 import net.minecraft.block.properties.IProperty;
@@ -18,10 +22,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
  */
 public class ItemCementSlab extends ItemBlockMetroCoreWithVariants {
 
-    private final BlockSlab singleSlab;
-    private final BlockSlab doubleSlab;
+    private final BlockCementSlab singleSlab;
+    private final BlockCementSlab doubleSlab;
 
-    public ItemCementSlab(Block block, BlockSlab singleSlab, BlockSlab doubleSlab){
+    public ItemCementSlab(Block block, BlockHalfCementSlab singleSlab, BlockDoubleCementSlab doubleSlab){
         super(block);
         this.singleSlab = singleSlab;
         this.doubleSlab = doubleSlab;
@@ -30,6 +34,7 @@ public class ItemCementSlab extends ItemBlockMetroCoreWithVariants {
     @Override
     public String getUnlocalizedName(ItemStack stack)
     {
+
         return this.singleSlab.getUnlocalizedName(stack.getMetadata());
     }
 

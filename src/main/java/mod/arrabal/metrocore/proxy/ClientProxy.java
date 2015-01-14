@@ -24,7 +24,7 @@ public class ClientProxy extends CommonProxy {
         }
         for (SlabModelEntry slabModelEntry : slabsToRegister){
             ModelHelper.registerBlock(slabModelEntry.block, slabModelEntry.meta, ModRef.MOD_ID + "." + slabModelEntry.name);
-            ModelHelper.registerItem(Item.getItemFromBlock(slabModelEntry.block), slabModelEntry.meta, ModRef.MOD_ID + ":" + slabModelEntry.name);
+            ModelHelper.registerItem(Item.getItemFromBlock(slabModelEntry.block), ModRef.MOD_ID + ":" + slabModelEntry.name);
         }
     }
 

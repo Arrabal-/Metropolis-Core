@@ -3,9 +3,11 @@ package mod.arrabal.metrocore.common.library;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
+import net.minecraft.client.renderer.ItemMeshDefinition;
 import net.minecraft.client.renderer.ItemModelMesher;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -24,6 +26,15 @@ public class ModelHelper {
         registerItem(Item.getItemFromBlock(block), meta, blockName);
     }
 
+    /*public static void registerBaseItem(Item item, final String itemName){
+        getItemModelMesher().register(item, new ItemMeshDefinition() {
+            @Override
+            public ModelResourceLocation getModelLocation(ItemStack stack) {
+                return new ModelResourceLocation(ModRef.MOD_ID + ":" + itemName.substring(itemName.indexOf(".")+1), "inventory");
+            }
+        });
+    }*/
+
     public static void registerBlock(Block block, String blockName){
         registerBlock(block, 0, blockName);
     }
@@ -39,4 +50,5 @@ public class ModelHelper {
     public static BlockModelShapes getBlockModelShapes(){
         return getItemModelMesher().getModelManager().getBlockModelShapes();
     }
+
 }
