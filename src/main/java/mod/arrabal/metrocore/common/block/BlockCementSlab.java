@@ -118,7 +118,8 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
     }
 
     @Override
-    public IProperty[] getBaseProperties() { return new IProperty[] {VARIANT};}
+    public IProperty[] getBaseProperties() {
+        return this.isDouble() ? new IProperty[] {SEAMLESS, VARIANT} : new IProperty[] {HALF, VARIANT};}
 
     @Override
     protected BlockState createBlockState()
