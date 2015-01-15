@@ -16,6 +16,8 @@ public class ModBlocks {
     public static Block blockCementPaver;
     public static BlockSlab blockCementSlab;
     public static BlockSlab blockDoubleCementSlab;
+    public static BlockSlab blockPolishedCementSlab;
+    public static BlockSlab blockDoublePolishedCementSlab;
 
     private static Block getRegisteredBlock(String name){
         return (Block)GameRegistry.findBlock(ModRef.MOD_ID, name);

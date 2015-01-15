@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "seamless=true,variant=lightgray": { "model": "metrocore:polished_ltgray_cement" },
+    "seamless=false,variant=lightgray": { "model": "metrocore:polished_ltgray_cement" },
+    "seamless=true,variant=black": { "model": "metrocore:polished_black_cement" },
+    "seamless=false,variant=black": { "model": "metrocore:polished_black_cement" },
+    "seamless=true,variant=white": { "model": "metrocore:polished_white_cement" },
+    "seamless=false,variant=white": { "model": "metrocore:polished_white_cement" },
+    "seamless=true,variant=gray": { "model": "metrocore:polished_gray_cement" },
+    "seamless=false,variant=gray": { "model": "metrocore:polished_gray_cement" },
+    "seamless=true,variant=brown": { "model": "metrocore:polished_brown_cement" },
+    "seamless=false,variant=brown": { "model": "metrocore:polished_brown_cement" },
+    "seamless=true,variant=tan": { "model": "metrocore:polished_tan_cement" },
+    "seamless=false,variant=tan": { "model": "metrocore:polished_tan_cement" },
+    "seamless=true,variant=red": { "model": "metrocore:polished_red_cement" },
+    "seamless=false,variant=red": { "model": "metrocore:polished_red_cement" },
+    "seamless=true,variant=terracotta": { "model": "metrocore:polished_terracotta_cement" },
+    "seamless=false,variant=terracotta": { "model": "metrocore:polished_terracotta_cement" }
+  }
+}

@@ -6,7 +6,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -15,14 +14,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Created by Evan on 1/13/2015.
+ * Created by Evan on 1/15/2015.
  */
-public class ItemCementSlab extends ItemBlockMetroCoreWithVariants {
+public class ItemPolishedCementSlab extends ItemBlockMetroCoreWithVariants {
 
-    private final BlockCementSlab singleSlab;
-    private final BlockCementSlab doubleSlab;
+    private final BlockPolishedCementSlab singleSlab;
+    private final BlockPolishedCementSlab doubleSlab;
 
-    public ItemCementSlab(Block block, BlockHalfCementSlab singleSlab, BlockDoubleCementSlab doubleSlab){
+    public ItemPolishedCementSlab(Block block, BlockHalfPolishedCementSlab singleSlab, BlockDoublePolishedCementSlab doubleSlab){
         super(block);
         this.singleSlab = singleSlab;
         this.doubleSlab = doubleSlab;

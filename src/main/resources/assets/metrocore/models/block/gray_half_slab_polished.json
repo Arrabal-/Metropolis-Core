@@ -1,0 +1,8 @@
+{
+  "parent": "block/half_slab",
+  "textures": {
+    "bottom": "metrocore:blocks/blockPolishedCementGray",
+    "top": "metrocore:blocks/blockPolishedCementGray",
+    "side": "metrocore:blocks/blockPolishedCementGray"
+  }
+}

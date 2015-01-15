@@ -1,0 +1,8 @@
+{
+  "parent": "block/half_slab",
+  "textures": {
+    "bottom": "metrocore:blocks/blockPolishedCementWhite",
+    "top": "metrocore:blocks/blockPolishedCementWhite",
+    "side": "metrocore:blocks/blockPolishedCementWhite"
+  }
+}
