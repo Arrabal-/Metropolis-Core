@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "half=bottom,variant=lightgray": { "model": "metrocore:lightgray_half_slab_etched" },
+    "half=top,variant=lightgray": { "model": "metrocore:lightgray_upper_slab_etched" },
+    "half=bottom,variant=black": { "model": "metrocore:black_half_slab_etched" },
+    "half=top,variant=black": { "model": "metrocore:black_upper_slab_etched" },
+    "half=bottom,variant=gray": { "model": "metrocore:gray_half_slab_etched" },
+    "half=top,variant=gray": { "model": "metrocore:gray_upper_slab_etched" },
+    "half=bottom,variant=white": { "model": "metrocore:white_half_slab_etched" },
+    "half=top,variant=white": { "model": "metrocore:white_upper_slab_etched" },
+    "half=bottom,variant=red": { "model": "metrocore:red_half_slab_etched" },
+    "half=top,variant=red": { "model": "metrocore:red_upper_slab_etched" },
+    "half=bottom,variant=tan": { "model": "metrocore:tan_half_slab_etched" },
+    "half=top,variant=tan": { "model": "metrocore:tan_upper_slab_etched" },
+    "half=bottom,variant=brown": { "model": "metrocore:brown_half_slab_etched" },
+    "half=top,variant=brown": { "model": "metrocore:brown_upper_slab_etched" },
+    "half=bottom,variant=terracotta": { "model": "metrocore:terracotta_half_slab_etched" },
+    "half=top,variant=terracotta": { "model": "metrocore:terracotta_upper_slab_etched" }
+  }
+}
