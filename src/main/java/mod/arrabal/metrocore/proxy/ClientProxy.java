@@ -1,9 +1,6 @@
 package mod.arrabal.metrocore.proxy;
 
-import mod.arrabal.metrocore.common.block.BlockDoubleCementSlab;
-import mod.arrabal.metrocore.common.block.BlockDoublePolishedCementSlab;
-import mod.arrabal.metrocore.common.block.BlockMetroCore;
-import mod.arrabal.metrocore.common.block.BlockMetroCoreSlab;
+import mod.arrabal.metrocore.common.block.*;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.library.ModelHelper;
 import net.minecraft.item.Item;
@@ -27,7 +24,8 @@ public class ClientProxy extends CommonProxy {
         for (SlabModelEntry slabModelEntry : slabsToRegister){
             ModelHelper.registerBlock(slabModelEntry.block, slabModelEntry.meta, ModRef.MOD_ID + "." + slabModelEntry.name);
             if (!(slabModelEntry.block instanceof BlockDoubleCementSlab) &&
-                    !(slabModelEntry.block instanceof BlockDoublePolishedCementSlab)) {
+                    !(slabModelEntry.block instanceof BlockDoublePolishedCementSlab) &&
+                    !(slabModelEntry.block instanceof BlockDoubleEtchedCementSlab)) {
                 ModelHelper.registerItem(Item.getItemFromBlock(slabModelEntry.block), slabModelEntry.meta, ModRef.MOD_ID + ":" + slabModelEntry.name);
             }
         }

@@ -4,6 +4,7 @@ import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.*;
 import mod.arrabal.metrocore.common.itemblocks.ItemBlockMetroCoreWithVariants;
 import mod.arrabal.metrocore.common.itemblocks.ItemCementSlab;
+import mod.arrabal.metrocore.common.itemblocks.ItemEtchedCementSlab;
 import mod.arrabal.metrocore.common.itemblocks.ItemPolishedCementSlab;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
 import net.minecraft.block.state.IBlockState;
@@ -32,10 +33,14 @@ public class Blocks {
         ModBlocks.blockCementSlab = new BlockHalfCementSlab();
         ModBlocks.blockDoublePolishedCementSlab = new BlockDoublePolishedCementSlab();
         ModBlocks.blockPolishedCementSlab = new BlockHalfPolishedCementSlab();
+        ModBlocks.blockDoubleEtchedCementSlab = new BlockDoubleEtchedCementSlab();
+        ModBlocks.blockEtchedCementSlab = new BlockHalfEtchedCementSlab();
         registerBlock(ModBlocks.blockDoubleCementSlab, "double_cement_slab").setUnlocalizedName("cement_slab");
         registerBlock(ModBlocks.blockCementSlab, "cement_slab").setUnlocalizedName("cement_slab");
         registerBlock(ModBlocks.blockDoublePolishedCementSlab, "double_polished_slab").setUnlocalizedName("polished_slab");
         registerBlock(ModBlocks.blockPolishedCementSlab, "polished_slab").setUnlocalizedName("polished_slab");
+        registerBlock(ModBlocks.blockDoubleEtchedCementSlab, "double_etched_slab").setUnlocalizedName("etched_slab");
+        registerBlock(ModBlocks.blockEtchedCementSlab, "etched_slab").setUnlocalizedName("etched_slab");
 
         //Stairs
 
@@ -76,6 +81,26 @@ public class Blocks {
             slab.setUnlocalizedName(name);
             if (slab.hasBaseProperties()) {
                 GameRegistry.registerBlock(block, ItemPolishedCementSlab.class, name, ModBlocks.blockPolishedCementSlab, ModBlocks.blockDoublePolishedCementSlab);
+                for (IBlockState state : slab.baseStates) {
+                    String stateName = slab.getStateName(state, true);
+                    name = name.contains("double_") ? name.replace("double_", "") : name;
+                    ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                    MetropolisCore.proxy.registerBlockForMeshing(slab, slab.getMetaFromState(state), stateName + "_" + name);
+                }
+            } else {
+                GameRegistry.registerBlock(block, name);
+                name = name.contains("double_") ? name.replace("double_", "") : name;
+                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + name);
+                MetropolisCore.proxy.registerBlockForMeshing(slab, 0, name);
+            }
+            return slab;
+        } else if (block instanceof BlockEtchedCementSlab) {
+            BlockEtchedCementSlab slab = (BlockEtchedCementSlab) block;
+            if (slab.baseStates == null)
+                slab.baseStates = BlockStateHelper.getValidStatesForProperties(slab.getDefaultState(), slab.getBaseProperties());
+            slab.setUnlocalizedName(name);
+            if (slab.hasBaseProperties()) {
+                GameRegistry.registerBlock(block, ItemEtchedCementSlab.class, name, ModBlocks.blockEtchedCementSlab, ModBlocks.blockDoubleEtchedCementSlab);
                 for (IBlockState state : slab.baseStates) {
                     String stateName = slab.getStateName(state, true);
                     name = name.contains("double_") ? name.replace("double_", "") : name;
