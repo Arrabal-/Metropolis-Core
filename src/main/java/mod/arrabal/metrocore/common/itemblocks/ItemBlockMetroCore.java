@@ -6,7 +6,7 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
 /**
- * Created by Evan on 1/6/2015.
+ * Created by Arrabal on 1/6/2015.
  */
 public class ItemBlockMetroCore extends ItemBlock {
 

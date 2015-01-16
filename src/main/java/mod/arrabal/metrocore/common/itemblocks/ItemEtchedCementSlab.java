@@ -16,7 +16,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Created by Evan on 1/16/2015.
+ * Created by Arrabal on 1/16/2015.
  */
 public class ItemEtchedCementSlab extends ItemBlockMetroCoreWithVariants {
 

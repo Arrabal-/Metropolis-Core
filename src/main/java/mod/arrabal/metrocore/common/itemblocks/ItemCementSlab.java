@@ -15,7 +15,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Created by Evan on 1/13/2015.
+ * Created by Arrabal on 1/13/2015.
  */
 public class ItemCementSlab extends ItemBlockMetroCoreWithVariants {
 

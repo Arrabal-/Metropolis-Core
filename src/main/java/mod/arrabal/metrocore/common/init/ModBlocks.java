@@ -6,7 +6,7 @@ import net.minecraft.block.BlockSlab;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 /**
- * Created by Evan on 1/13/2015.
+ * Created by Arrabal on 1/13/2015.
  */
 
 @GameRegistry.ObjectHolder(ModRef.MOD_ID)
