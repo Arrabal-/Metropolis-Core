@@ -1,8 +1,0 @@
-{
-  "parent": "block/half_slab",
-  "textures": {
-    "bottom": "metrocore:blocks/blockEtchedCementPaverBlack",
-    "top": "metrocore:blocks/blockEtchedCementPaverBlack",
-    "side": "metrocore:blocks/blockEtchedCementPaverBlack"
-  }
-}
