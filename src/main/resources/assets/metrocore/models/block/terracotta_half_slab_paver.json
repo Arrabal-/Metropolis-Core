@@ -1,0 +1,8 @@
+{
+  "parent": "block/half_slab",
+  "textures": {
+    "bottom": "metrocore:blocks/blockCementPaverTerraCotta",
+    "top": "metrocore:blocks/blockCementPaverTerraCotta",
+    "side": "metrocore:blocks/blockCementPaverTerraCotta_side"
+  }
+}

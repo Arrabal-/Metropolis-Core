@@ -2,6 +2,6 @@
   "parent": "block/cube_column",
   "textures": {
     "end": "metrocore:blocks/blockEtchedCementSlabTop_gray",
-    "side": "metrocore:blocks//blockEtchedCementPaverGray"
+    "side": "metrocore:blocks/blockEtchedCementPaverGray"
   }
 }

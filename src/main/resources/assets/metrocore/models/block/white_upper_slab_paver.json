@@ -1,0 +1,8 @@
+{
+  "parent": "block/upper_slab",
+  "textures": {
+    "bottom": "metrocore:blocks/blockCementPaverWhite",
+    "top": "metrocore:blocks/blockCementPaverWhite",
+    "side": "metrocore:blocks/blockCementPaverWhite"
+  }
+}

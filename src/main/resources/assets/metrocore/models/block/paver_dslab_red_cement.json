@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "metrocore:blocks/blockCementPaverRed",
+    "side": "metrocore:blocks/blockCementPaverRed_side"
+  }
+}
