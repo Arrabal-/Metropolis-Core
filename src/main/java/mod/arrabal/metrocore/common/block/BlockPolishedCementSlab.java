@@ -23,7 +23,7 @@ import java.util.Random;
 /**
  * Created by Arrabal on 1/15/2015.
  */
-public class BlockPolishedCementSlab extends BlockMetroCoreSlab {
+public abstract class BlockPolishedCementSlab extends BlockMetroCoreSlab {
 
     public static final PropertyEnum VARIANT = PropertyEnum.create("variant", CementSlabType.class);
     public static final PropertyBool SEAMLESS = PropertyBool.create("seamless");

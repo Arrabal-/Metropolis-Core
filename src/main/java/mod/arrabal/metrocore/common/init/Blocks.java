@@ -2,10 +2,7 @@ package mod.arrabal.metrocore.common.init;
 
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.*;
-import mod.arrabal.metrocore.common.itemblocks.ItemBlockMetroCoreWithVariants;
-import mod.arrabal.metrocore.common.itemblocks.ItemCementSlab;
-import mod.arrabal.metrocore.common.itemblocks.ItemEtchedCementSlab;
-import mod.arrabal.metrocore.common.itemblocks.ItemPolishedCementSlab;
+import mod.arrabal.metrocore.common.itemblocks.*;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -35,12 +32,16 @@ public class Blocks {
         ModBlocks.blockPolishedCementSlab = new BlockHalfPolishedCementSlab();
         ModBlocks.blockDoubleEtchedCementSlab = new BlockDoubleEtchedCementSlab();
         ModBlocks.blockEtchedCementSlab = new BlockHalfEtchedCementSlab();
+        ModBlocks.blockDoubleCementPaverSlab = new BlockDoubleCementPaverSlab();
+        ModBlocks.blockCementPaverSlab = new BlockHalfCementPaverSlab();
         registerBlock(ModBlocks.blockDoubleCementSlab, "double_cement_slab").setUnlocalizedName("cement_slab");
         registerBlock(ModBlocks.blockCementSlab, "cement_slab").setUnlocalizedName("cement_slab");
         registerBlock(ModBlocks.blockDoublePolishedCementSlab, "double_polished_slab").setUnlocalizedName("polished_slab");
         registerBlock(ModBlocks.blockPolishedCementSlab, "polished_slab").setUnlocalizedName("polished_slab");
         registerBlock(ModBlocks.blockDoubleEtchedCementSlab, "double_etched_slab").setUnlocalizedName("etched_slab");
         registerBlock(ModBlocks.blockEtchedCementSlab, "etched_slab").setUnlocalizedName("etched_slab");
+        registerBlock(ModBlocks.blockDoubleCementPaverSlab, "double_paver_slab").setUnlocalizedName("paver_slab");
+        registerBlock(ModBlocks.blockCementPaverSlab, "paver_slab").setUnlocalizedName("paver_slab");
 
         //Stairs
 
@@ -114,6 +115,26 @@ public class Blocks {
                 MetropolisCore.proxy.registerBlockForMeshing(slab, 0, name);
             }
             return slab;
+        } else if (block instanceof BlockCementPaverSlab) {
+            BlockCementPaverSlab slab = (BlockCementPaverSlab) block;
+            if (slab.baseStates == null)
+                slab.baseStates = BlockStateHelper.getValidStatesForProperties(slab.getDefaultState(), slab.getBaseProperties());
+            slab.setUnlocalizedName(name);
+            if (slab.hasBaseProperties()) {
+                GameRegistry.registerBlock(block, ItemCementPaverSlab.class, name, ModBlocks.blockCementPaverSlab, ModBlocks.blockDoubleCementPaverSlab);
+                for (IBlockState state : slab.baseStates) {
+                    String stateName = slab.getStateName(state, true);
+                    name = name.contains("double_") ? name.replace("double_", "") : name;
+                    ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                    MetropolisCore.proxy.registerBlockForMeshing(slab, slab.getMetaFromState(state), stateName + "_" + name);
+                }
+            } else {
+                GameRegistry.registerBlock(block, name);
+                name = name.contains("double_") ? name.replace("double_", "") : name;
+                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + name);
+                MetropolisCore.proxy.registerBlockForMeshing(slab, 0, name);
+            }
+            return slab;
         } else if (block instanceof BlockCementSlab){
             BlockCementSlab slab = (BlockCementSlab)block;
             if (slab.baseStates == null)
@@ -135,7 +156,7 @@ public class Blocks {
             }
             return slab;
         }  else {
-            return block;
+            return null;
         } //for later use
     }
 

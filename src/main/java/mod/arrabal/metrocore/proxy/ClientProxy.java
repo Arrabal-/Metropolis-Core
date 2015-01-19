@@ -25,7 +25,8 @@ public class ClientProxy extends CommonProxy {
             ModelHelper.registerBlock(slabModelEntry.block, slabModelEntry.meta, ModRef.MOD_ID + "." + slabModelEntry.name);
             if (!(slabModelEntry.block instanceof BlockDoubleCementSlab) &&
                     !(slabModelEntry.block instanceof BlockDoublePolishedCementSlab) &&
-                    !(slabModelEntry.block instanceof BlockDoubleEtchedCementSlab)) {
+                    !(slabModelEntry.block instanceof BlockDoubleEtchedCementSlab) &&
+                    !(slabModelEntry.block instanceof BlockDoubleCementPaverSlab)) {
                 ModelHelper.registerItem(Item.getItemFromBlock(slabModelEntry.block), slabModelEntry.meta, ModRef.MOD_ID + ":" + slabModelEntry.name);
             }
         }

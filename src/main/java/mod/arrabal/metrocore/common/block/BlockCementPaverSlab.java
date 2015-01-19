@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Created by Arrabal on 1/16/2015.
+ * Created by Arrabal on 1/19/2015.
  */
-public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
+public abstract class BlockCementPaverSlab extends BlockMetroCoreSlab {
 
     public static final PropertyEnum VARIANT = PropertyEnum.create("variant", CementSlabType.class);
     public static final PropertyBool SEAMLESS = PropertyBool.create("seamless");
 
-    protected BlockEtchedCementSlab(){
+    protected BlockCementPaverSlab(){
         super(Material.rock);
         IBlockState state = this.blockState.getBaseState();
 
@@ -45,19 +45,19 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
 
     @Override
     public Item getItemDropped(IBlockState state, Random random, int fortune){
-        return Item.getItemFromBlock(ModBlocks.blockEtchedCementSlab);
+        return Item.getItemFromBlock(ModBlocks.blockCementPaverSlab);
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public Item getItem(World world, BlockPos pos){
-        return Item.getItemFromBlock(ModBlocks.blockEtchedCementSlab);
+        return Item.getItemFromBlock(ModBlocks.blockCementPaverSlab);
     }
 
     @Override
     public String getUnlocalizedName(int meta) {
 
-        return super.getUnlocalizedName(meta) + "." + BlockEtchedCementSlab.CementSlabType.byMetadata(meta).getUnlocalizedName();
+        return super.getUnlocalizedName(meta) + "." + BlockCementPaverSlab.CementSlabType.byMetadata(meta).getUnlocalizedName();
     }
 
     @Override
@@ -73,16 +73,16 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
 
     @Override
     public Object getVariant(ItemStack stack) {
-        return BlockEtchedCementSlab.CementSlabType.byMetadata(stack.getMetadata() & 7);
+        return BlockCementPaverSlab.CementSlabType.byMetadata(stack.getMetadata() & 7);
     }
 
     @Override
     public void getSubBlocks(Item item, CreativeTabs creativeTab, List list){
-        if (item != Item.getItemFromBlock(ModBlocks.blockDoubleEtchedCementSlab)){
-            BlockEtchedCementSlab.CementSlabType[] types =  BlockEtchedCementSlab.CementSlabType.values();
+        if (item != Item.getItemFromBlock(ModBlocks.blockDoubleCementPaverSlab)){
+            BlockCementPaverSlab.CementSlabType[] types =  BlockCementPaverSlab.CementSlabType.values();
             int typeCount = types.length;
             for (int i = 0; i < typeCount; ++i){
-                BlockEtchedCementSlab.CementSlabType type = types[i];
+                BlockCementPaverSlab.CementSlabType type = types[i];
                 list.add(new ItemStack(item, 1, type.getMetadata()));
             }
         }
@@ -102,7 +102,7 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
     @Override
     public int getMetaFromState(IBlockState state){
         byte b = 0;
-        int meta = b | ((BlockEtchedCementSlab.CementSlabType)state.getValue(VARIANT)).getMetadata();
+        int meta = b | ((BlockCementPaverSlab.CementSlabType)state.getValue(VARIANT)).getMetadata();
         if (this.isDouble()) {
             if (((Boolean) state.getValue(SEAMLESS)).booleanValue()) {
                 meta |= 8;
@@ -147,7 +147,7 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
         TAN(5,"tan"),
         BROWN(6,"brown"),
         TERRACOTTA(7,"terracotta");
-        private static final BlockEtchedCementSlab.CementSlabType[] META_LOOKUP = new BlockEtchedCementSlab.CementSlabType[values().length];
+        private static final BlockCementPaverSlab.CementSlabType[] META_LOOKUP = new BlockCementPaverSlab.CementSlabType[values().length];
         private final int meta;
         private final String name;
         private final String unlocalizedName;
@@ -164,7 +164,7 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
 
         public int getMetadata(){return this.meta;}
 
-        public static BlockEtchedCementSlab.CementSlabType byMetadata(int meta){
+        public static BlockCementPaverSlab.CementSlabType byMetadata(int meta){
             if (meta < 0 || meta >= META_LOOKUP.length)
             {
                 meta = 0;
@@ -187,11 +187,11 @@ public abstract class BlockEtchedCementSlab extends BlockMetroCoreSlab {
         }
 
         static{
-            BlockEtchedCementSlab.CementSlabType[] types = values();
+            BlockCementPaverSlab.CementSlabType[] types = values();
             int typeNum = types.length;
 
             for (int i = 0; i < typeNum; ++i){
-                BlockEtchedCementSlab.CementSlabType variant = types[i];
+                BlockCementPaverSlab.CementSlabType variant = types[i];
                 META_LOOKUP[variant.getMetadata()] = variant;
             }
         }
