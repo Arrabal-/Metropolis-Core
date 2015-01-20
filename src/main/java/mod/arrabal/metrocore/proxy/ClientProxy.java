@@ -14,12 +14,17 @@ public class ClientProxy extends CommonProxy {
 
     private static ArrayList<ModelEntry> blocksToRegister = new ArrayList();
     private static ArrayList<SlabModelEntry> slabsToRegister = new ArrayList();
+    private static ArrayList<DoorModelEntry> doorsToRegister = new ArrayList();
 
     @Override
     public void registerRenderers() {
         for (ModelEntry modelEntry : blocksToRegister){
             ModelHelper.registerBlock(modelEntry.block, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
             ModelHelper.registerItem(Item.getItemFromBlock(modelEntry.block), modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
+        }
+        for (DoorModelEntry modelEntry : doorsToRegister){
+            ModelHelper.registerBlock(modelEntry.door, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
+            ModelHelper.registerItem(Item.getItemFromBlock(modelEntry.door), modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
         }
         for (SlabModelEntry slabModelEntry : slabsToRegister){
             ModelHelper.registerBlock(slabModelEntry.block, slabModelEntry.meta, ModRef.MOD_ID + "." + slabModelEntry.name);
@@ -39,6 +44,11 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void registerBlockForMeshing(BlockMetroCoreSlab block, int meta, String name){
         slabsToRegister.add(new SlabModelEntry(block, meta, name));
+    }
+
+    @Override
+    public void registerBlockForMeshing(BlockMetroCoreDoor block, int meta, String name){
+        doorsToRegister.add(new DoorModelEntry(block, meta, name));
     }
 
     @Override
@@ -65,6 +75,18 @@ public class ClientProxy extends CommonProxy {
 
         public SlabModelEntry(BlockMetroCoreSlab block, int meta, String name){
             this.block = block;
+            this.meta = meta;
+            this.name = name;
+        }
+    }
+
+    private static class DoorModelEntry{
+        public BlockMetroCoreDoor door;
+        public int meta;
+        public String name;
+
+        public DoorModelEntry(BlockMetroCoreDoor door, int meta, String name){
+            this.door = door;
             this.meta = meta;
             this.name = name;
         }

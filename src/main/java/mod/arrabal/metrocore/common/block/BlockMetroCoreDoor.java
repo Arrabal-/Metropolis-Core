@@ -14,6 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.List;
+import java.util.Random;
 
 /**
  * Created by Arrabal on 12/30/2014.
@@ -28,6 +29,11 @@ public abstract class BlockMetroCoreDoor extends BlockDoor{
         this.setCreativeTab(MetropolisCore.tabMetroWorld);
     }
 
+    protected abstract Item getItem();
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune){ return null;}
+
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubBlocks(Item item, CreativeTabs tab, List list) {
@@ -39,11 +45,6 @@ public abstract class BlockMetroCoreDoor extends BlockDoor{
         } else {
             list.add(new ItemStack(item, 1, 0));
         }
-    }
-
-    @Override
-    public int damageDropped(IBlockState state){
-        return this.getMetaFromState(state);
     }
 
     public IProperty[] getBaseProperties(){

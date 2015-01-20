@@ -4,6 +4,7 @@ import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.block.*;
 import mod.arrabal.metrocore.common.itemblocks.*;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
+import net.minecraft.block.BlockDoor;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.item.Item;
@@ -21,8 +22,10 @@ public class Blocks {
 
     public static void init() {
         //Blocks
-        registerBlock(new BlockCement(), "cement");
-        registerBlock(new BlockCementPaver(), "paver");
+        ModBlocks.blockCement = new BlockCement();
+        ModBlocks.blockCementPaver = new BlockCementPaver();
+        registerBlock(ModBlocks.blockCement, "cement");
+        registerBlock(ModBlocks.blockCementPaver, "paver");
 
 
         //Slabs
@@ -47,8 +50,10 @@ public class Blocks {
 
 
         //Doors
+        ModBlocks.blockGlassDoor = new BlockGlassDoor();
+        registerBlock(ModBlocks.blockGlassDoor, "glass_door");
 
-        ModBlocks.AssignBlocks();
+        //ModBlocks.assignBlocks();
     }
 
     public static void oreRegistration() {
@@ -155,7 +160,25 @@ public class Blocks {
                 MetropolisCore.proxy.registerBlockForMeshing(slab, 0, name);
             }
             return slab;
-        }  else {
+        } else if (block instanceof BlockMetroCoreDoor) {
+            BlockMetroCoreDoor MCblock = (BlockMetroCoreDoor)block;
+            if (MCblock.baseStates == null)
+                MCblock.baseStates = BlockStateHelper.getValidStatesForProperties(MCblock.getDefaultState(), MCblock.getBaseProperties());
+            MCblock.setUnlocalizedName(name);
+            if (MCblock.hasBaseProperties()) {
+                GameRegistry.registerBlock(MCblock, ItemBlockMetroCoreWithVariants.class, name);
+                for (IBlockState state : MCblock.baseStates) {
+                    String stateName = MCblock.getStateName(state, true);
+                    ModelBakery.addVariantName(Item.getItemFromBlock(MCblock), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                    MetropolisCore.proxy.registerBlockForMeshing(MCblock, MCblock.getMetaFromState(state), stateName + "_" + name);
+                }
+            } else {
+                GameRegistry.registerBlock(MCblock, name);
+                ModelBakery.addVariantName(Item.getItemFromBlock(MCblock), ModRef.MOD_ID + ":" + name);
+                MetropolisCore.proxy.registerBlockForMeshing(MCblock, 0, name);
+            }
+            return MCblock;
+        } else {
             return null;
         } //for later use
     }

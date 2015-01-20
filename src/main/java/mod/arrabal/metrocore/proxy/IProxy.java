@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.proxy;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
+import mod.arrabal.metrocore.common.block.BlockMetroCoreDoor;
 import mod.arrabal.metrocore.common.block.BlockMetroCoreSlab;
 
 /**
@@ -14,6 +15,8 @@ public interface IProxy {
     public void registerBlockForMeshing(BlockMetroCore block, int meta, String name);
 
     public void registerBlockForMeshing(BlockMetroCoreSlab block, int meta, String name);
+
+    public void registerBlockForMeshing(BlockMetroCoreDoor block, int meta, String name);
 
     public void registerSounds();
 }

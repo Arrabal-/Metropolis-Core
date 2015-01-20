@@ -12,8 +12,11 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 @GameRegistry.ObjectHolder(ModRef.MOD_ID)
 public class ModBlocks {
 
+    // Blocks
     public static Block blockCement;
     public static Block blockCementPaver;
+
+    // Slabs
     public static BlockSlab blockCementSlab;
     public static BlockSlab blockDoubleCementSlab;
     public static BlockSlab blockPolishedCementSlab;
@@ -23,12 +26,16 @@ public class ModBlocks {
     public static BlockSlab blockCementPaverSlab;
     public static BlockSlab blockDoubleCementPaverSlab;
 
+    // Doors
+    public static Block blockGlassDoor;
+
     private static Block getRegisteredBlock(String name){
         return (Block)GameRegistry.findBlock(ModRef.MOD_ID, name);
     }
 
-    public static void AssignBlocks(){
+    public static void assignBlocks(){
         blockCement = getRegisteredBlock("cement");
         blockCementPaver = getRegisteredBlock("paver");
+        blockGlassDoor = getRegisteredBlock("glass_door");
     }
 }

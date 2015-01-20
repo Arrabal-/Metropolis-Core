@@ -12,8 +12,11 @@ public class Items {
 
     public static void init() {
 
-        //Doors here
-        registerItem(new ItemGlassDoor().setUnlocalizedName("itemDoorGlass"));
+        //Doors
+        ModItems.itemGlassDoor = new ItemGlassDoor(ModBlocks.blockGlassDoor).setUnlocalizedName("glass_door");
+        registerItem(ModItems.itemGlassDoor);
+
+        //ModItems.assignItems();
     }
 
     public static void registerRecipies() {
@@ -22,7 +25,7 @@ public class Items {
 
     public static void registerItem(Item item)
     {
-        GameRegistry.registerItem(item, item.getUnlocalizedName().replace("item.", ""));
+        GameRegistry.registerItem(item, item.getUnlocalizedName());
     }
 
 }

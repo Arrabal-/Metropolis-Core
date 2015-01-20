@@ -41,8 +41,8 @@ public class MetropolisCore {
         ConfigHandler.init(configPath);
         MetropolisCoreHandlers.init();
         tabMetroWorld = new CreativeTabsMetroCore(CreativeTabs.getNextID(), "tabMetroWorld");
-        Items.init();
         Blocks.init();
+        Items.init();
         proxy.registerSounds();
     }
 
