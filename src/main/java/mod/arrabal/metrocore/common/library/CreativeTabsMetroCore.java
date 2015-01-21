@@ -1,6 +1,8 @@
 package mod.arrabal.metrocore.common.library;
 
 import mod.arrabal.metrocore.api.ItemHelper;
+import mod.arrabal.metrocore.common.init.ModBlocks;
+import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -17,7 +19,7 @@ public class CreativeTabsMetroCore extends CreativeTabs{
     @Override
     public ItemStack getIconItemStack()
     {
-        return (new ItemStack((Item) GameRegistry.findItem(ModRef.MOD_ID,"glass_door"), 1, 0));
+        return (new ItemStack(ModBlocks.blockCement, 1, 0));
     }
 
     @Override
