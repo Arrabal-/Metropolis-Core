@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.proxy;
 
+import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import mod.arrabal.metrocore.common.block.*;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.library.ModelHelper;
@@ -14,7 +15,8 @@ public class ClientProxy extends CommonProxy {
 
     private static ArrayList<ModelEntry> blocksToRegister = new ArrayList();
     private static ArrayList<SlabModelEntry> slabsToRegister = new ArrayList();
-    private static ArrayList<DoorModelEntry> doorsToRegister = new ArrayList();
+    //private static ArrayList<DoorModelEntry> doorsToRegister = new ArrayList();
+    private static ArrayList<ItemModelEntry> itemsToRegister = new ArrayList();
 
     @Override
     public void registerRenderers() {
@@ -22,10 +24,10 @@ public class ClientProxy extends CommonProxy {
             ModelHelper.registerBlock(modelEntry.block, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
             ModelHelper.registerItem(Item.getItemFromBlock(modelEntry.block), modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
         }
-        for (DoorModelEntry modelEntry : doorsToRegister){
+        /*for (DoorModelEntry modelEntry : doorsToRegister){
             ModelHelper.registerBlock(modelEntry.door, modelEntry.meta, ModRef.MOD_ID + "." + modelEntry.name);
             ModelHelper.registerItem(Item.getItemFromBlock(modelEntry.door), modelEntry.meta, ModRef.MOD_ID + ":" + modelEntry.name);
-        }
+        }*/
         for (SlabModelEntry slabModelEntry : slabsToRegister){
             ModelHelper.registerBlock(slabModelEntry.block, slabModelEntry.meta, ModRef.MOD_ID + "." + slabModelEntry.name);
             if (!(slabModelEntry.block instanceof BlockDoubleCementSlab) &&
@@ -34,6 +36,9 @@ public class ClientProxy extends CommonProxy {
                     !(slabModelEntry.block instanceof BlockDoubleCementPaverSlab)) {
                 ModelHelper.registerItem(Item.getItemFromBlock(slabModelEntry.block), slabModelEntry.meta, ModRef.MOD_ID + ":" + slabModelEntry.name);
             }
+        }
+        for (ItemModelEntry modelEntry : itemsToRegister){
+            ModelHelper.registerItem(modelEntry.item, ModRef.MOD_ID + ":" + modelEntry.name);
         }
     }
 
@@ -46,9 +51,14 @@ public class ClientProxy extends CommonProxy {
         slabsToRegister.add(new SlabModelEntry(block, meta, name));
     }
 
-    @Override
+    /*@Override
     public void registerBlockForMeshing(BlockMetroCoreDoor block, int meta, String name){
         doorsToRegister.add(new DoorModelEntry(block, meta, name));
+    }*/
+
+    @Override
+    public void registerItemForMeshing(Item item, int meta, String name){
+        itemsToRegister.add(new ItemModelEntry(item, meta, name));
     }
 
     @Override
@@ -80,7 +90,19 @@ public class ClientProxy extends CommonProxy {
         }
     }
 
-    private static class DoorModelEntry{
+    private static class ItemModelEntry {
+        public Item item;
+        public int meta;
+        public String name;
+
+        public ItemModelEntry(Item item, int meta, String name){
+            this.item = item;
+            this.meta = meta;
+            this.name = name.substring(name.indexOf(".") + 1);
+        }
+    }
+
+    /*private static class DoorModelEntry{
         public BlockMetroCoreDoor door;
         public int meta;
         public String name;
@@ -90,5 +112,5 @@ public class ClientProxy extends CommonProxy {
             this.meta = meta;
             this.name = name;
         }
-    }
+    }*/
 }

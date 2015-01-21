@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.common.init;
 
+import mod.arrabal.metrocore.MetropolisCore;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.item.ItemGlassDoor;
 import net.minecraft.item.Item;
@@ -23,9 +24,9 @@ public class Items {
 
     }
 
-    public static void registerItem(Item item)
-    {
+    public static void registerItem(Item item){
         GameRegistry.registerItem(item, item.getUnlocalizedName());
+        MetropolisCore.proxy.registerItemForMeshing(item, 0, item.getUnlocalizedName());
     }
 
 }

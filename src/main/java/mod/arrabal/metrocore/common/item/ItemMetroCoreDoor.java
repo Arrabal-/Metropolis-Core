@@ -22,6 +22,20 @@ public class ItemMetroCoreDoor extends ItemDoor {
 
     }
 
+    /*@Override
+    public String getUnlocalizedName()
+    {
+        String unlocalizedName = super.getUnlocalizedName();
+        return unlocalizedName.substring(unlocalizedName.indexOf(".")+1);
+    }
+
+    @Override
+    public String getUnlocalizedName(ItemStack stack)
+    {
+        String unlocalizedName = super.getUnlocalizedName();
+        return unlocalizedName.substring(unlocalizedName.indexOf(".")+1);
+    }*/
+
     @Override
     public boolean onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ)
     {

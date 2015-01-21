@@ -81,4 +81,4 @@ tile.stairsCementRed2.name=Etched Red Cement Stairs
 tile.stairsCementTan2.name=Etched Tan Cement Stairs
 tile.stairsCementTerraCotta2.name=Etched Terra Cotta Cement Stairs
 
-item.itemDoorGlass.name=Glass Door
+item.glass_door.name=Glass Door

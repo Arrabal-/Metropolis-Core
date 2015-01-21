@@ -162,10 +162,11 @@ public class Blocks {
             return slab;
         } else if (block instanceof BlockMetroCoreDoor) {
             BlockMetroCoreDoor MCblock = (BlockMetroCoreDoor)block;
-            if (MCblock.baseStates == null)
-                MCblock.baseStates = BlockStateHelper.getValidStatesForProperties(MCblock.getDefaultState(), MCblock.getBaseProperties());
+            /*if (MCblock.baseStates == null)
+                MCblock.baseStates = BlockStateHelper.getValidStatesForProperties(MCblock.getDefaultState(), MCblock.getBaseProperties());*/
             MCblock.setUnlocalizedName(name);
-            if (MCblock.hasBaseProperties()) {
+            GameRegistry.registerBlock(MCblock, name);
+            /*if (MCblock.hasBaseProperties()) {
                 GameRegistry.registerBlock(MCblock, ItemBlockMetroCoreWithVariants.class, name);
                 for (IBlockState state : MCblock.baseStates) {
                     String stateName = MCblock.getStateName(state, true);
@@ -176,7 +177,7 @@ public class Blocks {
                 GameRegistry.registerBlock(MCblock, name);
                 ModelBakery.addVariantName(Item.getItemFromBlock(MCblock), ModRef.MOD_ID + ":" + name);
                 MetropolisCore.proxy.registerBlockForMeshing(MCblock, 0, name);
-            }
+            }*/
             return MCblock;
         } else {
             return null;
