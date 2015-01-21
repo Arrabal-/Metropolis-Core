@@ -14,8 +14,8 @@ public class Items {
     public static void init() {
 
         //Doors
-        ModItems.itemGlassDoor = new ItemGlassDoor(ModBlocks.blockGlassDoor).setUnlocalizedName("glass_door");
-        registerItem(ModItems.itemGlassDoor);
+        ModItems.itemGlassDoor = new ItemGlassDoor(ModBlocks.blockGlassDoor).setUnlocalizedName("item_glass_door");
+        registerItem(ModItems.itemGlassDoor, "item_glass_door");
 
         //ModItems.assignItems();
     }
@@ -24,9 +24,9 @@ public class Items {
 
     }
 
-    public static void registerItem(Item item){
-        GameRegistry.registerItem(item, item.getUnlocalizedName());
-        MetropolisCore.proxy.registerItemForMeshing(item, 0, item.getUnlocalizedName());
+    public static void registerItem(Item item, String name){
+        GameRegistry.registerItem(item, name);
+        MetropolisCore.proxy.registerItemForMeshing(item, 0, name);
     }
 
 }

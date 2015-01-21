@@ -1,6 +1,5 @@
 package mod.arrabal.metrocore.proxy;
 
-import com.sun.corba.se.spi.ior.iiop.IIOPProfileTemplate;
 import mod.arrabal.metrocore.common.block.*;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.library.ModelHelper;
@@ -85,7 +84,7 @@ public class ClientProxy extends CommonProxy {
         public ItemModelEntry(Item item, int meta, String name){
             this.item = item;
             this.meta = meta;
-            this.name = name.substring(name.indexOf(".") + 1);
+            this.name = name;
         }
     }
 }
