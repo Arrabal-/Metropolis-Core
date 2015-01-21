@@ -1,7 +1,6 @@
 package mod.arrabal.metrocore.common.block;
 
 import com.google.common.collect.ImmutableSet;
-import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.library.BlockStateHelper;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
@@ -26,7 +25,6 @@ public abstract class BlockMetroCoreDoor extends BlockDoor{
     protected BlockMetroCoreDoor(Material material){
         super(material);
         this.baseStates = BlockStateHelper.getValidStatesForProperties(this.getDefaultState(), this.getBaseProperties());
-        this.setCreativeTab(MetropolisCore.tabMetroWorld);
     }
 
     protected abstract Item getItem();

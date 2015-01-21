@@ -6,7 +6,6 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
@@ -15,14 +14,38 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Created by Arrabal on 1/13/2015.
+ * Created by Evan on 1/21/2015.
  */
-public class ItemCementSlab extends ItemBlockMetroCoreWithVariants {
+public class ItemBlockMetroCoreSlab extends ItemBlockMetroCoreWithVariants {
 
-    private final BlockCementSlab singleSlab;
-    private final BlockCementSlab doubleSlab;
+    private final BlockSlab singleSlab;
+    private final BlockSlab doubleSlab;
 
-    public ItemCementSlab(Block block, BlockHalfCementSlab singleSlab, BlockDoubleCementSlab doubleSlab){
+    public ItemBlockMetroCoreSlab(Block block, BlockSlab singleSlab, BlockSlab doubleSlab){
+        super(block);
+        this.singleSlab = singleSlab;
+        this.doubleSlab = doubleSlab;
+    }
+
+    public ItemBlockMetroCoreSlab(Block block, BlockHalfCementSlab singleSlab, BlockDoubleCementSlab doubleSlab){
+        super(block);
+        this.singleSlab = singleSlab;
+        this.doubleSlab = doubleSlab;
+    }
+
+    public ItemBlockMetroCoreSlab(Block block, BlockHalfCementPaverSlab singleSlab, BlockDoubleCementPaverSlab doubleSlab){
+        super(block);
+        this.singleSlab = singleSlab;
+        this.doubleSlab = doubleSlab;
+    }
+
+    public ItemBlockMetroCoreSlab(Block block, BlockHalfEtchedCementSlab singleSlab, BlockDoubleEtchedCementSlab doubleSlab){
+        super(block);
+        this.singleSlab = singleSlab;
+        this.doubleSlab = doubleSlab;
+    }
+
+    public ItemBlockMetroCoreSlab(Block block, BlockHalfPolishedCementSlab singleSlab, BlockDoublePolishedCementSlab doubleSlab){
         super(block);
         this.singleSlab = singleSlab;
         this.doubleSlab = doubleSlab;

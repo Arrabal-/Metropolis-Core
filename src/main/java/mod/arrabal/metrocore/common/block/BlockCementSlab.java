@@ -57,8 +57,9 @@ public abstract class BlockCementSlab extends BlockMetroCoreSlab {
 
     @Override
     public String getUnlocalizedName(int meta) {
-
-        return super.getUnlocalizedName(meta) + "." + BlockCementSlab.CementSlabType.byMetadata(meta).getUnlocalizedName();
+        IBlockState state = this.getStateFromMeta(meta);
+        String unlocalizedName = state.getBlock().getUnlocalizedName();
+        return unlocalizedName + "." + BlockCementSlab.CementSlabType.byMetadata(meta).getUnlocalizedName();
     }
 
     @Override

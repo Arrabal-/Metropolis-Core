@@ -26,7 +26,9 @@ public abstract class BlockMetroCoreSlab extends BlockSlab{
     protected BlockMetroCoreSlab(Material material){
         super(material);
         this.baseStates = BlockStateHelper.getValidStatesForProperties(this.getDefaultState(), this.getBaseProperties());
-        this.setCreativeTab(MetropolisCore.tabMetroWorld);
+        if (!this.isDouble()) {
+            this.setCreativeTab(MetropolisCore.tabMetroWorld);
+        }
     }
 
     @Override
@@ -61,16 +63,7 @@ public abstract class BlockMetroCoreSlab extends BlockSlab{
     }
 
     @Override
-    public String getUnlocalizedName(int meta){
-        IBlockState state = this.getStateFromMeta(meta);
-        String unlocalizedName = state.getBlock().getUnlocalizedName();
-        //String stateName = getStateName(state, false);
-        //String unlocalizedName = super.getUnlocalizedName() + stateName;
-        return unlocalizedName;
-    }
+    public abstract String getUnlocalizedName(int meta);
 
-    public String getStateName(IBlockState state, boolean full){
-        String unlocalizedName = state.getBlock().getUnlocalizedName();
-        return unlocalizedName.substring(unlocalizedName.indexOf(".") + 1);
-    }
+    public abstract String getStateName(IBlockState state, boolean full);
 }

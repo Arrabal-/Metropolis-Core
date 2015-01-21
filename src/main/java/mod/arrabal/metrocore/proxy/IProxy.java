@@ -17,8 +17,6 @@ public interface IProxy {
 
     public void registerBlockForMeshing(BlockMetroCoreSlab block, int meta, String name);
 
-    //public void registerBlockForMeshing(BlockMetroCoreDoor block, int meta, String name);
-
     public void registerItemForMeshing(Item item, int meta, String name);
 
     public void registerSounds();
