@@ -21,14 +21,14 @@ import net.minecraft.block.Block;
 public class Blocks {
 
     public static void init() {
-        //Blocks
+        // Blocks
         ModBlocks.blockCement = new BlockCement();
         ModBlocks.blockCementPaver = new BlockCementPaver();
         registerBlock(ModBlocks.blockCement, "cement");
         registerBlock(ModBlocks.blockCementPaver, "paver");
 
 
-        //Slabs
+        // Slabs
         ModBlocks.blockDoubleCementSlab = new BlockDoubleCementSlab();
         ModBlocks.blockCementSlab = new BlockHalfCementSlab();
         ModBlocks.blockDoublePolishedCementSlab = new BlockDoublePolishedCementSlab();
@@ -46,12 +46,27 @@ public class Blocks {
         registerBlock(ModBlocks.blockDoubleCementPaverSlab, "double_paver_slab", ModBlocks.blockCementPaverSlab, ModBlocks.blockDoubleCementPaverSlab).setUnlocalizedName("paver_slab");
         registerBlock(ModBlocks.blockCementPaverSlab, "paver_slab", ModBlocks.blockCementPaverSlab, ModBlocks.blockDoubleCementPaverSlab).setUnlocalizedName("paver_slab");
 
-        //Stairs
-
-
-        //Doors
+        // Doors
         ModBlocks.blockGlassDoor = new BlockGlassDoor();
         registerBlock(ModBlocks.blockGlassDoor, "glass_door");
+
+        // Stairs
+        ModBlocks.blockCementStairs = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState());
+        ModBlocks.blockCementStairsBlack = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.BLACK));
+        ModBlocks.blockCementStairsWhite = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.WHITE));
+        ModBlocks.blockCementStairsGray = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.GRAY));
+        ModBlocks.blockCementStairsBrown = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.BROWN));
+        ModBlocks.blockCementStairsRed = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.RED));
+        ModBlocks.blockCementStairsTan = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.TAN));
+        ModBlocks.blockCementStairsTerraCotta = new BlockMetroCoreStairs(ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.TERRACOTTA));
+        registerBlock(ModBlocks.blockCementStairs,"cement_stairs").setUnlocalizedName("cement_stairs");
+        registerBlock(ModBlocks.blockCementStairsBlack,"cement_stairs_black").setUnlocalizedName("cement_stairs_black");
+        registerBlock(ModBlocks.blockCementStairsWhite,"cement_stairs_white").setUnlocalizedName("cement_stairs_white");
+        registerBlock(ModBlocks.blockCementStairsGray,"cement_stairs_gray").setUnlocalizedName("cement_stairs_gray");
+        registerBlock(ModBlocks.blockCementStairsBrown,"cement_stairs_brown").setUnlocalizedName("cement_stairs_brown");
+        registerBlock(ModBlocks.blockCementStairsRed,"cement_stairs_red").setUnlocalizedName("cement_stairs_red");
+        registerBlock(ModBlocks.blockCementStairsTan,"cement_stairs_tan").setUnlocalizedName("cement_stairs_tan");
+        registerBlock(ModBlocks.blockCementStairsTerraCotta,"cement_stairs_terracotta").setUnlocalizedName("cement_stairs_terracotta");
 
         //ModBlocks.assignBlocks();
     }
@@ -105,6 +120,7 @@ public class Blocks {
         }  else {
             block.setUnlocalizedName(name);
             GameRegistry.registerBlock(block, name);
+            MetropolisCore.proxy.registerItemForMeshing(Item.getItemFromBlock(block),0,name);
             return block;
         }
     }

@@ -1,0 +1,8 @@
+{
+  "parent": "block/stairs",
+  "textures": {
+    "bottom": "metrocore:blocks/blockCementWhite",
+    "top": "metrocore:blocks/blockCementWhite",
+    "side": "metrocore:blocks/blockCementWhite"
+  }
+}

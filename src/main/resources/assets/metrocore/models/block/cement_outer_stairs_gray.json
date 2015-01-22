@@ -1,0 +1,8 @@
+{
+  "parent": "block/outer_stairs",
+  "textures": {
+    "bottom": "metrocore:blocks/blockCementGray",
+    "top": "metrocore:blocks/blockCementGray",
+    "side": "metrocore:blocks/blockCementGray"
+  }
+}

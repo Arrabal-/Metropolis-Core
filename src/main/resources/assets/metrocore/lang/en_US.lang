@@ -72,14 +72,14 @@ tile.etched_slab.red.name=Red Etched Cement Slab
 tile.etched_slab.tan.name=Tan Etched Cement Slab
 tile.etched_slab.terracotta.name=Terra Cotta Etched Cement Slab
 
-tile.stairsCement.name=Cement Stairs
-tile.stairsCementBlack.name=Black Cement Stairs
-tile.stairsCementBrown.name=Brown Cement Stairs
-tile.stairsCementGray.name=Gray Cement Stairs
-tile.stairsCementLightGray.name=Light Gray Cement Stairs
-tile.stairsCementRed.name=Red Cement Stairs
-tile.stairsCementTan.name=Tan Cement Stairs
-tile.stairsCementTerraCotta.name=Terra Cotta Cement Stairs
+tile.cement_stairs.name=Cement Stairs
+tile.cement_stairs_black.name=Black Cement Stairs
+tile.cement_stairs_brown.name=Brown Cement Stairs
+tile.cement_stairs_gray.name=Gray Cement Stairs
+tile.cement_stairs_white.name=White Cement Stairs
+tile.cement_stairs_red.name=Red Cement Stairs
+tile.cement_stairs_tan.name=Tan Cement Stairs
+tile.cement_stairs_terracotta.name=Terra Cotta Cement Stairs
 
 tile.stairsCement2.name=Etched Cement Stairs
 tile.stairsCementBlack2.name=Etched Black Cement Stairs

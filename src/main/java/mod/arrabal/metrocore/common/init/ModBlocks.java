@@ -29,6 +29,16 @@ public class ModBlocks {
     // Doors
     public static Block blockGlassDoor;
 
+    // Stairs
+    public static Block blockCementStairs;
+    public static Block blockCementStairsBlack;
+    public static Block blockCementStairsWhite;
+    public static Block blockCementStairsGray;
+    public static Block blockCementStairsBrown;
+    public static Block blockCementStairsRed;
+    public static Block blockCementStairsTan;
+    public static Block blockCementStairsTerraCotta;
+
     private static Block getRegisteredBlock(String name){
         return (Block)GameRegistry.findBlock(ModRef.MOD_ID, name);
     }
