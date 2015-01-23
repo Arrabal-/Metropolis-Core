@@ -13,6 +13,9 @@ public class ModItems {
     // Doors
     public static Item itemGlassDoor;
 
+    // Tools
+    public static Item itemDataTablet;
+
     private static Item getRegisteredItem(String name){
         return (Item)GameRegistry.findItem(ModRef.MOD_ID, name);
     }
