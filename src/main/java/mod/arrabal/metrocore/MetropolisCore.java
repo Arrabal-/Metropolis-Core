@@ -1,7 +1,5 @@
 package mod.arrabal.metrocore;
 
-import mod.arrabal.metrocore.common.init.ModBlocks;
-import mod.arrabal.metrocore.common.init.ModItems;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -42,7 +40,7 @@ public class MetropolisCore {
     public static void preInit(FMLPreInitializationEvent event) {
         configPath = event.getModConfigurationDirectory() + "/Metropolis/";
         ConfigHandler.init(configPath);
-        MetropolisCoreHandlers.init();
+        MetropolisCoreHandlers.preInit();
         tabMetroWorld = CreativeTabsMetroCore.tabMetroWorld;
         tabMetroCoreItems = CreativeTabsMetroCore.tabMetroCoreItems;
         Blocks.init();
@@ -53,6 +51,7 @@ public class MetropolisCore {
     //Actions taken during loading of mods
     @Mod.EventHandler
     public static void Init(FMLInitializationEvent event) {
+        MetropolisCoreHandlers.init();
         proxy.registerRenderers();
         Blocks.oreRegistration();
 

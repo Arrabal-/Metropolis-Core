@@ -1,6 +1,9 @@
 package mod.arrabal.metrocore.common.handlers;
 
+import mod.arrabal.metrocore.MetropolisCore;
+import mod.arrabal.metrocore.network.GuiHandler;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.handlers.world.TerrainGenEventHandler;
@@ -12,12 +15,16 @@ import net.minecraftforge.common.MinecraftForge;
  */
 public class MetropolisCoreHandlers {
 
-    public static void init() {
+    public static void preInit() {
         GameRegistry.registerWorldGenerator(new WorldGenerationHandler(), 1000000);
         registerNetworkEventHandlers();
         registerWorldEventHandlers();
         registerFMLEventHandlers();
 
+    }
+
+    public static void init(){
+        registerGuiHandlers();
     }
 
     private static void registerNetworkEventHandlers() {
@@ -30,6 +37,10 @@ public class MetropolisCoreHandlers {
 
     private static void registerFMLEventHandlers(){
         FMLCommonHandler.instance().bus().register(new ConfigHandler());
+    }
+
+    private static void registerGuiHandlers(){
+        NetworkRegistry.INSTANCE.registerGuiHandler(MetropolisCore.instance, new GuiHandler());
     }
 
 

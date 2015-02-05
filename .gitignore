@@ -16,3 +16,4 @@ saves
 .idea/workspace.xml
 usernamecache.json
 src/main/resources/assets/metrocore/textures/items/Thumbs.db
+src/main/resources/assets/metrocore/textures/gui/Thumbs.db

@@ -13,9 +13,12 @@ public class ModRef {
     public static final String CLIENT_PROXY_LOCATION = PROXY_STEM + ".ClientProxy";
     public static final String COMMON_PROXY_LOCATION = PROXY_STEM + ".CommonProxy";
     public static final String SERVER_PROXY_LOCATION = PROXY_STEM + ".ServerProxy";
-    public static final String GUI_FACTORY_CLASS = "mod.arrabal.metrocore.client.GUI.GUIFactory";
+    public static final String GUI_FACTORY_CLASS = "mod.arrabal.metrocore.client.Gui.GuiFactory";
     public static final String CATEGORY_MOD_MECHANICS = "mod_mechanics";
     public static final String CATEGORY_CITY_GENERATION = "city_generation";
+    public static final String GUI_TEXTURE_LOCATION = MOD_ID + ":" + "textures/gui/";
+    public static final String GUIDE_GUI_TEXTURE = GUI_TEXTURE_LOCATION + "guiDataTablet.png";
+    public static final String GUIDE_GUI_TEXTURE_ON = GUI_TEXTURE_LOCATION + "guiDataTablet_on.png";
 
     // World generation constants
     public static final int CITY_SQUARE_ID = 0;
@@ -35,4 +38,5 @@ public class ModRef {
     public static final int FLAT_ID = 104;
     public static final int PRISON_ID = 105;
     public static final int MUNICIPAL_BUILDING_ID = 106;
+
 }
