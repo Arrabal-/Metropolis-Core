@@ -62,11 +62,22 @@ public class MetropolisStart {
         for (int iteration = 2; iteration <= radiusIterations; iteration++) {
             for (int buildX = -iteration; buildX <= iteration; buildX++){
                 for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
+                    if ((buildX < iteration && buildZ < iteration) ||
+                        ((buildX < -this.maxXGenRadius) || (buildX > this.maxXGenRadius)) ||
+                            ((buildZ < -this.maxZGenRadius) || (buildZ > this.maxZGenRadius))) continue;
                     int worldX, worldZ;
                     worldX = chunkX + buildX;
                     worldZ = chunkZ + buildZ;
-                    if (cityLayoutStart.cityComponentMap.containsKey(worldX + " " + worldZ)) continue;
-
+                    String newChunkKey = worldX + " " + worldZ;
+                    if (cityLayoutStart.cityComponentMap.containsKey(newChunkKey)) {
+                        cityComponent = cityLayoutStart.cityComponentMap.get(newChunkKey);
+                        cityComponent.buildComponent(cityLayoutStart, random);
+                    }
+                    else{
+                        // found empty city tile.  Need to generate new tile.  Should take place after chained generation of tiles
+                        LogHelper.debug("Found empty city tile during component build at " + newChunkKey);
+                        cityLayoutStart.buildComponent(this.cityLayoutStart, random, buildX, buildZ);
+                    }
                 }
             }
         }

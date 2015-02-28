@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.world.structure;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
@@ -87,17 +88,19 @@ public class CityComponentPieces {
         }
     }
 
-    private static int getComponentTotalWeightedValue(List componentList){
+    private static int getComponentMaxWeightedValue(List componentList){
         boolean flag = false;
         int i = 0;
+        int max = -1;
         CityWeight cityWeight;
         for (Iterator iterator = componentList.iterator(); iterator.hasNext(); i+= cityWeight.cityComponentWeight){
             cityWeight = (CityComponentPieces.CityWeight)iterator.next();
             if (cityWeight.cityComponentMax > 0 && cityWeight.cityComponentSpawned < cityWeight.cityComponentMax){
                 flag = true;
+                max = cityWeight.cityComponentWeight > max ? cityWeight.cityComponentWeight : max;
             }
         }
-        return flag ? i : -1;
+        return flag ? max : -1;
     }
 
     private static CityComponent getCityComponent(CityComponentPieces.Start start, CityComponentPieces.CityWeight cityWeight, Random random, int minX, int minY, int minZ,
@@ -161,10 +164,10 @@ public class CityComponentPieces {
         }
         return (CityComponent)object;
     }
-
+    //TODO: This is returning null for new components
     private static CityComponent getNextValidComponent(CityComponentPieces.Start start, Random random, int chunkX, int chunkZ, int minY, int maxY, boolean buildings){
-        int totalWeights = buildings ? getComponentTotalWeightedValue(start.weightedBuildingList) : getComponentTotalWeightedValue(start.weightedCityComponentList);
-        int threshold = random.nextInt(totalWeights);
+        int totalWeights = buildings ? getComponentMaxWeightedValue(start.weightedBuildingList) : getComponentMaxWeightedValue(start.weightedCityComponentList);
+        int threshold = random.nextInt(totalWeights); //Threshold initial value is too high relative to weights.
         int listSize;
         int listThreshold = buildings ? 1 : 4;
         int i = 0;
@@ -176,8 +179,8 @@ public class CityComponentPieces {
             CityComponentPieces.CityWeight cityWeight = (CityComponentPieces.CityWeight)iterator.next();
             if (threshold < cityWeight.cityComponentWeight + i){
                 if (!cityWeight.canSpawnMoreComponents() || (cityWeight == start.cityWeight && listSize > listThreshold &&
-                        cityWeight.cityComponentClass != CityComponentPieces.Street.class || cityWeight.cityComponentClass != CityComponentPieces.Alley.class ||
-                        cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodDistrict.class || cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodAlley.class)){
+                        (cityWeight.cityComponentClass != CityComponentPieces.Street.class || cityWeight.cityComponentClass != CityComponentPieces.Alley.class ||
+                        cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodDistrict.class || cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodAlley.class))){
                     i+=cityWeight.cityComponentWeight;
                     continue;
                 }
@@ -204,7 +207,8 @@ public class CityComponentPieces {
             }
             i+=cityWeight.cityComponentWeight;
         }
-
+        //instead of returning null when no match is found either calculate a new threshold value (with a max number of iterations)
+        //or default to a street tile
         return null;
     }
 
@@ -235,26 +239,25 @@ public class CityComponentPieces {
         }
 
 
-        protected CityComponent getNextCityComponentXZ() {
+        protected CityComponent getNextCityComponentXZ(CityComponentPieces.Start start, Random random, int xShift, int zShift, int minY, int maxY, boolean buildings) {
 
-            return null;
+            int chunkX, chunkZ;
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
+            return getNextValidComponent(start, random, chunkX + xShift, chunkZ + zShift, minY, maxY, buildings);
         }
 
-        protected CityComponent getNextCityComponentP(CityComponentPieces.Start start, Object preciseClass, Random random, int chunkX, int chunkZ, boolean buildings) {
+        protected CityComponent getNextCityComponentP(CityComponentPieces.Start start, Object preciseClass, Random random, int chunkX, int chunkZ, int minY, int maxY, boolean buildings) {
 
             Iterator iterator = buildings ? start.weightedBuildingList.iterator() : start.weightedCityComponentList.iterator();
-            int listSize;
-            int i = 0;
 
             while (iterator.hasNext()) {
-                listSize = buildings ? start.weightedBuildingList.size() : start.weightedCityComponentList.size();
                 CityComponentPieces.CityWeight cityWeight = (CityComponentPieces.CityWeight) iterator.next();
                 if (!cityWeight.canSpawnMoreComponents() || cityWeight.cityComponentClass != preciseClass) {
-                    i += cityWeight.cityComponentWeight;
                     continue;
                 }
-                CityComponent cityComponent = getCityComponent(start, cityWeight, random, (chunkX << 4), 1, (chunkZ << 4),
-                        (chunkX << 4) + 15, start.baseY, (chunkZ << 4) + 15);
+                CityComponent cityComponent = getCityComponent(start, cityWeight, random, (chunkX << 4), minY, (chunkZ << 4),
+                        (chunkX << 4) + 15, maxY, (chunkZ << 4) + 15);
 
                 if (cityComponent != null) {
                     ++cityWeight.cityComponentSpawned;
@@ -271,10 +274,41 @@ public class CityComponentPieces {
                     }
                     return cityComponent;
                 }
-                i+=cityWeight.cityComponentWeight;
             }
-
+            LogHelper.debug("Failed to get next city component (precise).  Can not spawn more components of that type.");
             return null;
+        }
+
+        @Override
+        public void buildComponent(CityComponent cityTile, Random random){
+            int chunkX, chunkZ;
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
+
+            for (int i = -1; i <= 1; ++i){
+                for (int j = -1; j <= 1; ++j){
+                    if (i==0 && j==0) continue;
+                    int buildX = chunkX + i;
+                    int buildZ = chunkZ + j;
+                    String newChunkKey = buildX + " " + buildZ;
+                    if (this.startPiece.cityComponentMap.containsKey(newChunkKey)) continue;
+                    CityComponent cityComponent = getNextCityComponentXZ(this.startPiece, random, i, j, 1, this.startPiece.baseY, false);
+                    if (cityComponent != null){
+                        this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void buildComponent(CityComponent cityTile, Random random, int xShift, int zShift) {
+            int buildX = (this.getChunkPosition().getX() >> 4) + xShift;
+            int buildZ = (this.getChunkPosition().getZ() >> 4) + zShift;
+            String newChunkKey = buildX + " " + buildZ;
+            CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) cityTile, random, xShift, zShift, 1, startPiece.baseY, false);
+            if (cityComponent != null){
+                this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+            }
         }
 
     }
@@ -310,6 +344,7 @@ public class CityComponentPieces {
             MetropolisCityPlan dimensions = new MetropolisCityPlan(minX, minY, minZ, maxX, maxY, maxZ, start.coordBaseMode, "CitySquare");
             return new CitySquare(tileTypeID, tileVariant, start, random, dimensions);
         }
+
 
         @Override
         public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
@@ -363,36 +398,47 @@ public class CityComponentPieces {
                 case MIXED:
                 case WEB: {
                     // add 4 avenues leading away from the start area
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX + 1, chunkZ, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX - 1, chunkZ, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 1, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 1, false);
+                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX + 1, chunkZ, 1, this.baseY, false);
+                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX - 1, chunkZ, 1, this.baseY, false);
+                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 1, 1, this.baseY, false);
+                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 1, 1, this.baseY, false);
                     cityComponentMap.put((chunkX + 1) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent1);
                     cityComponentMap.put((chunkX - 1) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent2);
                     cityComponentMap.put(chunkX + " " + (chunkZ + 1), (CityComponentPieces.Avenue) cityComponent3);
                     cityComponentMap.put(chunkX + " " + (chunkZ - 1), (CityComponentPieces.Avenue) cityComponent4);
 
                     // extend the avenues a second chunk
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX + 2, chunkZ, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX - 2, chunkZ, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 2, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 2, false);
+                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX + 2, chunkZ, 1, this.baseY, false);
+                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX - 2, chunkZ, 1, this.baseY, false);
+                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 2, 1, this.baseY, false);
+                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 2, 1, this.baseY, false);
                     cityComponentMap.put((chunkX + 2) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent1);
                     cityComponentMap.put((chunkX - 2) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent2);
                     cityComponentMap.put(chunkX + " " + (chunkZ + 2), (CityComponentPieces.Avenue) cityComponent3);
                     cityComponentMap.put(chunkX + " " + (chunkZ - 2), (CityComponentPieces.Avenue) cityComponent4);
 
                     // fill in the corners with alleys
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ + 1, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ - 1, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ + 1, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ - 1, false);
+                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ + 1, 1, this.baseY, false);
+                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ - 1, 1, this.baseY, false);
+                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ + 1, 1, this.baseY, false);
+                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ - 1, 1, this.baseY, false);
                     cityComponentMap.put((chunkX + 1) + " " + (chunkZ + 1), (CityComponentPieces.Alley) cityComponent1);
                     cityComponentMap.put((chunkX - 1) + " " + (chunkZ - 1), (CityComponentPieces.Alley) cityComponent2);
                     cityComponentMap.put((chunkX - 1) + " " + (chunkZ + 1), (CityComponentPieces.Alley) cityComponent3);
                     cityComponentMap.put((chunkX + 1) + " " + (chunkZ - 1), (CityComponentPieces.Alley) cityComponent4);
                     break;
                 }
+            }
+        }
+
+        @Override
+        public void buildComponent(CityComponent start, Random random, int xShift, int zShift){
+            int buildX = (this.getChunkPosition().getX() >> 4) + xShift;
+            int buildZ = (this.getChunkPosition().getZ() >> 4) + zShift;
+            String newChunkKey = buildX + " " + buildZ;
+            CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) start, random, xShift, zShift, 1, baseY, false);
+            if (cityComponent != null){
+                cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
             }
         }
 
@@ -685,6 +731,16 @@ public class CityComponentPieces {
         protected CityComponent getNextBuldingLevel() {
 
             return null;
+        }
+
+        @Override
+        public void buildComponent(CityComponent cityTile, Random random){
+
+        }
+
+        @Override
+        public void buildComponent(CityComponent cityTile, Random random, int chunkX, int chunkZ){
+
         }
     }
 
