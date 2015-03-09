@@ -45,6 +45,8 @@ public abstract class CityComponent {
 
     public abstract boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox);
 
+    public abstract boolean addComponentParts(World world, Random random);
+
     public MetropolisBaseBB getBoundingBox(){
         return this.boundingBox;
     }

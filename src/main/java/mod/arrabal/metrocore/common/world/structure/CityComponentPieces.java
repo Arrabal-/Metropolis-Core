@@ -49,8 +49,8 @@ public class CityComponentPieces {
                 arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.CityPark.class, 10, MathHelper.getRandomIntegerInRange(random, 1, 2)));
                 arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.Avenue.class, 20, MathHelper.getRandomIntegerInRange(random, 8, 16)));
                 arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.CitySquare.class, 15, MathHelper.getRandomIntegerInRange(random, 1, 5)));
-                arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.NeighborhoodAlley.class, 20, MathHelper.getRandomIntegerInRange(random, 1, 10)));
-                arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.NeighborhoodDistrict.class, 15, MathHelper.getRandomIntegerInRange(random, 3, 20)));
+                arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.NeighborhoodAlley.class, 15, MathHelper.getRandomIntegerInRange(random, 1, 10)));
+                arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.NeighborhoodDistrict.class, 20, MathHelper.getRandomIntegerInRange(random, 3, 20)));
                 //TODO:  check for new tiles added by other mods and add them to the list
                 arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.Alley.class, 16, MathHelper.getRandomIntegerInRange(random, 8, 22)));
                 arrayList.add(new CityComponentPieces.CityWeight(CityComponentPieces.Street.class, 35, MathHelper.getRandomIntegerInRange(random, 20, 46)));
@@ -86,6 +86,12 @@ public class CityComponentPieces {
 
             return this.cityComponentMax == 0 || this.cityComponentSpawned < this.cityComponentMax;
         }
+
+        public boolean hasNoSpawnLimit(){
+            if (cityComponentClass == CityComponentPieces.Street.class || cityComponentClass == CityComponentPieces.Alley.class ||
+                   cityComponentClass == CityComponentPieces.NeighborhoodDistrict.class || cityComponentClass == CityComponentPieces.NeighborhoodAlley.class) return true;
+            return false;
+        }
     }
 
     private static int getComponentMaxWeightedValue(List componentList){
@@ -100,7 +106,17 @@ public class CityComponentPieces {
                 max = cityWeight.cityComponentWeight > max ? cityWeight.cityComponentWeight : max;
             }
         }
-        return flag ? max : -1;
+        if (flag) return max;
+        if (componentList.size() <= 4){
+            i = 0;
+            for (Iterator iterator = componentList.iterator(); iterator.hasNext(); i+=cityWeight.cityComponentWeight){
+                cityWeight = (CityComponentPieces.CityWeight)iterator.next();
+                if (cityWeight.cityComponentMax == 0 && cityWeight.hasNoSpawnLimit()){
+                    max = cityWeight.cityComponentWeight * 2 > max ? cityWeight.cityComponentWeight * 2 : max;
+                }
+            }
+        }
+        return max;
     }
 
     private static CityComponent getCityComponent(CityComponentPieces.Start start, CityComponentPieces.CityWeight cityWeight, Random random, int minX, int minY, int minZ,
@@ -166,8 +182,8 @@ public class CityComponentPieces {
     }
     //TODO: This is returning null for new components
     private static CityComponent getNextValidComponent(CityComponentPieces.Start start, Random random, int chunkX, int chunkZ, int minY, int maxY, boolean buildings){
-        int totalWeights = buildings ? getComponentMaxWeightedValue(start.weightedBuildingList) : getComponentMaxWeightedValue(start.weightedCityComponentList);
-        int threshold = random.nextInt(totalWeights); //Threshold initial value is too high relative to weights.
+        int maxWeights = buildings ? getComponentMaxWeightedValue(start.weightedBuildingList) : getComponentMaxWeightedValue(start.weightedCityComponentList);
+        int threshold = random.nextInt(maxWeights); //Threshold initial value is too high relative to weights.
         int listSize;
         int listThreshold = buildings ? 1 : 4;
         int i = 0;
@@ -179,8 +195,7 @@ public class CityComponentPieces {
             CityComponentPieces.CityWeight cityWeight = (CityComponentPieces.CityWeight)iterator.next();
             if (threshold < cityWeight.cityComponentWeight + i){
                 if (!cityWeight.canSpawnMoreComponents() || (cityWeight == start.cityWeight && listSize > listThreshold &&
-                        (cityWeight.cityComponentClass != CityComponentPieces.Street.class || cityWeight.cityComponentClass != CityComponentPieces.Alley.class ||
-                        cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodDistrict.class || cityWeight.cityComponentClass != CityComponentPieces.NeighborhoodAlley.class))){
+                        !cityWeight.hasNoSpawnLimit())){
                     i+=cityWeight.cityComponentWeight;
                     continue;
                 }
@@ -196,7 +211,7 @@ public class CityComponentPieces {
                             start.weightedBuildingList.remove(cityWeight);
                         }
                         else {
-                            if (cityWeight.cityComponentClass == CityComponentPieces.Street.class){
+                            if (cityWeight.hasNoSpawnLimit()){
                                 cityWeight.cityComponentMax = 0;
                             }
                             else start.weightedCityComponentList.remove(cityWeight);
@@ -204,6 +219,7 @@ public class CityComponentPieces {
                     }
                     return cityComponent;
                 }
+                else LogHelper.debug("getNextValid Component failed to find next tile at [" + chunkX + ", " + chunkZ + "]");
             }
             i+=cityWeight.cityComponentWeight;
         }
@@ -218,6 +234,7 @@ public class CityComponentPieces {
         protected int minBuildingLevels;
         protected boolean isRuins;
         protected CityComponentPieces.Start startPiece;
+        protected BuildMap joinedTileMap;
 
 
         public Metropolis() {
@@ -230,11 +247,11 @@ public class CityComponentPieces {
                 this.startPiece = start;
             }
             this.minBuildingLevels = 3;
-
+            this.joinedTileMap = new BuildMap();
         }
 
         protected CityComponent getNextCityComponent() {
-
+            LogHelper.debug("Call to empty getNextCityComponent() method in Metropolis class");
             return null;
         }
 
@@ -242,14 +259,19 @@ public class CityComponentPieces {
         protected CityComponent getNextCityComponentXZ(CityComponentPieces.Start start, Random random, int xShift, int zShift, int minY, int maxY, boolean buildings) {
 
             int chunkX, chunkZ;
+            Object defaultTile = buildings ? CityComponentPieces.Tower.class : CityComponentPieces.Street.class;
             chunkX = this.getChunkPosition().getX() >> 4;
             chunkZ = this.getChunkPosition().getZ() >> 4;
-            return getNextValidComponent(start, random, chunkX + xShift, chunkZ + zShift, minY, maxY, buildings);
+            CityComponent cityComponent = getNextValidComponent(start, random, chunkX + xShift, chunkZ + zShift, minY, maxY, buildings);
+            if (cityComponent != null) return cityComponent;
+            LogHelper.debug("Failed to get next city component (XZ).  Fall back to default tile.");
+            return getNextCityComponentP(start, defaultTile, random, chunkX + xShift, chunkZ + zShift, minY, maxY, buildings);
         }
 
         protected CityComponent getNextCityComponentP(CityComponentPieces.Start start, Object preciseClass, Random random, int chunkX, int chunkZ, int minY, int maxY, boolean buildings) {
 
             Iterator iterator = buildings ? start.weightedBuildingList.iterator() : start.weightedCityComponentList.iterator();
+            Object defaultClass = buildings ? CityComponentPieces.Tower.class : CityComponentPieces.Street.class;
 
             while (iterator.hasNext()) {
                 CityComponentPieces.CityWeight cityWeight = (CityComponentPieces.CityWeight) iterator.next();
@@ -275,8 +297,8 @@ public class CityComponentPieces {
                     return cityComponent;
                 }
             }
-            LogHelper.debug("Failed to get next city component (precise).  Can not spawn more components of that type.");
-            return null;
+            LogHelper.debug("Failed to get next city component (precise).  Fall back to default tile.");
+            return getNextCityComponentP(start, defaultClass, random, chunkX, chunkZ, minY, maxY, buildings);
         }
 
         @Override
@@ -285,19 +307,47 @@ public class CityComponentPieces {
             chunkX = this.getChunkPosition().getX() >> 4;
             chunkZ = this.getChunkPosition().getZ() >> 4;
 
-            for (int i = -1; i <= 1; ++i){
-                for (int j = -1; j <= 1; ++j){
-                    if (i==0 && j==0) continue;
-                    int buildX = chunkX + i;
-                    int buildZ = chunkZ + j;
-                    String newChunkKey = buildX + " " + buildZ;
-                    if (this.startPiece.cityComponentMap.containsKey(newChunkKey)) continue;
-                    CityComponent cityComponent = getNextCityComponentXZ(this.startPiece, random, i, j, 1, this.startPiece.baseY, false);
-                    if (cityComponent != null){
-                        this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
-                    }
+            this.joinedTileMap.getIntersections(chunkX, chunkZ);
+
+            CityComponent cityComponent1, cityComponent2, cityComponent3, cityComponent4;
+            String newChunkKey;
+
+            newChunkKey = chunkX + " " + (chunkZ + 1);
+            if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
+                cityComponent1 = getNextCityComponentXZ(this.startPiece, random, 0, 1, 1, this.startPiece.baseY, false);
+                if (cityComponent1 != null){
+                    this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent1);
+                    this.joinedTileMap.intersections.set(0,(CityComponentPieces.Metropolis) cityComponent1);
                 }
             }
+
+            newChunkKey = (chunkX - 1) + " " + (chunkZ);
+            if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
+                cityComponent2 = getNextCityComponentXZ(this.startPiece, random, -1, 0, 1, this.startPiece.baseY, false);
+                if (cityComponent2 != null){
+                    this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent2);
+                    this.joinedTileMap.intersections.set(1,(CityComponentPieces.Metropolis) cityComponent2);
+                }
+            }
+
+            newChunkKey = (chunkX) + " " + (chunkZ - 1);
+            if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
+                cityComponent3 = getNextCityComponentXZ(this.startPiece, random, 0, -1, 1, this.startPiece.baseY, false);
+                if (cityComponent3 != null){
+                    this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent3);
+                    this.joinedTileMap.intersections.set(2,(CityComponentPieces.Metropolis) cityComponent3);
+                }
+            }
+
+            newChunkKey = (chunkX + 1) + " " + (chunkZ);
+            if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
+                cityComponent4 = getNextCityComponentXZ(this.startPiece, random, 1, 0, 1, this.startPiece.baseY, false);
+                if (cityComponent4 != null){
+                    this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent4);
+                    this.joinedTileMap.intersections.set(3,(CityComponentPieces.Metropolis) cityComponent4);
+                }
+            }
+
         }
 
         @Override
@@ -308,6 +358,109 @@ public class CityComponentPieces {
             CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) cityTile, random, xShift, zShift, 1, startPiece.baseY, false);
             if (cityComponent != null){
                 this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+            }
+            else LogHelper.debug("Failed to build new component at " + newChunkKey);
+        }
+
+        @Override
+        public boolean addComponentParts(World world, Random random){
+
+            return false;
+        }
+
+        protected class BuildMap {
+
+            public ArrayList<CityComponentPieces.Metropolis> intersections;
+            public boolean requiredTile;
+            public int requiredTileLocation;
+            public byte rightOfWay; // 1 = East/West 2 = North/South 3 = All
+
+            public static final byte ROW_EW = 1;
+            public static final byte ROW_NS = 2;
+            public static final byte ROW_ALL = 3;
+            public static final byte ROW_NONE = 0;
+            public static final int TILE_LOC_SOUTH = 1;
+            public static final int TILE_LOC_WEST = 2;
+            public static final int TILE_LOC_NORTH = 3;
+            public static final int TILE_LOC_EAST = 4;
+
+            protected BuildMap(){
+                intersections = new ArrayList();
+                requiredTile = false;
+                requiredTileLocation = 0;
+                rightOfWay = ROW_NONE;
+            }
+
+            public void getIntersections(int chunkX, int chunkZ){
+                ArrayList<CityComponentPieces.Metropolis> adjacentTiles = new ArrayList();
+
+                String newChunk = (chunkX) + " " + (chunkZ + 1);
+                if (startPiece.cityComponentMap.containsKey(newChunk)){
+                    adjacentTiles.add(0, startPiece.cityComponentMap.get(newChunk)); // South
+                } else adjacentTiles.add(0, null);
+
+                newChunk = (chunkX - 1) + " " + (chunkZ);
+                if (startPiece.cityComponentMap.containsKey(newChunk)){
+                    adjacentTiles.add(1 ,startPiece.cityComponentMap.get(newChunk)); // West
+                } else adjacentTiles.add(1, null);
+
+                newChunk = (chunkX) + " " + (chunkZ - 1);
+                if (startPiece.cityComponentMap.containsKey(newChunk)){
+                    adjacentTiles.add(2, startPiece.cityComponentMap.get(newChunk)); // North
+                } else adjacentTiles.add(2, null);
+
+                newChunk = (chunkX + 1) + " " + (chunkZ);
+                if (startPiece.cityComponentMap.containsKey(newChunk)){
+                    adjacentTiles.add(3, startPiece.cityComponentMap.get(newChunk)); // East
+                } else adjacentTiles.add(3, null);
+
+                if (adjacentTiles.size() > 0) intersections = adjacentTiles;
+
+            }
+
+            public void getHasRequiredTile(Class matchClass){
+
+                for (int i = 0; i < intersections.size(); ++i){
+                    if (intersections.get(i) != null){
+                        if (matchClass.isInstance(intersections.get(i))){
+                            requiredTile = true;
+                            requiredTileLocation = requiredTileLocation | i;
+                        }
+                    }
+                }
+            }
+
+            public void getRightOfWay(Class matchClass){
+                byte row = 0;
+
+                for (int i = 0; i < intersections.size(); ++i){
+                    if (intersections.get(i) != null){
+                        if (matchClass.isInstance(intersections.get(i))){
+                            if (row > 0){
+                                if (row == 1 && (i == 1 || i == 3)){
+                                    rightOfWay = ROW_ALL;
+                                    return;
+                                }
+                                if (row == 2 && (i == 0 || i == 2)){
+                                    rightOfWay = ROW_ALL;
+                                    return;
+                                }
+                            } else {
+                                switch (i) {
+                                    case 1:
+                                        row = ROW_EW;
+                                        break;
+                                    case 2:
+                                        row = ROW_NS;
+                                        break;
+                                    default:
+                                        row = (byte) (i - 2);
+                                }
+                            }
+                        }
+                    }
+                }
+                rightOfWay = row;
             }
         }
 
@@ -343,6 +496,58 @@ public class CityComponentPieces {
 
             MetropolisCityPlan dimensions = new MetropolisCityPlan(minX, minY, minZ, maxX, maxY, maxZ, start.coordBaseMode, "CitySquare");
             return new CitySquare(tileTypeID, tileVariant, start, random, dimensions);
+        }
+
+        @Override
+        public void buildComponent(CityComponent start, Random random){
+            int chunkX, chunkZ;
+            CityComponent cityComponent1;
+
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
+
+            this.joinedTileMap.getIntersections(chunkX, chunkZ);
+            this.joinedTileMap.getHasRequiredTile(CityComponentPieces.Avenue.class);
+
+            List buildList = new ArrayList();
+            for (int i = 0; i < this.joinedTileMap.intersections.size(); ++i){
+                CityComponent component = this.joinedTileMap.intersections.get(i);
+                if (component == null){
+                    buildList.add(i);
+                }
+            }
+            while (!buildList.isEmpty()){
+                int working = random.nextInt(buildList.size());
+                int buildX = 0;
+                int buildZ = 0;
+                int newTile = (int) buildList.get(working);
+                switch(newTile){
+                    case 0:
+                        buildZ = 1;
+                        break;
+                    case 1:
+                        buildX = -1;
+                        break;
+                    case 2:
+                        buildZ = -1;
+                        break;
+                    case 3:
+                        buildX = 1;
+                        break;
+                }
+                if (!this.joinedTileMap.requiredTile){
+                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX + buildX, chunkZ + buildZ, 1, startPiece.baseY, false);
+                    if (cityComponent1 != null) this.joinedTileMap.requiredTile = true;
+                } else {
+                    cityComponent1 = getNextCityComponentXZ((CityComponentPieces.Start)start, random, buildX, buildZ, 1, startPiece.baseY, false);
+                }
+                if (cityComponent1 != null){
+                    buildList.remove(working);
+                    this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                } else LogHelper.debug("Failed to build new tile adjacent to City Square");
+            }
+
         }
 
 
@@ -440,6 +645,7 @@ public class CityComponentPieces {
             if (cityComponent != null){
                 cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
             }
+            else LogHelper.debug("Failed to build new component at " + newChunkKey);
         }
 
         @Override
@@ -451,11 +657,13 @@ public class CityComponentPieces {
 
     public static class CityPark extends CityComponentPieces.Metropolis {
 
+        private boolean joinedPark;
         @SuppressWarnings("unused")
         public CityPark() {}
 
         protected CityPark(int tileTypeID, int tileVariant, CityComponentPieces.Start start, Random random, MetropolisCityPlan boundingBox){
             super(tileTypeID, start);
+            this.joinedPark = false;
             this.typeVariant = tileVariant;
             this.boundingBox = boundingBox;
             this.maxBuildingLevels = 11;
@@ -466,6 +674,67 @@ public class CityComponentPieces {
 
             MetropolisCityPlan dimensions = new MetropolisCityPlan(minX, minY, minZ, maxX, maxY, maxZ, start.coordBaseMode, "CityPark");
             return new CityPark(tileTypeID, tileVariant, start, random, dimensions);
+        }
+
+        @Override
+        public void buildComponent(CityComponent start, Random random){
+            int chunkX, chunkZ;
+            CityComponent cityComponent1;
+
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
+
+            this.joinedTileMap.getIntersections(chunkX, chunkZ);
+            this.joinedTileMap.getHasRequiredTile(CityComponentPieces.CityPark.class);
+            if (this.joinedTileMap.requiredTile) joinedPark = true;
+
+            List buildList = new ArrayList();
+            for (int i = 0; i < this.joinedTileMap.intersections.size(); ++i){
+                CityComponent component = this.joinedTileMap.intersections.get(i);
+                if (component == null){
+                    buildList.add(i);
+                }
+            }
+            while (!buildList.isEmpty()){
+                int working = random.nextInt(buildList.size());
+                int buildX = 0;
+                int buildZ = 0;
+                int newTile = (int) buildList.get(working);
+                switch(newTile){
+                    case 0:
+                        buildZ = 1;
+                        break;
+                    case 1:
+                        buildX = -1;
+                        break;
+                    case 2:
+                        buildZ = -1;
+                        break;
+                    case 3:
+                        buildX = 1;
+                        break;
+                }
+                if (!joinedPark){
+                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.CityPark.class, random, chunkX + buildX, chunkZ + buildZ, 1, startPiece.baseY, false);
+                    this.joinedTileMap.requiredTile = false;
+                    this.joinedTileMap.requiredTileLocation = 0;
+                    this.joinedTileMap.getHasRequiredTile(CityComponentPieces.Avenue.class);
+                    this.joinedTileMap.getHasRequiredTile(CityComponentPieces.Street.class);
+                } else if (!this.joinedTileMap.requiredTile){
+                    float check = random.nextFloat();
+                    cityComponent1 = (check < 25.0F) ? getNextCityComponentP((CityComponentPieces.Start) start, CityComponentPieces.Avenue.class, random, chunkX + buildX, chunkZ + buildZ, 1, startPiece.baseY, false) :
+                            getNextCityComponentP((CityComponentPieces.Start) start, CityComponentPieces.Street.class, random, chunkX + buildX, chunkZ + buildZ, 1, startPiece.baseY, false);
+                    if (cityComponent1 != null) this.joinedTileMap.requiredTile = true;
+                }else {
+                    cityComponent1 = getNextCityComponentXZ((CityComponentPieces.Start)start, random, buildX, buildZ, 1, startPiece.baseY, false);
+                }
+                if (cityComponent1 != null){
+                    buildList.remove(working);
+                    this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                } else LogHelper.debug("Failed to build new tile adjacent to City Park");
+            }
+
         }
 
         @Override
@@ -563,6 +832,63 @@ public class CityComponentPieces {
 
             MetropolisCityPlan dimensions = new MetropolisCityPlan(minX, minY, minZ, maxX, maxY, maxZ, start.coordBaseMode, "CityAvenue");
             return new Avenue(tileTypeID, tileVariant, start, random, dimensions);
+        }
+
+        @Override
+        public void buildComponent(CityComponent start, Random random){
+            int chunkX, chunkZ;
+            CityComponent cityComponent1;
+
+            chunkX = this.getChunkPosition().getX() >> 4;
+            chunkZ = this.getChunkPosition().getZ() >> 4;
+
+            this.joinedTileMap.getIntersections(chunkX, chunkZ);
+            this.joinedTileMap.getHasRequiredTile(CityComponentPieces.Avenue.class);
+            this.joinedTileMap.getRightOfWay(CityComponentPieces.Avenue.class);
+
+            List buildList = new ArrayList();
+            for (int i = 0; i < this.joinedTileMap.intersections.size(); ++i){
+                CityComponent component = this.joinedTileMap.intersections.get(i);
+                if (component == null){
+                    buildList.add(i);
+                }
+            }
+            while (!buildList.isEmpty()){
+                int working = random.nextInt(buildList.size());
+                int buildX = 0;
+                int buildZ = 0;
+                int newTile = (int) buildList.get(working);
+                switch(newTile){
+                    case 0:
+                        buildZ = 1;
+                        break;
+                    case 1:
+                        buildX = -1;
+                        break;
+                    case 2:
+                        buildZ = -1;
+                        break;
+                    case 3:
+                        buildX = 1;
+                        break;
+                }
+                if (!this.joinedTileMap.requiredTile){
+                    if (this.joinedTileMap.rightOfWay == BuildMap.ROW_ALL ||
+                            (((this.joinedTileMap.rightOfWay == BuildMap.ROW_EW) && (newTile == 1 || newTile == 3)) ||
+                                    ((this.joinedTileMap.rightOfWay == BuildMap.ROW_NS) && (newTile == 0 || newTile == 2)))){
+                        cityComponent1 = getNextCityComponentP((CityComponentPieces.Start) start, CityComponentPieces.Avenue.class, random, chunkX + buildX, chunkZ + buildZ, 1, startPiece.baseY, false);
+                        if (cityComponent1 != null) this.joinedTileMap.requiredTile = true;
+                    } else cityComponent1 = getNextCityComponentXZ((CityComponentPieces.Start)start, random, buildX, buildZ, 1, startPiece.baseY, false);
+                }else {
+                    cityComponent1 = getNextCityComponentXZ((CityComponentPieces.Start)start, random, buildX, buildZ, 1, startPiece.baseY, false);
+                }
+                if (cityComponent1 != null){
+                    buildList.remove(working);
+                    this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                } else LogHelper.debug("Failed to build new tile adjacent to Avenue");
+            }
+
         }
 
         @Override
@@ -741,6 +1067,11 @@ public class CityComponentPieces {
         @Override
         public void buildComponent(CityComponent cityTile, Random random, int chunkX, int chunkZ){
 
+        }
+
+        @Override
+        public boolean addComponentParts(World world, Random random){
+            return false;
         }
     }
 

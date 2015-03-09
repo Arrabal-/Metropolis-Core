@@ -8,10 +8,7 @@ import mod.arrabal.metrocore.common.world.structure.MetropolisCityPlan;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Arrabal on 6/24/2014.
@@ -62,9 +59,7 @@ public class MetropolisStart {
         for (int iteration = 2; iteration <= radiusIterations; iteration++) {
             for (int buildX = -iteration; buildX <= iteration; buildX++){
                 for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
-                    if ((buildX < iteration && buildZ < iteration) ||
-                        ((buildX < -this.maxXGenRadius) || (buildX > this.maxXGenRadius)) ||
-                            ((buildZ < -this.maxZGenRadius) || (buildZ > this.maxZGenRadius))) continue;
+                    if ((Math.abs(buildX) < iteration && Math.abs(buildZ) < iteration) || (Math.abs(buildX) > this.maxXGenRadius) || (Math.abs(buildZ) > this.maxZGenRadius)) continue;
                     int worldX, worldZ;
                     worldX = chunkX + buildX;
                     worldZ = chunkZ + buildZ;
