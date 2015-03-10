@@ -312,7 +312,7 @@ public class CityComponentPieces {
             CityComponent cityComponent1, cityComponent2, cityComponent3, cityComponent4;
             String newChunkKey;
 
-            newChunkKey = chunkX + " " + (chunkZ + 1);
+            newChunkKey = "[" + chunkX + ", " + (chunkZ + 1) + "]";
             if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
                 cityComponent1 = getNextCityComponentXZ(this.startPiece, random, 0, 1, 1, this.startPiece.baseY, false);
                 if (cityComponent1 != null){
@@ -321,7 +321,7 @@ public class CityComponentPieces {
                 }
             }
 
-            newChunkKey = (chunkX - 1) + " " + (chunkZ);
+            newChunkKey = "[" + (chunkX - 1) + ", " + (chunkZ) + "]";
             if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
                 cityComponent2 = getNextCityComponentXZ(this.startPiece, random, -1, 0, 1, this.startPiece.baseY, false);
                 if (cityComponent2 != null){
@@ -330,7 +330,7 @@ public class CityComponentPieces {
                 }
             }
 
-            newChunkKey = (chunkX) + " " + (chunkZ - 1);
+            newChunkKey = "[" + (chunkX) + ", " + (chunkZ - 1) + "]";
             if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
                 cityComponent3 = getNextCityComponentXZ(this.startPiece, random, 0, -1, 1, this.startPiece.baseY, false);
                 if (cityComponent3 != null){
@@ -339,7 +339,7 @@ public class CityComponentPieces {
                 }
             }
 
-            newChunkKey = (chunkX + 1) + " " + (chunkZ);
+            newChunkKey = "[" + (chunkX + 1) + ", " + (chunkZ) + "]";
             if (!this.startPiece.cityComponentMap.containsKey(newChunkKey)){
                 cityComponent4 = getNextCityComponentXZ(this.startPiece, random, 1, 0, 1, this.startPiece.baseY, false);
                 if (cityComponent4 != null){
@@ -354,7 +354,7 @@ public class CityComponentPieces {
         public void buildComponent(CityComponent cityTile, Random random, int xShift, int zShift) {
             int buildX = (this.getChunkPosition().getX() >> 4) + xShift;
             int buildZ = (this.getChunkPosition().getZ() >> 4) + zShift;
-            String newChunkKey = buildX + " " + buildZ;
+            String newChunkKey = "[" + buildX + ", " + buildZ + "]";
             CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) cityTile, random, xShift, zShift, 1, startPiece.baseY, false);
             if (cityComponent != null){
                 this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
@@ -394,22 +394,22 @@ public class CityComponentPieces {
             public void getIntersections(int chunkX, int chunkZ){
                 ArrayList<CityComponentPieces.Metropolis> adjacentTiles = new ArrayList();
 
-                String newChunk = (chunkX) + " " + (chunkZ + 1);
+                String newChunk = "[" + (chunkX) + ", " + (chunkZ + 1) + "]";
                 if (startPiece.cityComponentMap.containsKey(newChunk)){
                     adjacentTiles.add(0, startPiece.cityComponentMap.get(newChunk)); // South
                 } else adjacentTiles.add(0, null);
 
-                newChunk = (chunkX - 1) + " " + (chunkZ);
+                newChunk = "[" + (chunkX - 1) + ", " + (chunkZ) + "]";
                 if (startPiece.cityComponentMap.containsKey(newChunk)){
                     adjacentTiles.add(1 ,startPiece.cityComponentMap.get(newChunk)); // West
                 } else adjacentTiles.add(1, null);
 
-                newChunk = (chunkX) + " " + (chunkZ - 1);
+                newChunk = "[" + (chunkX) + ", " + (chunkZ - 1) + "]";
                 if (startPiece.cityComponentMap.containsKey(newChunk)){
                     adjacentTiles.add(2, startPiece.cityComponentMap.get(newChunk)); // North
                 } else adjacentTiles.add(2, null);
 
-                newChunk = (chunkX + 1) + " " + (chunkZ);
+                newChunk = "[" + (chunkX + 1) + ", " + (chunkZ) + "]";
                 if (startPiece.cityComponentMap.containsKey(newChunk)){
                     adjacentTiles.add(3, startPiece.cityComponentMap.get(newChunk)); // East
                 } else adjacentTiles.add(3, null);
@@ -543,8 +543,9 @@ public class CityComponentPieces {
                 }
                 if (cityComponent1 != null){
                     buildList.remove(working);
+                    String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
-                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                 } else LogHelper.debug("Failed to build new tile adjacent to City Square");
             }
 
@@ -607,30 +608,30 @@ public class CityComponentPieces {
                     cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX - 1, chunkZ, 1, this.baseY, false);
                     cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 1, 1, this.baseY, false);
                     cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 1, 1, this.baseY, false);
-                    cityComponentMap.put((chunkX + 1) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent1);
-                    cityComponentMap.put((chunkX - 1) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent2);
-                    cityComponentMap.put(chunkX + " " + (chunkZ + 1), (CityComponentPieces.Avenue) cityComponent3);
-                    cityComponentMap.put(chunkX + " " + (chunkZ - 1), (CityComponentPieces.Avenue) cityComponent4);
+                    cityComponentMap.put("[" + (chunkX + 1) + ", " + chunkZ + "]", (CityComponentPieces.Avenue) cityComponent1);
+                    cityComponentMap.put("[" + (chunkX - 1) + ", " + chunkZ + "]", (CityComponentPieces.Avenue) cityComponent2);
+                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Avenue) cityComponent3);
+                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Avenue) cityComponent4);
 
                     // extend the avenues a second chunk
                     cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX + 2, chunkZ, 1, this.baseY, false);
                     cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX - 2, chunkZ, 1, this.baseY, false);
                     cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 2, 1, this.baseY, false);
                     cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 2, 1, this.baseY, false);
-                    cityComponentMap.put((chunkX + 2) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent1);
-                    cityComponentMap.put((chunkX - 2) + " " + chunkZ, (CityComponentPieces.Avenue) cityComponent2);
-                    cityComponentMap.put(chunkX + " " + (chunkZ + 2), (CityComponentPieces.Avenue) cityComponent3);
-                    cityComponentMap.put(chunkX + " " + (chunkZ - 2), (CityComponentPieces.Avenue) cityComponent4);
+                    cityComponentMap.put("[" + (chunkX + 2) + ", " + chunkZ + "]", (CityComponentPieces.Avenue) cityComponent1);
+                    cityComponentMap.put("[" + (chunkX - 2) + ", " + chunkZ + "]", (CityComponentPieces.Avenue) cityComponent2);
+                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 2) + "]", (CityComponentPieces.Avenue) cityComponent3);
+                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 2) + "]", (CityComponentPieces.Avenue) cityComponent4);
 
                     // fill in the corners with alleys
                     cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ + 1, 1, this.baseY, false);
                     cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ - 1, 1, this.baseY, false);
                     cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ + 1, 1, this.baseY, false);
                     cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ - 1, 1, this.baseY, false);
-                    cityComponentMap.put((chunkX + 1) + " " + (chunkZ + 1), (CityComponentPieces.Alley) cityComponent1);
-                    cityComponentMap.put((chunkX - 1) + " " + (chunkZ - 1), (CityComponentPieces.Alley) cityComponent2);
-                    cityComponentMap.put((chunkX - 1) + " " + (chunkZ + 1), (CityComponentPieces.Alley) cityComponent3);
-                    cityComponentMap.put((chunkX + 1) + " " + (chunkZ - 1), (CityComponentPieces.Alley) cityComponent4);
+                    cityComponentMap.put("[" + (chunkX + 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Alley) cityComponent1);
+                    cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Alley) cityComponent2);
+                    cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Alley) cityComponent3);
+                    cityComponentMap.put("[" + (chunkX + 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Alley) cityComponent4);
                     break;
                 }
             }
@@ -640,7 +641,7 @@ public class CityComponentPieces {
         public void buildComponent(CityComponent start, Random random, int xShift, int zShift){
             int buildX = (this.getChunkPosition().getX() >> 4) + xShift;
             int buildZ = (this.getChunkPosition().getZ() >> 4) + zShift;
-            String newChunkKey = buildX + " " + buildZ;
+            String newChunkKey = "[" + buildX + ", " + buildZ + "]";
             CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) start, random, xShift, zShift, 1, baseY, false);
             if (cityComponent != null){
                 cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
@@ -730,8 +731,9 @@ public class CityComponentPieces {
                 }
                 if (cityComponent1 != null){
                     buildList.remove(working);
+                    String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
-                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                 } else LogHelper.debug("Failed to build new tile adjacent to City Park");
             }
 
@@ -884,8 +886,9 @@ public class CityComponentPieces {
                 }
                 if (cityComponent1 != null){
                     buildList.remove(working);
+                    String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
-                    this.startPiece.cityComponentMap.put((chunkX + buildX) + " " + (chunkZ + buildZ), (CityComponentPieces.Metropolis) cityComponent1);
+                    this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                 } else LogHelper.debug("Failed to build new tile adjacent to Avenue");
             }
 

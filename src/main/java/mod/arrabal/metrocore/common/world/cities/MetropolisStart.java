@@ -47,35 +47,6 @@ public class MetropolisStart {
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         cityLayoutStart.citySize = cityClass;
         cityLayoutStart.roadGrid = getRoadGridType(random);
-        String hashKey = chunkX + " " + chunkZ;
-        cityLayoutStart.cityComponentMap.put(hashKey,cityLayoutStart);
-        cityLayoutStart.buildComponent(cityLayoutStart, random);
-        int radiusIterations = Math.max(maxXGenRadius, maxZGenRadius);
-        CityComponent cityComponent;
-        LogHelper.debug("Starting build city map with start at " + hashKey);
-        LogHelper.debug("Max gen radius (x,z): " + this.maxXGenRadius + " " + this.maxZGenRadius);
-        LogHelper.debug("BaseY: " + this.baseY);
-        LogHelper.debug("City Class: " + cityClass + " " + "Road Grid: " + cityLayoutStart.roadGrid);
-        for (int iteration = 2; iteration <= radiusIterations; iteration++) {
-            for (int buildX = -iteration; buildX <= iteration; buildX++){
-                for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
-                    if ((Math.abs(buildX) < iteration && Math.abs(buildZ) < iteration) || (Math.abs(buildX) > this.maxXGenRadius) || (Math.abs(buildZ) > this.maxZGenRadius)) continue;
-                    int worldX, worldZ;
-                    worldX = chunkX + buildX;
-                    worldZ = chunkZ + buildZ;
-                    String newChunkKey = worldX + " " + worldZ;
-                    if (cityLayoutStart.cityComponentMap.containsKey(newChunkKey)) {
-                        cityComponent = cityLayoutStart.cityComponentMap.get(newChunkKey);
-                        cityComponent.buildComponent(cityLayoutStart, random);
-                    }
-                    else{
-                        // found empty city tile.  Need to generate new tile.  Should take place after chained generation of tiles
-                        LogHelper.debug("Found empty city tile during component build at " + newChunkKey);
-                        cityLayoutStart.buildComponent(this.cityLayoutStart, random, buildX, buildZ);
-                    }
-                }
-            }
-        }
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -131,6 +102,15 @@ public class MetropolisStart {
 
     public boolean getMaxBBIntersection(int xMinPos, int zMinPos, int xMaxPos, int zMaxPos){
         return this.cityLayoutStart.maxSize.intersectsWith(xMinPos, zMinPos, xMaxPos, zMaxPos);
+    }
+
+    public int getMaxGenRadius(boolean getX){
+        if (getX) return this.maxXGenRadius;
+        return this.maxZGenRadius;
+    }
+
+    public int getBaseY() {
+        return this.baseY;
     }
 
 }

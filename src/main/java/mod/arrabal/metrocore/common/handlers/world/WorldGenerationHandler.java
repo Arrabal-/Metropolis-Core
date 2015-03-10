@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
+import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
@@ -77,7 +78,35 @@ public class WorldGenerationHandler implements IWorldGenerator {
                         if (handler.doGenerateSurfaceMetropolis(world, random, chunkX, chunkZ)){
                             if (handler.startMapContainsKey(handler.currentStart.toString())){
                                 MetropolisStart start = handler.getStartFromKey(handler.currentStart.toString());
-
+                                String hashKey = start.getStartKey();
+                                start.cityLayoutStart.cityComponentMap.put(hashKey,start.cityLayoutStart);
+                                start.cityLayoutStart.buildComponent(start.cityLayoutStart, random);
+                                int radiusIterations = Math.max(start.getMaxGenRadius(true), start.getMaxGenRadius(false));
+                                CityComponent cityComponent;
+                                LogHelper.debug("Starting build city map with start at " + hashKey);
+                                LogHelper.debug("Max gen radius (x,z): " + start.getMaxGenRadius(true) + " " + start.getMaxGenRadius(false));
+                                LogHelper.debug("BaseY: " + start.getBaseY());
+                                LogHelper.debug("City Class: " + start.cityLayoutStart.citySize + " " + "Road Grid: " + start.cityLayoutStart.roadGrid);
+                                for (int iteration = 2; iteration <= radiusIterations; iteration++) {
+                                    for (int buildX = -iteration; buildX <= iteration; buildX++){
+                                        for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
+                                            if ((Math.abs(buildX) < iteration && Math.abs(buildZ) < iteration) || (Math.abs(buildX) > start.getMaxGenRadius(true)) || (Math.abs(buildZ) > start.getMaxGenRadius(false))) continue;
+                                            int worldX, worldZ;
+                                            worldX = chunkX + buildX;
+                                            worldZ = chunkZ + buildZ;
+                                            String newChunkKey = "[" + worldX + ", " + worldZ + "]";
+                                            if (start.cityLayoutStart.cityComponentMap.containsKey(newChunkKey)) {
+                                                cityComponent = start.cityLayoutStart.cityComponentMap.get(newChunkKey);
+                                                cityComponent.buildComponent(start.cityLayoutStart, random);
+                                            }
+                                            else{
+                                                // found empty city tile.  Need to generate new tile.  Should take place after chained generation of tiles
+                                                LogHelper.debug("Found empty city tile during component build at " + newChunkKey);
+                                                start.cityLayoutStart.buildComponent(start.cityLayoutStart, random, buildX, buildZ);
+                                            }
+                                        }
+                                    }
+                                }
                             }
                             //generate city layout
                             //generate building layouts
