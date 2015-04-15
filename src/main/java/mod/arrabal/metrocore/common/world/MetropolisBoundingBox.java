@@ -40,7 +40,7 @@ public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> 
         maxX = xMax;
         maxZ = zMax;
         minY = 1;
-        maxY = 512;
+        maxY = 255;
         name = "MetropolisBoundingBox";
     }
 
@@ -50,7 +50,7 @@ public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> 
         maxX = xMax;
         maxZ = zMax;
         minY = 1;
-        maxY = 512;
+        maxY = 255;
         name = sName;
     }
 

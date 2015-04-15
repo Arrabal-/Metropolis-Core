@@ -117,7 +117,8 @@ public class CityBoundsSaveData extends WorldSavedData
         int size = this.xMin.size();
         for (int i = 0; i < size; i++){
             MetropolisBaseBB boundingBox = new MetropolisBaseBB(xMin.get(i), zMin.get(i), xMax.get(i), zMax.get(i), "Citybounds");
-            map.put(boundingBox.coordToString(), boundingBox);
+            String mapKey = "[" + xCenter.get(i) + ", " + zCenter.get(i) + "]";
+            map.put(mapKey, boundingBox);
         }
         return map;
     }

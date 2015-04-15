@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
@@ -92,8 +93,8 @@ public class WorldGenerationHandler implements IWorldGenerator {
                                         for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
                                             if ((Math.abs(buildX) < iteration && Math.abs(buildZ) < iteration) || (Math.abs(buildX) > start.getMaxGenRadius(true)) || (Math.abs(buildZ) > start.getMaxGenRadius(false))) continue;
                                             int worldX, worldZ;
-                                            worldX = chunkX + buildX;
-                                            worldZ = chunkZ + buildZ;
+                                            worldX = start.getStartX() + buildX;
+                                            worldZ = start.getStartZ() + buildZ;
                                             String newChunkKey = "[" + worldX + ", " + worldZ + "]";
                                             if (start.cityLayoutStart.cityComponentMap.containsKey(newChunkKey)) {
                                                 cityComponent = start.cityLayoutStart.cityComponentMap.get(newChunkKey);
@@ -107,7 +108,12 @@ public class WorldGenerationHandler implements IWorldGenerator {
                                         }
                                     }
                                 }
+                                LogHelper.info("Completed building city layout with start at " + start.getStartKey());
+                                handler.addToGenerationMap(start.cityLayoutStart.cityPlan);
                             }
+                            if(handler.doBuildMetropolis(world, random, handler.currentStart.chunkXPos, handler.currentStart.chunkZPos)){
+                                LogHelper.info("Succeeded in building all city component parts");
+                            } else LogHelper.info("Failed building one or more city component parts");
                             //generate city layout
                             //generate building layouts
                         }

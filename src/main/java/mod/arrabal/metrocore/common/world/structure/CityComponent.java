@@ -143,9 +143,9 @@ public abstract class CityComponent {
         switch (this.coordBaseMode)
         {
             case 0:
-            case 2:
-                return this.boundingBox.minX + offsetX;
             case 1:
+                return this.boundingBox.minX + offsetX;
+            case 2:
                 return this.boundingBox.maxX - offsetZ;
             case 3:
                 return this.boundingBox.minX + offsetZ;
@@ -163,8 +163,18 @@ public abstract class CityComponent {
     // Gets a relative z position in the bounding box based on offset values for x, z, and the coordBaseMode
     protected int getZWithOffset(int offsetX, int offsetZ)
     {
-
-        return 0;
+        switch (this.coordBaseMode)
+        {
+            case 0:
+                return this.boundingBox.maxZ - offsetZ;
+            case 1:
+                return this.boundingBox.minZ + offsetZ;
+            case 2:
+            case 3:
+                return this.boundingBox.minZ + offsetX;
+            default:
+                return offsetZ;
+        }
     }
 
     protected void placeBlockAtCurrentPosition(World world, IBlockState blockstate, int meta, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
@@ -202,7 +212,7 @@ public abstract class CityComponent {
     }
 
     protected void fillWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
-                                  IBlockState placeBlock, IBlockState replaceBlock, boolean alwaysReplace)
+                                  IBlockState exteriorBlock, IBlockState interiorBlock, boolean onlyReplaceBlocks)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
         {
@@ -210,15 +220,15 @@ public abstract class CityComponent {
             {
                 for (int i2 = minZ; i2 <= maxZ; ++i2)
                 {
-                    if (!alwaysReplace || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
+                    if (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
                     {
                         if (k1 != minY && k1 != maxY && l1 != minX && l1 != maxX && i2 != minZ && i2 != maxZ)
                         {
-                            this.placeBlockAtCurrentPosition(world, replaceBlock, 0, l1, k1, i2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, interiorBlock, 0, l1, k1, i2, boundingBox);
                         }
                         else
                         {
-                            this.placeBlockAtCurrentPosition(world, placeBlock, 0, l1, k1, i2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, exteriorBlock, 0, l1, k1, i2, boundingBox);
                         }
                     }
                 }
@@ -227,8 +237,8 @@ public abstract class CityComponent {
     }
 
     protected void fillWithMetadataBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY,
-                                          int maxZ, IBlockState placeBlock, int placeBlockMetadata, IBlockState replaceBlock, int replaceBlockMetadata,
-                                          boolean alwaysReplace)
+                                          int maxZ, IBlockState exteriorBlock, int exteriorBlockMetadata, IBlockState interiorBlock, int interiorBlockMetadata,
+                                          boolean onlyReplaceBlocks)
     {
         for (int i2 = minY; i2 <= maxY; ++i2)
         {
@@ -236,15 +246,15 @@ public abstract class CityComponent {
             {
                 for (int k2 = minZ; k2 <= maxZ; ++k2)
                 {
-                    if (!alwaysReplace || this.getBlockAtCurrentPosition(world, j2, i2, k2, boundingBox).getMaterial() != Material.air)
+                    if (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, j2, i2, k2, boundingBox).getMaterial() != Material.air)
                     {
                         if (i2 != minY && i2 != maxY && j2 != minX && j2 != maxX && k2 != minZ && k2 != maxZ)
                         {
-                            this.placeBlockAtCurrentPosition(world, replaceBlock, replaceBlockMetadata, j2, i2, k2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, interiorBlock, interiorBlockMetadata, j2, i2, k2, boundingBox);
                         }
                         else
                         {
-                            this.placeBlockAtCurrentPosition(world, placeBlock, placeBlockMetadata, j2, i2, k2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, exteriorBlock, exteriorBlockMetadata, j2, i2, k2, boundingBox);
                         }
                     }
                 }
@@ -257,7 +267,7 @@ public abstract class CityComponent {
      * maxZ, boolean alwaysreplace, Random rand, BlockSelector blockselector
      */
     protected void fillWithRandomizedBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ,
-                                            int maxX, int maxY, int maxZ, boolean alwaysreplace, Random random,
+                                            int maxX, int maxY, int maxZ, boolean onlyReplaceBlocks, Random random,
                                             CityComponent.BlockSelector blockSelector)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
@@ -266,7 +276,7 @@ public abstract class CityComponent {
             {
                 for (int i2 = minZ; i2 <= maxZ; ++i2)
                 {
-                    if (!alwaysreplace || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
+                    if (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
                     {
                         blockSelector.selectBlocks(random, l1, k1, i2, k1 == minY || k1 == maxY || l1 == minX || l1 == maxX || i2 == minZ || i2 == maxZ);
                         this.placeBlockAtCurrentPosition(world, blockSelector.getSelectedBlock(), blockSelector.getSelectedBlockMetaData(), l1, k1, i2, boundingBox);
@@ -281,7 +291,7 @@ public abstract class CityComponent {
      * minZ, int maxX, int maxY, int maxZ, Block placeBlock, Block replaceBlock, boolean alwaysreplace
      */
     protected void randomlyFillWithBlocks(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int minX, int minY, int minZ,
-                                          int maxX, int maxY, int maxZ, IBlockState placeBlock, IBlockState replaceBlock, boolean alwaysreplace)
+                                          int maxX, int maxY, int maxZ, IBlockState exteriorBlock, IBlockState interiorBlock, boolean onlyReplaceBlocks)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
         {
@@ -289,15 +299,15 @@ public abstract class CityComponent {
             {
                 for (int i2 = minZ; i2 <= maxZ; ++i2)
                 {
-                    if (random.nextFloat() <= randLimit && (!alwaysreplace || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air))
+                    if (random.nextFloat() <= randLimit && (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air))
                     {
                         if (k1 != minY && k1 != maxY && l1 != minX && l1 != maxX && i2 != minZ && i2 != maxZ)
                         {
-                            this.placeBlockAtCurrentPosition(world, replaceBlock, 0, l1, k1, i2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, interiorBlock, 0, l1, k1, i2, boundingBox);
                         }
                         else
                         {
-                            this.placeBlockAtCurrentPosition(world, placeBlock, 0, l1, k1, i2, boundingBox);
+                            this.placeBlockAtCurrentPosition(world, exteriorBlock, 0, l1, k1, i2, boundingBox);
                         }
                     }
                 }
@@ -313,7 +323,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillSphereWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean alwaysreplace)
+    protected void fillSphereWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean onlyReplaceBlocks)
     {
         float f = (float)(maxX - minX + 1);
         float f1 = (float)(maxY - minY + 1);
@@ -333,7 +343,7 @@ public abstract class CityComponent {
                 {
                     float f7 = ((float)i2 - f4) / (f2 * 0.5F);
 
-                    if (!alwaysreplace || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
+                    if (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
                     {
                         float f8 = f6 * f6 + f5 * f5 + f7 * f7;
 
@@ -360,7 +370,7 @@ public abstract class CityComponent {
             while (!world.isAirBlock(blockpos) && blockpos.getY() < 255)
             {
                 world.setBlockState(blockpos, Blocks.air.getDefaultState(), 2);
-                blockpos.up();
+                blockpos = blockpos.up();
             }
         }
     }

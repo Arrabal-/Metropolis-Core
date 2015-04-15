@@ -66,11 +66,11 @@ public class ChunkGenerationLogger extends WorldSavedData {
             {
                 try
                 {
-                    throw new Exception("MetropoisCore caught IWorldGenerator.generate on already generated coordinates, stacktrace:");
+                    throw new Exception("MetropoisCore caught IWorldGenerator.generate on already generated coordinates: [" + chunkX + ", " + chunkZ + "]");
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    //e.printStackTrace();
                 }
 
                 return true;

@@ -30,7 +30,7 @@ public class MetropolisDataHandler {
                 Map.Entry entry = (Map.Entry) iterator.next();
                 MetropolisBaseBB value = (MetropolisBaseBB) entry.getValue();
                 conflict = value.intersectsWith(boundingBox) ||
-                        value.getSquaredDistance(boundingBox, true) < (ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween);
+                        value.getSquaredDistance(boundingBox, false) < (ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween);
             }
         }
         return conflict;

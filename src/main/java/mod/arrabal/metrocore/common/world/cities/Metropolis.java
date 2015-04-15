@@ -12,6 +12,7 @@ import net.minecraft.village.Village;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.BiomeDictionary;
 
 import java.util.ArrayList;
@@ -75,8 +76,10 @@ public final class Metropolis {
 
     //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
     private static MetropolisBaseBB blockSpawnArea(World world, int radius){
-        int spawnMinX = world.getSpawnPoint().getX() - radius;
-        int spawnMinZ = world .getSpawnPoint().getZ() - radius;
+        int spawnX = world.getSpawnPoint().getX();
+        int spawnZ = world.getSpawnPoint().getZ();
+        int spawnMinX = spawnX - radius;
+        int spawnMinZ = spawnZ - radius;
         return new MetropolisBaseBB(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
     }
 
@@ -84,8 +87,11 @@ public final class Metropolis {
     // will call doGenerateMetropolisStart()
     public static boolean generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
-        int densityFactor = ModOptions.metropolisMinDistanceBetween;
-        if ((genDensity == 0 || ((Math.abs(chunkX) % densityFactor != 0 && Math.abs(chunkZ) % densityFactor != 0)))){
+        double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
+        double xDensityCheck, zDensityCheck;
+        xDensityCheck = (double)Math.abs(chunkX) % densityFactor;
+        zDensityCheck = (double)Math.abs(chunkZ) % densityFactor;
+        if (genDensity == 0 || ((double)Math.abs(chunkX) % densityFactor != 0.0d) || ((double)Math.abs(chunkZ) % densityFactor != 0.0d)){
             LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
             return false;
         }
@@ -93,17 +99,20 @@ public final class Metropolis {
 
         random = getNewRandom(world, chunkX, chunkZ);
 
-        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
+        //EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
 
         int checkX, checkZ;
-        if (entityplayer != null) {
+        /*if (entityplayer != null) {
             checkX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
             checkZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
+
         }
         else {
             checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift));
             checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift));
-        }
+        }*/
+        checkX = chunkX;
+        checkZ = chunkZ;
         if (checkForSpawnConflict(world, checkX, checkZ)){
             LogHelper.trace("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
             return false;
@@ -123,14 +132,14 @@ public final class Metropolis {
                         genMaxX + ", " + genMaxZ + "]");
                 return false;
             }
-            int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ, 100);
+            int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ, 50);
             int checkY = StatsHelper.getStaticMean(heightMap);
             int devY = StatsHelper.getStaticStandardDeviation(heightMap, checkY);
             Random rarityCheck = new Random(world.getTotalWorldTime());
             if (devY <= ConfigHandler.metropolisMaxHeightVariation && rarityCheck.nextDouble() <= genRarity) {
                 LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
-                handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
+                //handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
                 handler.doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ);
                 handler.currentStart = new ChunkCoordIntPair(checkX, checkZ);
                 return true;
@@ -250,6 +259,7 @@ public final class Metropolis {
     public static int[] getGroundHeightMap(World world, int minX, int minZ, int maxX, int maxZ, int sampleSize){
         //Attempting to improve efficiency by only taking a sample of the height map
         int[] heightMap;
+        Chunk testChunk;
         if (sampleSize > 0) {
             heightMap = new int[sampleSize];
             Random heightCheck = new Random(world.getTotalWorldTime());
@@ -257,7 +267,11 @@ public final class Metropolis {
                 int newX = heightCheck.nextInt(maxX - minX) + minX;
                 int newZ = heightCheck.nextInt(maxZ - minZ) + minZ;
                 BlockPos newPos = new BlockPos(newX, 0, newZ);
-                heightMap[i] = world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
+                testChunk = world.getChunkFromBlockCoords(newPos);
+                if (world.isBlockLoaded(newPos, false)){
+                    heightMap[i] = testChunk.getHeight(newPos) - 1;
+                } else LogHelper.info("Chunk not loaded when trying to check heightmap");
+                //world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
             }
         } else {
             int blocks = (maxX - minX + 1) * (maxZ - minZ + 1);
@@ -266,7 +280,10 @@ public final class Metropolis {
             for (int i = minX; i < maxX + 1; i++) {
                 for (int j = minZ; j < maxZ + 1; j++) {
                     BlockPos newPos = new BlockPos(i,0,j);
-                    heightMap[index] = world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
+                    testChunk = world.getChunkFromBlockCoords(newPos);
+                    if (world.isBlockLoaded(newPos, false)){
+                        heightMap[index] =  world.getChunkFromBlockCoords(newPos).getHeight(newPos) - 1;
+                    } else LogHelper.info("Chunk not loaded when trying to check heightmap");
                     index += 1;
                 }
             }
@@ -276,8 +293,8 @@ public final class Metropolis {
 
     private static Random  getNewRandom(World world, int chunkX, int chunkZ){
         Random random = new Random(world.getSeed());
-        long l = (chunkX / ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L);
-        long l2 = (chunkZ / ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L);
+        long l = (long) ((chunkX / (double) ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L));
+        long l2 = (long) ((chunkZ / (double) ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L));
         long l3 = (l * l2) * (random.nextLong()+1L);
         random.setSeed(l3 ^ world.getSeed());
         return random;

@@ -3,12 +3,15 @@ package mod.arrabal.metrocore.common.world.cities;
 import mod.arrabal.metrocore.common.handlers.data.ChunkGenerationLogger;
 import mod.arrabal.metrocore.common.handlers.data.CityBoundsSaveData;
 import mod.arrabal.metrocore.common.handlers.data.MetropolisDataHandler;
+import mod.arrabal.metrocore.common.world.gen.MapGenMetropolis;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.gen.MapGenBase;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Arrabal on 9/15/14.
@@ -18,9 +21,14 @@ public class MetropolisGenerationContainer {
     private MetropolisDataHandler dataHandler;
     private Metropolis generator;
     private ChunkGenerationLogger chunkLogger;
-    private CityBoundsSaveData cityMap;
+    private static CityBoundsSaveData cityMap;
+    public MapGenMetropolis cityGenerator;
 
     public ChunkCoordIntPair currentStart;
+
+    public MetropolisGenerationContainer(){
+
+    }
 
     public MetropolisGenerationContainer(World world){
         this.chunkLogger = (ChunkGenerationLogger) world.getPerWorldStorage().loadData(ChunkGenerationLogger.class, "metropolisChunkLogger");
@@ -28,10 +36,10 @@ public class MetropolisGenerationContainer {
             this.chunkLogger = new ChunkGenerationLogger("metropolisChunkLogger");
             world.getPerWorldStorage().setData("metropolisChunkLogger", this.chunkLogger);
         }
-        this.cityMap = (CityBoundsSaveData) world.getPerWorldStorage().loadData(CityBoundsSaveData.class, "metropolisCityBounds");
-        if (this.cityMap == null){
-            this.cityMap = new CityBoundsSaveData("metropolisCityBounds");
-            world.getPerWorldStorage().setData("metropolisCityBounds",this.cityMap);
+        MetropolisGenerationContainer.cityMap = (CityBoundsSaveData) world.getPerWorldStorage().loadData(CityBoundsSaveData.class, "metropolisCityBounds");
+        if (MetropolisGenerationContainer.cityMap == null){
+            MetropolisGenerationContainer.cityMap = new CityBoundsSaveData("metropolisCityBounds");
+            world.getPerWorldStorage().setData("metropolisCityBounds",MetropolisGenerationContainer.cityMap);
         }
         this.generator = new Metropolis();
         this.dataHandler = new MetropolisDataHandler();
@@ -40,39 +48,37 @@ public class MetropolisGenerationContainer {
     public boolean doGenerateSurfaceMetropolis(World world, Random random, int chunkX, int chunkZ){
         if (this.generator != null){
             if (this.dataHandler.isGenMapEmpty()){
-                this.dataHandler.setGenMap(this.cityMap.getBoundingBoxMap());
+                this.dataHandler.setGenMap(MetropolisGenerationContainer.cityMap.getBoundingBoxMap());
             }
             return Metropolis.generateMetropolis(random, chunkX, chunkZ, world, this);
         }
         return false;
     }
 
-    public boolean doBuildMetropolis(World world, int chunkX, int chunkZ){
+    public boolean doBuildMetropolis(World world, Random random, int chunkX, int chunkZ){
         //TODO:  Need to revise this to use the structure start class (not written yet) to actually spawn the city
         ChunkCoordIntPair genCoords = new ChunkCoordIntPair(chunkX, chunkZ);
         if (this.dataHandler.startMapContainsKey(genCoords.toString())){
             MetropolisStart start = this.dataHandler.getStartFromKey(genCoords.toString());
             if (!start.getCurrentlyBuilding()){
-                //flip currently building to true
-                //call start method from structure class
-                return false; //start.generate(world);
+                return start.generate(world, random);
+            }
+        }else {
+            MetropolisStart start = null;
+            boolean validGenChunk = false;
+            Iterator iterator = this.dataHandler.startMap.entrySet().iterator();
+            while (iterator.hasNext() && !validGenChunk){
+                Map.Entry entry = (Map.Entry) iterator.next();
+                start = (MetropolisStart) entry.getValue();
+                if (start.getMaxBBIntersection(chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15)){
+                    validGenChunk = true;
+                }
+            }
+            if (validGenChunk && !start.getCurrentlyBuilding()) {
+                return start.generate(world, random);
             }
         }
-        MetropolisStart start = null;
-        boolean validGenChunk = false;
-        Iterator iterator = this.dataHandler.startMap.entrySet().iterator();
-        while (iterator.hasNext() && !validGenChunk){
-            Map.Entry entry = (Map.Entry) iterator.next();
-            start = (MetropolisStart) entry.getValue();
-            if (start.getMaxBBIntersection(chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15)){
-                validGenChunk = true;
-            }
-        }
-        if (validGenChunk && !start.getCurrentlyBuilding()) {
-            //flip currently building to true
-            //call start method from structure class
-            return false; //start.generate(world, chunkX, chunkZ);
-        }
+
         return false;
     }
 
@@ -86,7 +92,7 @@ public class MetropolisGenerationContainer {
 
     public void addToGenerationMap(MetropolisBaseBB urbanArea) {
         this.dataHandler.addToBoundingBoxMap(urbanArea);
-        this.cityMap.saveBoundingBoxData(urbanArea);
+        MetropolisGenerationContainer.cityMap.saveBoundingBoxData(urbanArea);
     }
 
     public void addToStartMap(MetropolisStart start){
@@ -103,6 +109,11 @@ public class MetropolisGenerationContainer {
 
     public void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius) {
         this.generator.generateMetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius);
+    }
+
+    public ConcurrentHashMap<String, MetropolisBaseBB> getUpdatedCityMap(){
+        this.dataHandler.setGenMap(MetropolisGenerationContainer.cityMap.getBoundingBoxMap());
+        return MetropolisGenerationContainer.cityMap.getBoundingBoxMap();
     }
 
 }

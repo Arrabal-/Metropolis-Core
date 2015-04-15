@@ -40,8 +40,8 @@ public class MetropolisStart {
         this.baseType = UrbanClassification.URBAN;
         currentlyBuilding = false;
         UrbanType cityClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
-        List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, false);
-        List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, true);
+        List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), false);
+        List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), true);
         this.cityLayoutStart = new CityComponentPieces.Start(0, getStartVariant(random, cityClass), random, chunkX, chunkZ, avgY, tileList, structureList);
         cityLayoutStart.maxSize = new MetropolisBaseBB((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
@@ -94,6 +94,18 @@ public class MetropolisStart {
         return random;
     }
 
+    private boolean constructCityTile(World world, Random random, int chunkX, int chunkZ){
+        String mapKey = "[" + chunkX + ", " + chunkZ + "]";
+        if (cityLayoutStart.cityComponentMap.containsKey(mapKey)){
+            currentlyBuilding = true;
+            CityComponent cityComponent = cityLayoutStart.cityComponentMap.get(mapKey);
+            cityComponent.addComponentParts(world, random);
+            currentlyBuilding = false;
+            return true;
+        }
+        return false;
+    }
+
     public String getStartKey(){
         return startCoord.toString();
     }
@@ -113,4 +125,25 @@ public class MetropolisStart {
         return this.baseY;
     }
 
+    public int getStartX() {
+        return startCoord.chunkXPos;
+    }
+
+    public int getStartZ(){
+        return startCoord.chunkZPos;
+    }
+
+    public boolean generate(World world, Random random){
+        boolean flag = false;
+        Iterator iterator = cityLayoutStart.cityComponentMap.entrySet().iterator();
+        while (iterator.hasNext()){
+            Map.Entry entry = (Map.Entry) iterator.next();
+            CityComponent cityComponent = (CityComponent) entry.getValue();
+            flag = constructCityTile(world, random, cityComponent.getBoundingBox().startX, cityComponent.getBoundingBox().startZ);
+        }
+        //flag = constructCityTile(world, random, chunkX, chunkZ);
+        //flag = placeCityStructures(world, random, chunkX, chunkZ);
+        currentlyBuilding = false;
+        return flag;
+    }
 }

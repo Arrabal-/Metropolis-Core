@@ -12,17 +12,13 @@ public class ModOptions {
     public static final String DEBUG_TRACE = "trace";
 
     public static int metropolisMinDistanceBetween;
-    public static int metropolisAxisSpawnLength;
-    public static int metropolisAxisSpawnShift;
     public static int metropolisCenterSpawnShift;
-    public static int metropolisMinCitySpawnSpread;
+    public static int metropolisMaxCitySpawnSpread;
 
 
     public static void init(){
         metropolisMinDistanceBetween = (int) ((1d/ ConfigHandler.metropolisGenDensity) * BASE_DIST_BETWEEN_CITY/2d);
-        metropolisAxisSpawnLength = (int) Math.sqrt((metropolisMinDistanceBetween*metropolisMinDistanceBetween)/2d) +1;
-        metropolisMinCitySpawnSpread = 2*ConfigHandler.metropolisMaxGenRadius + 16;
-        metropolisAxisSpawnShift = (int) Math.sqrt((metropolisMinCitySpawnSpread*metropolisMinCitySpawnSpread)/2d);
-        metropolisCenterSpawnShift = (metropolisAxisSpawnLength - metropolisAxisSpawnShift)/2;
+        metropolisMaxCitySpawnSpread = 2 * (ConfigHandler.metropolisMaxGenRadius * 16) + 16;
+        metropolisCenterSpawnShift = 0; //((2 * metropolisMaxCitySpawnSpread) + metropolisMinDistanceBetween) >> 4;
     }
 }

@@ -34,7 +34,7 @@ public class MetropolisBaseBB extends MetropolisBoundingBox {
         this.startCoord = new ChunkCoordIntPair(minX >> 4, minZ >> 4);
         this.startX = startCoord.chunkXPos;
         this.startZ = startCoord.chunkZPos;
-        this.facing = 0;
+        this.facing = -1;
     }
 
     public MetropolisBaseBB(String sData){
