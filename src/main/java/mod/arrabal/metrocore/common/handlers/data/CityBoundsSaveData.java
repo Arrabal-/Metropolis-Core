@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.handlers.data;
 
 import mod.arrabal.metrocore.common.library.LogHelper;
-import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
+import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldSavedData;
 
@@ -102,21 +102,21 @@ public class CityBoundsSaveData extends WorldSavedData
         nbt.setIntArray("zCenter", zCenterSave);
     }
 
-    public void saveBoundingBoxData(MetropolisBaseBB mBB){
-        xMin.add(mBB.minX);
-        xMax.add(mBB.maxX);
-        zMin.add(mBB.minZ);
-        zMax.add(mBB.maxZ);
+    public void saveBoundingBoxData(MetropolisBoundingBox mBB){
+        xMin.add(mBB.minBlocKCoords.getX());
+        xMax.add(mBB.maxBlockCoords.getX());
+        zMin.add(mBB.minBlocKCoords.getZ());
+        zMax.add(mBB.maxBlockCoords.getZ());
         xCenter.add(mBB.getCenterX());
         zCenter.add(mBB.getCenterZ());
         this.markDirty();
     }
 
-    public ConcurrentHashMap<String, MetropolisBaseBB> getBoundingBoxMap(){
-        ConcurrentHashMap<String, MetropolisBaseBB> map = new ConcurrentHashMap<String, MetropolisBaseBB>();
+    public ConcurrentHashMap<String, MetropolisBoundingBox> getBoundingBoxMap(){
+        ConcurrentHashMap<String, MetropolisBoundingBox> map = new ConcurrentHashMap<String, MetropolisBoundingBox>();
         int size = this.xMin.size();
         for (int i = 0; i < size; i++){
-            MetropolisBaseBB boundingBox = new MetropolisBaseBB(xMin.get(i), zMin.get(i), xMax.get(i), zMax.get(i), "Citybounds");
+            MetropolisBoundingBox boundingBox = new MetropolisBoundingBox(xMin.get(i), zMin.get(i), xMax.get(i), zMax.get(i), "Citybounds");
             String mapKey = "[" + xCenter.get(i) + ", " + zCenter.get(i) + "]";
             map.put(mapKey, boundingBox);
         }

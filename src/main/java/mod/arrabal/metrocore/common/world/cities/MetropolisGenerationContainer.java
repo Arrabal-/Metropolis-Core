@@ -3,10 +3,10 @@ package mod.arrabal.metrocore.common.world.cities;
 import mod.arrabal.metrocore.common.handlers.data.ChunkGenerationLogger;
 import mod.arrabal.metrocore.common.handlers.data.CityBoundsSaveData;
 import mod.arrabal.metrocore.common.handlers.data.MetropolisDataHandler;
+import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.gen.MapGenMetropolis;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.MapGenBase;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -82,7 +82,7 @@ public class MetropolisGenerationContainer {
         return false;
     }
 
-    public boolean doConflictCheck(MetropolisBaseBB boundingBox){
+    public boolean doConflictCheck(MetropolisBoundingBox boundingBox){
         return this.dataHandler.ConflictCheck(boundingBox);
     }
 
@@ -90,7 +90,7 @@ public class MetropolisGenerationContainer {
         return this.chunkLogger.catchChunkBug(chunkX, chunkZ);
     }
 
-    public void addToGenerationMap(MetropolisBaseBB urbanArea) {
+    public void addToGenerationMap(MetropolisBoundingBox urbanArea) {
         this.dataHandler.addToBoundingBoxMap(urbanArea);
         MetropolisGenerationContainer.cityMap.saveBoundingBoxData(urbanArea);
     }
@@ -111,7 +111,7 @@ public class MetropolisGenerationContainer {
         this.generator.generateMetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius);
     }
 
-    public ConcurrentHashMap<String, MetropolisBaseBB> getUpdatedCityMap(){
+    public ConcurrentHashMap<String, MetropolisBoundingBox> getUpdatedCityMap(){
         this.dataHandler.setGenMap(MetropolisGenerationContainer.cityMap.getBoundingBoxMap());
         return MetropolisGenerationContainer.cityMap.getBoundingBoxMap();
     }

@@ -5,11 +5,8 @@ import mod.arrabal.metrocore.common.init.ModBlocks;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
-import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
+import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
-import net.minecraft.block.material.Material;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -371,14 +368,15 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
-            int buildX = this.boundingBox.minX;
-            int buildZ = this.boundingBox.minZ;
+            int buildX = this.boundingBox.minBlocKCoords.getX();
+            int buildZ = this.boundingBox.minBlocKCoords.getZ();
             for (int x = 0; x < 16; ++x){
                 for (int z = 0; z < 16; ++z){
-                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxY + 1, buildZ + z, new MetropolisBaseBB(buildX, buildZ, this.boundingBox.maxX, this.boundingBox.maxZ,"clearBB"));
+                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxBlockCoords.getY() + 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"clearBB"));
                 }
             }
-            this.fillWithBlocks(world, this.boundingBox, boundingBox.minX, boundingBox.minY, boundingBox.minZ, boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ, ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            this.fillWithBlocks(world, this.boundingBox,buildX, this.boundingBox.minBlocKCoords.getY(), buildZ, this.boundingBox.maxBlockCoords.getX(),
+                    this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
             return true;
         }
 
@@ -566,7 +564,7 @@ public class CityComponentPieces {
 
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -581,7 +579,7 @@ public class CityComponentPieces {
 
         public MetropolisStart.UrbanType citySize;
         public MetropolisStart.RoadGrid roadGrid;
-        public MetropolisBaseBB maxSize;
+        public CityLayoutPlan maxSize;
         public MetropolisCityPlan cityPlan;
 
         public int baseY;
@@ -681,19 +679,20 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
-            int buildX = this.boundingBox.minX;
-            int buildZ = this.boundingBox.minZ;
+            int buildX = this.boundingBox.minBlocKCoords.getX();
+            int buildZ = this.boundingBox.minBlocKCoords.getZ();
             for (int x = 0; x < 16; ++x){
                 for (int z = 0; z < 16; ++z){
-                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxY + 1, buildZ + z, new MetropolisBaseBB(buildX, buildZ, this.boundingBox.maxX, this.boundingBox.maxZ,"clearBB"));
+                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxBlockCoords.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"clearBB"));
                 }
             }
-            this.fillWithBlocks(world, this.boundingBox, boundingBox.minX, boundingBox.minY, boundingBox.minZ, boundingBox.maxX, boundingBox.maxY, boundingBox.maxZ, ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            this.fillWithBlocks(world, this.boundingBox, buildX, this.boundingBox.minBlocKCoords.getY(), buildZ, this.boundingBox.maxBlockCoords.getX(),
+                    this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
             return true;
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
 
@@ -784,7 +783,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -821,7 +820,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -857,7 +856,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -940,7 +939,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -964,7 +963,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -989,7 +988,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1027,7 +1026,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
 
@@ -1052,7 +1051,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1077,7 +1076,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1140,7 +1139,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1162,7 +1161,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1185,7 +1184,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1207,7 +1206,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1231,7 +1230,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1254,7 +1253,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }
@@ -1277,7 +1276,7 @@ public class CityComponentPieces {
         }
 
         @Override
-        public boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox) {
+        public boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox) {
             return false;
         }
     }

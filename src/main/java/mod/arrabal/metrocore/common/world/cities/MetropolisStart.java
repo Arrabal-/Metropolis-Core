@@ -1,10 +1,8 @@
 package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
-import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
-import mod.arrabal.metrocore.common.world.structure.MetropolisCityPlan;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
 
@@ -43,7 +41,7 @@ public class MetropolisStart {
         List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), false);
         List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), true);
         this.cityLayoutStart = new CityComponentPieces.Start(0, getStartVariant(random, cityClass), random, chunkX, chunkZ, avgY, tileList, structureList);
-        cityLayoutStart.maxSize = new MetropolisBaseBB((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
+        cityLayoutStart.maxSize = new CityLayoutPlan((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         cityLayoutStart.citySize = cityClass;
         cityLayoutStart.roadGrid = getRoadGridType(random);

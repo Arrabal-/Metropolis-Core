@@ -1,98 +1,77 @@
 package mod.arrabal.metrocore.common.world;
 
 
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+
 /**
  * Created by Arrabal on 6/11/2014.
  */
 public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> {
 
-    public int minX;
-    public int minY;
-    public int minZ;
-    public int maxX;
-    public int maxY;
-    public int maxZ;
+    public BlockPos minBlocKCoords;
+    public BlockPos maxBlockCoords;
     public final String name;
 
+    public MetropolisBoundingBox(BlockPos minPos, BlockPos maxPos){
+        this.minBlocKCoords = minPos;
+        this.maxBlockCoords = maxPos;
+        this.name = "MetropolisBoundingBox";
+    }
+
+    public MetropolisBoundingBox(BlockPos minPos, BlockPos maxPos, String label){
+        this.minBlocKCoords = minPos;
+        this.maxBlockCoords = maxPos;
+        this.name = label;
+    }
+
     public MetropolisBoundingBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax, String sName){
-        minX = xMin;
-        minY = yMin;
-        minZ = zMin;
-        maxX = xMax;
-        maxY = yMax;
-        maxZ = zMax;
+        this.minBlocKCoords = new BlockPos(xMin, yMin, zMin);
+        this.maxBlockCoords = new BlockPos(xMax, yMax, zMax);
         name = sName;
     }
 
-    public MetropolisBoundingBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax){
-        minX = xMin;
-        minY = yMin;
-        minZ = zMin;
-        maxX = xMax;
-        maxY = yMax;
-        maxZ = zMax;
-        name = "MetropolisBoundingBox";
-    }
-
     public MetropolisBoundingBox(int xMin, int zMin, int xMax, int zMax){
-        minX = xMin;
-        minZ = zMin;
-        maxX = xMax;
-        maxZ = zMax;
-        minY = 1;
-        maxY = 255;
+        this.minBlocKCoords = new BlockPos(xMin, 1, zMin);
+        this.maxBlockCoords = new BlockPos(xMax, 255, zMax);
         name = "MetropolisBoundingBox";
     }
 
     public MetropolisBoundingBox(int xMin, int zMin, int xMax, int zMax, String sName){
-        minX = xMin;
-        minZ = zMin;
-        maxX = xMax;
-        maxZ = zMax;
-        minY = 1;
-        maxY = 255;
+        this.minBlocKCoords = new BlockPos(xMin, 1, zMin);
+        this.maxBlockCoords = new BlockPos(xMax, 255, zMax);
         name = sName;
     }
 
     public MetropolisBoundingBox(String sData){
         String[] split = sData.split(" ");
-        minX = Integer.valueOf(split[0]);
-        minY = Integer.valueOf(split[1]);
-        minZ = Integer.valueOf(split[2]);
-        maxX = Integer.valueOf(split[3]);
-        maxY = Integer.valueOf(split[4]);
-        maxZ = Integer.valueOf(split[5]);
+        this.minBlocKCoords = new BlockPos(Integer.valueOf(split[0]), Integer.valueOf(split[1]), Integer.valueOf(split[2]));
+        this.maxBlockCoords = new BlockPos(Integer.valueOf(split[3]), Integer.valueOf(split[4]), Integer.valueOf(split[5]));
         name = split[6];
     }
 
     public boolean intersectsWith(MetropolisBoundingBox mBB){
-        return this.maxX >= mBB.minX && this.minX <= mBB.maxX &&
-                this.maxZ >= mBB.minZ && this.minZ <= mBB.maxZ &&
-                this.maxY >= mBB.minY && this.minY <= mBB.maxY;
+        return this.maxBlockCoords.getX() >= mBB.minBlocKCoords.getX() && this.minBlocKCoords.getX() <= mBB.maxBlockCoords.getX() &&
+                this.maxBlockCoords.getZ() >= mBB.minBlocKCoords.getZ() && this.minBlocKCoords.getZ() <= mBB.maxBlockCoords.getZ() &&
+                this.maxBlockCoords.getY() >= mBB.minBlocKCoords.getY() && this.minBlocKCoords.getY() <= mBB.maxBlockCoords.getY();
     }
 
-    public boolean intersectsWith(int xMinPos, int zMinPos, int xMaxPos, int zMaxPos)
-    {
-        return this.maxX >= xMinPos && this.minX <= xMaxPos && this.maxZ >= zMinPos && this.minZ <= zMaxPos;
+    public boolean intersectsWith(int xMinPos, int zMinPos, int xMaxPos, int zMaxPos) {
+        return this.maxBlockCoords.getX() >= xMinPos && this.minBlocKCoords.getX() <= xMaxPos &&
+                this.maxBlockCoords.getZ() >= zMinPos && this.minBlocKCoords.getZ() <= zMaxPos;
     }
 
     public void expandTo(MetropolisBoundingBox mBB){
-        this.minX = Math.min(this.minX, mBB.minX);
-        this.minY = Math.min(this.minY, mBB.minY);
-        this.minZ = Math.min(this.minZ, mBB.minZ);
-        this.maxX = Math.max(this.maxX, mBB.maxX);
-        this.maxY = Math.max(this.maxY, mBB.maxY);
-        this.maxZ = Math.max(this.maxZ, mBB.maxZ);
+        this.minBlocKCoords = new BlockPos(Math.min(this.minBlocKCoords.getX(), mBB.minBlocKCoords.getX()),
+                Math.min(this.minBlocKCoords.getY(), mBB.minBlocKCoords.getY()), Math.min(this.minBlocKCoords.getZ(), mBB.minBlocKCoords.getZ()));
+        this.maxBlockCoords = new BlockPos( Math.max(this.maxBlockCoords.getX(), mBB.maxBlockCoords.getX()),
+                Math.max(this.maxBlockCoords.getY(), mBB.maxBlockCoords.getY()), Math.max(this.maxBlockCoords.getZ(), mBB.maxBlockCoords.getZ()));
     }
 
     public void offset(int x, int y, int z)
     {
-        this.minX += x;
-        this.minY += y;
-        this.minZ += z;
-        this.maxX += x;
-        this.maxY += y;
-        this.maxZ += z;
+        this.minBlocKCoords.add(x, y, z);
+        this.maxBlockCoords.add(x, y, z);
     }
 
     /**
@@ -100,7 +79,7 @@ public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> 
      */
     public int getXSize()
     {
-        return this.maxX - this.minX + 1;
+        return this.maxBlockCoords.getX() - this.minBlocKCoords.getX() + 1;
     }
 
     /**
@@ -108,7 +87,7 @@ public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> 
      */
     public int getYSize()
     {
-        return this.maxY - this.minY + 1;
+        return this.maxBlockCoords.getY() - this.minBlocKCoords.getY() + 1;
     }
 
     /**
@@ -116,41 +95,103 @@ public class MetropolisBoundingBox implements Comparable<MetropolisBoundingBox> 
      */
     public int getZSize()
     {
-        return this.maxZ - this.minZ + 1;
+        return this.maxBlockCoords.getZ() - this.minBlocKCoords.getZ() + 1;
     }
 
     public int getCenterX()
     {
-        return this.minX + (this.maxX - this.minX + 1) / 2;
+        return this.minBlocKCoords.getX() + this.getXSize() / 2;
     }
 
     public int getCenterY()
     {
-        return this.minY + (this.maxY - this.minY + 1) / 2;
+        return this.minBlocKCoords.getY() + this.getYSize() / 2;
     }
 
     public int getCenterZ()
     {
-        return this.minZ + (this.maxZ - this.minZ + 1) / 2;
+        return this.minBlocKCoords.getZ() + this.getZSize() / 2;
     }
 
     public boolean isVecInside(int x, int y, int z)
     {
-        return x >= this.minX && x <= this.maxX && z >= this.minZ && z <= this.maxZ && y >= this.minY && y <= this.maxY;
+        return x >= this.minBlocKCoords.getX() && x <= this.maxBlockCoords.getX() &&
+                z >= this.minBlocKCoords.getZ() && z <= this.maxBlockCoords.getZ() &&
+                y >= this.minBlocKCoords.getY() && y <= this.maxBlockCoords.getY();
     }
+
+    public boolean isVecInside(BlockPos blockPos){
+        return blockPos.getX() >= this.minBlocKCoords.getX() && blockPos.getX() <= this.maxBlockCoords.getX() &&
+                blockPos.getZ() >= this.minBlocKCoords.getZ() && blockPos.getZ() <= this.maxBlockCoords.getZ() &&
+                blockPos.getY() >= this.minBlocKCoords.getY() && blockPos.getY() <= this.maxBlockCoords.getY();
+    }
+
+    public int getSquaredDistance(MetropolisBoundingBox mBB, boolean center){
+        if (center){
+            return ((this.getCenterX() - mBB.getCenterX()) * (this.getCenterX() - mBB.getCenterX())) +
+                    ((this.getCenterZ() - mBB.getCenterZ()) * (this.getCenterZ() - mBB.getCenterZ()));
+        }
+        int xDist = Math.min(Math.abs(this.minBlocKCoords.getX() - mBB.maxBlockCoords.getX()), Math.abs(this.maxBlockCoords.getX() - mBB.minBlocKCoords.getX()));
+        int zDist =  Math.min(Math.abs(this.minBlocKCoords.getZ() - mBB.maxBlockCoords.getZ()), Math.abs(this.maxBlockCoords.getZ() - mBB.minBlocKCoords.getZ()));
+        return xDist * xDist + zDist * zDist;
+    }
+
+    /*public void contractHeight(int contract, int direction, boolean symmetrical) {
+        if (symmetrical) {
+            this.minY += contract;
+            this.maxY -= contract;
+        } else switch (direction) {
+            case 0:
+                this.minY += contract;
+                break;
+            default:
+                this.maxY -= contract;
+        }
+    }
+
+    public void contractPlane(int contract, int direction, boolean symmetrical) {
+        if (symmetrical) {
+            if (direction == 0 || direction == 2) {
+                this.minZ += contract;
+                this.maxZ -= contract;
+            } else {
+                this.minX += contract;
+                this.maxX -= contract;
+            }
+        } else switch (direction) {
+            case 0:
+                this.maxZ -= contract;
+                break;
+            case 1:
+                this.minX += contract;
+                break;
+            case 2:
+                this.minZ += contract;
+                break;
+            case 3:
+                this.maxX -= contract;
+                break;
+        }
+    }*/
 
     @Override
     public int compareTo(MetropolisBoundingBox mBB) {
-        if(mBB.minX == minX && mBB.minY == minY && mBB.minZ == minZ){
+        if(mBB.minBlocKCoords.getX() == this.minBlocKCoords.getX() && mBB.minBlocKCoords.getY() == this.minBlocKCoords.getY() &&
+                mBB.minBlocKCoords.getZ() == this.minBlocKCoords.getZ()){
             return 0;
         }
-        if (mBB.minX < minX){ return 1; }
+        if (mBB.minBlocKCoords.getX() < this.minBlocKCoords.getX()){ return 1; }
         return -1;
+    }
+
+    public String coordToString(){
+        return "[" + (this.minBlocKCoords.getX() >> 4) + ", " + (this.minBlocKCoords.getZ() >> 4) + "]";
     }
 
     @Override
     public String toString()
     {
-        return minX + " " + minY + " " + minZ + " " + maxX + " " + maxY + " " + maxZ + " " + name;
+        return this.minBlocKCoords.getX() + " " + this.minBlocKCoords.getY() + " " + this.minBlocKCoords.getZ() +
+                " " + this.maxBlockCoords.getX() + " " + this.maxBlockCoords.getY() + " " + this.maxBlockCoords.getZ() + " " + name;
     }
 }

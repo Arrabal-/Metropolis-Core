@@ -4,9 +4,13 @@ gradlew.bat
 Metropolis-Core.iml
 Metropolis-Core.ipr
 Metropolis-Core.iws
-gradle
+.gradle
 options.txt
-config
+config/Metropolis
+config/NEI
+crash-reports
+asm
+build
 run
 .idea
 logs

@@ -1,7 +1,7 @@
 package mod.arrabal.metrocore.common.handlers.data;
 
 import mod.arrabal.metrocore.common.library.ModOptions;
-import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
+import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 
 import java.util.Iterator;
@@ -13,22 +13,22 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class MetropolisDataHandler {
 
-    public ConcurrentHashMap<String, MetropolisBaseBB> urbanGenerationMap;
+    public ConcurrentHashMap<String, MetropolisBoundingBox> urbanGenerationMap;
     public ConcurrentHashMap<String, MetropolisStart> startMap;
 
 
     public MetropolisDataHandler(){
-        this.urbanGenerationMap = new ConcurrentHashMap<String, MetropolisBaseBB>();
+        this.urbanGenerationMap = new ConcurrentHashMap<String, MetropolisBoundingBox>();
         this.startMap = new ConcurrentHashMap<String, MetropolisStart>();
     }
 
-    public boolean ConflictCheck(MetropolisBaseBB boundingBox){
+    public boolean ConflictCheck(MetropolisBoundingBox boundingBox){
         boolean conflict = false;
         if (!this.urbanGenerationMap.isEmpty()) {
             Iterator iterator = this.urbanGenerationMap.entrySet().iterator();
             while (iterator.hasNext() && !conflict) {
                 Map.Entry entry = (Map.Entry) iterator.next();
-                MetropolisBaseBB value = (MetropolisBaseBB) entry.getValue();
+                MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
                 conflict = value.intersectsWith(boundingBox) ||
                         value.getSquaredDistance(boundingBox, false) < (ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween);
             }
@@ -36,7 +36,7 @@ public class MetropolisDataHandler {
         return conflict;
     }
 
-    public void addToBoundingBoxMap(MetropolisBaseBB urbanArea){
+    public void addToBoundingBoxMap(MetropolisBoundingBox urbanArea){
         this.urbanGenerationMap.put(urbanArea.coordToString(),urbanArea);
     }
 
@@ -52,7 +52,7 @@ public class MetropolisDataHandler {
         return this.urbanGenerationMap.isEmpty();
     }
 
-    public void setGenMap(ConcurrentHashMap<String, MetropolisBaseBB> boundingBoxMap){
+    public void setGenMap(ConcurrentHashMap<String, MetropolisBoundingBox> boundingBoxMap){
         this.urbanGenerationMap = boundingBoxMap;
     }
 
@@ -60,7 +60,7 @@ public class MetropolisDataHandler {
         this.startMap.put(start.getStartKey(), start);
     }
 
-    public ConcurrentHashMap<String, MetropolisBaseBB> getMappedBoundingBoxes(){
+    public ConcurrentHashMap<String, MetropolisBoundingBox> getMappedBoundingBoxes(){
         return this.urbanGenerationMap;
     }
 }

@@ -4,7 +4,6 @@ import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockStone;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
@@ -103,14 +102,14 @@ public class OverrideBiomeDecorator extends BiomeDecorator {
 
     private boolean generatingInCityArea(World world, BlockPos blockPos){
         MetropolisGenerationContainer handler = WorldGenerationHandler.getGenContainerFromWorld(world);
-        ConcurrentHashMap<String, MetropolisBaseBB> mappedCities = handler.getUpdatedCityMap();
+        ConcurrentHashMap<String, MetropolisBoundingBox> mappedCities = handler.getUpdatedCityMap();
         Iterator iterator = mappedCities.entrySet().iterator();
-        MetropolisBaseBB boundingBox;
+        MetropolisBoundingBox boundingBox;
         while (iterator.hasNext()){
             Map.Entry entry = (Map.Entry) iterator.next();
-            boundingBox = (MetropolisBaseBB) entry.getValue();
-            MetropolisBoundingBox clearTerrain = new MetropolisBoundingBox(boundingBox.minX, boundingBox.minZ, boundingBox.maxX, boundingBox.maxZ);
-            if (clearTerrain.isVecInside(blockPos.getX(), blockPos.getY(), blockPos.getZ())){
+            boundingBox = (MetropolisBoundingBox) entry.getValue();
+            MetropolisBoundingBox clearTerrain = new MetropolisBoundingBox(boundingBox.minBlocKCoords.getX(), boundingBox.minBlocKCoords.getZ(), boundingBox.maxBlockCoords.getX(), boundingBox.maxBlockCoords.getZ());
+            if (clearTerrain.isVecInside(blockPos)){
                 return true;
             }
         }

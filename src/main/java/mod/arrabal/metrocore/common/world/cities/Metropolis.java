@@ -6,7 +6,6 @@ import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.library.ModOptions;
 import net.minecraft.entity.monster.*;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.village.Village;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -42,7 +41,7 @@ public final class Metropolis {
     private static int spawnBlockRadius;
     private static double genDensity;
     private static double genRarity;
-    public static MetropolisBaseBB spawnPointBlock;
+    public static CityLayoutPlan spawnPointBlock;
 
     public enum StructureType {URBAN, ROAD, METROPOLIS, CITY, TOWN, HIGHWAY, PAVED, COUNTRY_ROAD}
 
@@ -75,12 +74,12 @@ public final class Metropolis {
 
 
     //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
-    private static MetropolisBaseBB blockSpawnArea(World world, int radius){
+    private static CityLayoutPlan blockSpawnArea(World world, int radius){
         int spawnX = world.getSpawnPoint().getX();
         int spawnZ = world.getSpawnPoint().getZ();
         int spawnMinX = spawnX - radius;
         int spawnMinZ = spawnZ - radius;
-        return new MetropolisBaseBB(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
+        return new CityLayoutPlan(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
     }
 
     // Called during world generation to calculate necessary variables and test location for suitability.  If spawning criteria are met
@@ -175,7 +174,7 @@ public final class Metropolis {
     }
 
     private static boolean checkForGenerationConflict(int minPosX, int minPosZ, int maxPosX, int maxPosZ, MetropolisGenerationContainer handler){
-        return handler.doConflictCheck(new MetropolisBaseBB(minPosX, minPosZ,maxPosX, maxPosZ,"GenerationCheck"));
+        return handler.doConflictCheck(new CityLayoutPlan(minPosX, minPosZ,maxPosX, maxPosZ,"GenerationCheck"));
     }
 
     @SuppressWarnings("unchecked")

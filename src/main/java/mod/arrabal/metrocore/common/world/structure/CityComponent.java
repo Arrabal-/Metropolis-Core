@@ -1,15 +1,12 @@
 package mod.arrabal.metrocore.common.world.structure;
 
-import mod.arrabal.metrocore.common.world.cities.MetropolisBaseBB;
+import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityDispenser;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.WeightedRandomChestContent;
@@ -27,7 +24,7 @@ import java.util.Random;
  */
 public abstract class CityComponent {
 
-    protected MetropolisBaseBB boundingBox;
+    protected MetropolisBoundingBox boundingBox;
     protected int typeID;
     protected int typeVariant;
     protected int coordBaseMode;
@@ -43,11 +40,11 @@ public abstract class CityComponent {
 
     public abstract void buildComponent(CityComponent cityTile, Random random, int chunkX, int chunkZ);
 
-    public abstract boolean addComponentParts(World world, Random random, MetropolisBaseBB boundingBox);
+    public abstract boolean addComponentParts(World world, Random random, MetropolisBoundingBox boundingBox);
 
     public abstract boolean addComponentParts(World world, Random random);
 
-    public MetropolisBaseBB getBoundingBox(){
+    public MetropolisBoundingBox getBoundingBox(){
         return this.boundingBox;
     }
 
@@ -59,7 +56,7 @@ public abstract class CityComponent {
         return this.typeVariant;
     }
 
-    public static CityComponent findIntersecting(List tileList, MetropolisBaseBB boundingBox){
+    public static CityComponent findIntersecting(List tileList, MetropolisBoundingBox boundingBox){
         Iterator iterator = tileList.iterator();
         CityComponent cityComponent;
 
@@ -77,14 +74,16 @@ public abstract class CityComponent {
         return new BlockPos(this.boundingBox.getCenterX(), this.boundingBox.getCenterY(), this.boundingBox.getCenterZ());
     }
 
-    protected boolean isLiquidInCityBoundingBox(World world, MetropolisBaseBB boundingBox)
+    protected boolean isLiquidInCityBoundingBox(World world, MetropolisBoundingBox boundingBox)
     {
-        int i = Math.max(this.boundingBox.minX - 1, boundingBox.minX);
-        int j = Math.max(this.boundingBox.minY - 1, boundingBox.minY);
-        int k = Math.max(this.boundingBox.minZ - 1, boundingBox.minZ);
-        int l = Math.min(this.boundingBox.maxX + 1, boundingBox.maxX);
-        int i1 = Math.min(this.boundingBox.maxY + 1, boundingBox.maxY);
-        int j1 = Math.min(this.boundingBox.maxZ + 1, boundingBox.maxZ);
+        BlockPos bbMin = boundingBox.minBlocKCoords;
+        BlockPos bbMax = boundingBox.maxBlockCoords;
+        int i = Math.max(this.boundingBox.minBlocKCoords.getX() - 1, bbMin.getX());
+        int j = Math.max(this.boundingBox.minBlocKCoords.getY() - 1, bbMin.getY());
+        int k = Math.max(this.boundingBox.minBlocKCoords.getZ() - 1, bbMin.getZ());
+        int l = Math.min(this.boundingBox.maxBlockCoords.getX() + 1, bbMax.getX());
+        int i1 = Math.min(this.boundingBox.maxBlockCoords.getY() + 1, bbMax.getY());
+        int j1 = Math.min(this.boundingBox.maxBlockCoords.getZ() + 1,bbMax.getZ());
         int k1;
         int l1;
 
@@ -144,11 +143,11 @@ public abstract class CityComponent {
         {
             case 0:
             case 1:
-                return this.boundingBox.minX + offsetX;
+                return this.boundingBox.minBlocKCoords.getX() + offsetX;
             case 2:
-                return this.boundingBox.maxX - offsetZ;
+                return this.boundingBox.maxBlockCoords.getX() - offsetZ;
             case 3:
-                return this.boundingBox.minX + offsetZ;
+                return this.boundingBox.minBlocKCoords.getX() + offsetZ;
             default:
                 return offsetX;
         }
@@ -157,7 +156,7 @@ public abstract class CityComponent {
     // Gets a relative y position in the bounding box based on offset value for y and the coordBaseMode
     protected int getYWithOffset(int offsetY)
     {
-        return this.coordBaseMode == -1 ? offsetY : offsetY + this.boundingBox.minY;
+        return this.coordBaseMode == -1 ? offsetY : offsetY + this.boundingBox.minBlocKCoords.getY();
     }
 
     // Gets a relative z position in the bounding box based on offset values for x, z, and the coordBaseMode
@@ -166,18 +165,18 @@ public abstract class CityComponent {
         switch (this.coordBaseMode)
         {
             case 0:
-                return this.boundingBox.maxZ - offsetZ;
+                return this.boundingBox.maxBlockCoords.getZ() - offsetZ;
             case 1:
-                return this.boundingBox.minZ + offsetZ;
+                return this.boundingBox.minBlocKCoords.getZ() + offsetZ;
             case 2:
             case 3:
-                return this.boundingBox.minZ + offsetX;
+                return this.boundingBox.minBlocKCoords.getZ() + offsetX;
             default:
                 return offsetZ;
         }
     }
 
-    protected void placeBlockAtCurrentPosition(World world, IBlockState blockstate, int meta, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
+    protected void placeBlockAtCurrentPosition(World world, IBlockState blockstate, int meta, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox)
     {
         int i1 = this.getXWithOffset(posX, posZ);
         int j1 = this.getYWithOffset(posY);
@@ -189,7 +188,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected Block getBlockAtCurrentPosition(World world, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
+    protected Block getBlockAtCurrentPosition(World world, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox)
     {
         int l = this.getXWithOffset(posX, posZ);
         int i1 = this.getYWithOffset(posY);
@@ -197,7 +196,7 @@ public abstract class CityComponent {
         return !boundingBox.isVecInside(l, i1, j1) ? Blocks.air : world.getBlockState(new BlockPos(l,i1,j1)).getBlock();
     }
 
-    protected void fillWithAir(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
+    protected void fillWithAir(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
         {
@@ -211,7 +210,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+    protected void fillWithBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
                                   IBlockState exteriorBlock, IBlockState interiorBlock, boolean onlyReplaceBlocks)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
@@ -236,7 +235,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillWithMetadataBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY,
+    protected void fillWithMetadataBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY,
                                           int maxZ, IBlockState exteriorBlock, int exteriorBlockMetadata, IBlockState interiorBlock, int interiorBlockMetadata,
                                           boolean onlyReplaceBlocks)
     {
@@ -266,7 +265,7 @@ public abstract class CityComponent {
      * arguments: World worldObj, StructureBoundingBox structBB, int minX, int minY, int minZ, int maxX, int maxY, int
      * maxZ, boolean alwaysreplace, Random rand, BlockSelector blockselector
      */
-    protected void fillWithRandomizedBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ,
+    protected void fillWithRandomizedBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ,
                                             int maxX, int maxY, int maxZ, boolean onlyReplaceBlocks, Random random,
                                             CityComponent.BlockSelector blockSelector)
     {
@@ -290,7 +289,7 @@ public abstract class CityComponent {
      * arguments: World worldObj, StructureBoundingBox structBB, Random rand, float randLimit, int minX, int minY, int
      * minZ, int maxX, int maxY, int maxZ, Block placeBlock, Block replaceBlock, boolean alwaysreplace
      */
-    protected void randomlyFillWithBlocks(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int minX, int minY, int minZ,
+    protected void randomlyFillWithBlocks(World world, MetropolisBoundingBox boundingBox, Random random, float randLimit, int minX, int minY, int minZ,
                                           int maxX, int maxY, int maxZ, IBlockState exteriorBlock, IBlockState interiorBlock, boolean onlyReplaceBlocks)
     {
         for (int k1 = minY; k1 <= maxY; ++k1)
@@ -315,7 +314,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void randomlyPlaceBlockAtPostion(World world, MetropolisBaseBB boundingBox, Random random, float randLimit, int posX, int posY, int posZ, IBlockState placeBlock, int meta)
+    protected void randomlyPlaceBlockAtPostion(World world, MetropolisBoundingBox boundingBox, Random random, float randLimit, int posX, int posY, int posZ, IBlockState placeBlock, int meta)
     {
         if (random.nextFloat() < randLimit)
         {
@@ -323,7 +322,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillSphereWithBlocks(World world, MetropolisBaseBB boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean onlyReplaceBlocks)
+    protected void fillSphereWithBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean onlyReplaceBlocks)
     {
         float f = (float)(maxX - minX + 1);
         float f1 = (float)(maxY - minY + 1);
@@ -357,7 +356,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void clearCurrentPositionBlocksUpwards(World world, int posX, int posY, int posZ, MetropolisBaseBB boundingBox)
+    protected void clearCurrentPositionBlocksUpwards(World world, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox)
     {
         int l = this.getXWithOffset(posX, posZ);
         int i1 = this.getYWithOffset(posY);
@@ -376,7 +375,7 @@ public abstract class CityComponent {
     }
 
     protected void fillCurrentPositionBlocksDownward(World world, IBlockState placeBlock, int meta, int posX, int posY, int posZ,
-                                 MetropolisBaseBB boundingBox)
+                                 MetropolisBoundingBox boundingBox)
     {
         int i1 = this.getXWithOffset(posX, posZ);
         int j1 = this.getYWithOffset(posY);
@@ -392,7 +391,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected boolean generateStructureChestContents(World world, MetropolisBaseBB boundingBox, Random random,
+    protected boolean generateStructureChestContents(World world, MetropolisBoundingBox boundingBox, Random random,
                                                      int posX, int posY, int posZ, List chestContents,
                                                      int maxIterations)
     {
@@ -421,7 +420,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected boolean generateStructureDispenserContents(World world, MetropolisBaseBB boundingBox, Random random, int posX, int posY,
+    protected boolean generateStructureDispenserContents(World world, MetropolisBoundingBox boundingBox, Random random, int posX, int posY,
                                                          int posZ, int meta, WeightedRandomChestContent[] dispenserContents, int maxIterations)
     {
         int j1 = this.getXWithOffset(posX, posZ);
@@ -430,7 +429,7 @@ public abstract class CityComponent {
 
         BlockPos blockpos = new BlockPos(j1,k1,l1);
 
-        if (boundingBox.isVecInside(j1, k1, l1) && world.getBlockState(blockpos).getBlock() != Blocks.dispenser)
+        if (boundingBox.isVecInside(blockpos) && world.getBlockState(blockpos).getBlock() != Blocks.dispenser)
         {
 
             //need to fix
@@ -442,7 +441,7 @@ public abstract class CityComponent {
         }
     }
 
-    protected void placeDoorAtCurrentPosition(World world, MetropolisBaseBB boundingBox, Random random, int posX, int posY, int posZ,
+    protected void placeDoorAtCurrentPosition(World world, MetropolisBoundingBox boundingBox, Random random, int posX, int posY, int posZ,
                                               EnumFacing facing, Block doorBlock)
     {
         int i1 = this.getXWithOffset(posX, posZ);
@@ -451,15 +450,17 @@ public abstract class CityComponent {
 
         BlockPos blockpos = new BlockPos(i1,j1,k1);
 
-        if (boundingBox.isVecInside(i1, j1, k1))
+        if (boundingBox.isVecInside(blockpos))
         {
             ItemDoor.placeDoor(world, blockpos, facing.rotateYCCW(), doorBlock);
         }
     }
 
     public String getHashKey(){
-        return this.boundingBox.minX + " " + this.boundingBox.minY  + " " + this.boundingBox.minZ + " " +
-                this.boundingBox.maxX + " " + this.boundingBox.maxY + " " + this.boundingBox.maxZ;
+        BlockPos minVals = this.boundingBox.minBlocKCoords;
+        BlockPos maxVals = this.boundingBox.maxBlockCoords;
+        return minVals.getX() + " " + minVals.getY()  + " " + minVals.getZ() + " " +
+                maxVals.getX() + " " + maxVals.getY() + " " + maxVals.getZ();
     }
 
     public abstract static class BlockSelector{
