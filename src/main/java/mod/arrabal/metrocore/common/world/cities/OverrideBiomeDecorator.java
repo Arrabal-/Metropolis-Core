@@ -101,8 +101,8 @@ public class OverrideBiomeDecorator extends BiomeDecorator {
     }
 
     private boolean generatingInCityArea(World world, BlockPos blockPos){
-        MetropolisGenerationContainer handler = WorldGenerationHandler.getGenContainerFromWorld(world);
-        ConcurrentHashMap<String, MetropolisBoundingBox> mappedCities = handler.getUpdatedCityMap();
+/*        MetropolisGenerationContainer handler = WorldGenerationHandler.getGenContainerFromWorld(world);
+        //ConcurrentHashMap<String, MetropolisBoundingBox> mappedCities = handler.getUpdatedCityMap();
         Iterator iterator = mappedCities.entrySet().iterator();
         MetropolisBoundingBox boundingBox;
         while (iterator.hasNext()){
@@ -112,7 +112,7 @@ public class OverrideBiomeDecorator extends BiomeDecorator {
             if (clearTerrain.isVecInside(blockPos)){
                 return true;
             }
-        }
+        }*/
         return false;
     }
 

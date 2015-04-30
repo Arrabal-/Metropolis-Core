@@ -59,7 +59,7 @@ public class WorldGenerationHandler implements IWorldGenerator {
     @Override
     public void generate(Random random, int chunkX, int chunkZ, World world, IChunkProvider chunkGenerator, IChunkProvider chunkProvider) {
 
-        if (!world.isRemote && ConfigHandler.enableCityCreation){
+/*        if (!world.isRemote && ConfigHandler.enableCityCreation){
             int[] tuple = {chunkX,chunkZ};
             if (this.currentlyGenerating.contains(tuple)){
                 LogHelper.info("MetropolisCore caught recursive generator call at [" + chunkX + "' " + chunkZ + "]");
@@ -122,10 +122,10 @@ public class WorldGenerationHandler implements IWorldGenerator {
                 }
             }
 
-        }
+        }*/
     }
 
-    public static MetropolisGenerationContainer getGenContainerFromWorld(World world){
+/*    public static MetropolisGenerationContainer getGenContainerFromWorld(World world){
         MetropolisGenerationContainer handler = null;
         if (!world.isRemote){
             if (!generatorMap.containsKey(world.provider.getDimensionId())){
@@ -137,5 +137,5 @@ public class WorldGenerationHandler implements IWorldGenerator {
             }
         }
         return handler;
-    }
+    }*/
 }

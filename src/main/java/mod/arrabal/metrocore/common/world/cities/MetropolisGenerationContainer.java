@@ -45,7 +45,7 @@ public class MetropolisGenerationContainer {
         this.dataHandler = new MetropolisDataHandler();
     }
 
-    public boolean doGenerateSurfaceMetropolis(World world, Random random, int chunkX, int chunkZ){
+/*    public boolean doGenerateSurfaceMetropolis(World world, Random random, int chunkX, int chunkZ){
         if (this.generator != null){
             if (this.dataHandler.isGenMapEmpty()){
                 this.dataHandler.setGenMap(MetropolisGenerationContainer.cityMap.getBoundingBoxMap());
@@ -53,10 +53,9 @@ public class MetropolisGenerationContainer {
             return Metropolis.generateMetropolis(random, chunkX, chunkZ, world, this);
         }
         return false;
-    }
+    }*/
 
-    public boolean doBuildMetropolis(World world, Random random, int chunkX, int chunkZ){
-        //TODO:  Need to revise this to use the structure start class (not written yet) to actually spawn the city
+    /*public boolean doBuildMetropolis(World world, Random random, int chunkX, int chunkZ){
         ChunkCoordIntPair genCoords = new ChunkCoordIntPair(chunkX, chunkZ);
         if (this.dataHandler.startMapContainsKey(genCoords.toString())){
             MetropolisStart start = this.dataHandler.getStartFromKey(genCoords.toString());
@@ -80,9 +79,9 @@ public class MetropolisGenerationContainer {
         }
 
         return false;
-    }
+    }*/
 
-    public boolean doConflictCheck(MetropolisBoundingBox boundingBox){
+/*    public boolean doConflictCheck(MetropolisBoundingBox boundingBox){
         return this.dataHandler.ConflictCheck(boundingBox);
     }
 
@@ -108,12 +107,12 @@ public class MetropolisGenerationContainer {
     }
 
     public void doGenerateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius) {
-        this.generator.generateMetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius);
+        //this.generator.generateMetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius);
     }
 
     public ConcurrentHashMap<String, MetropolisBoundingBox> getUpdatedCityMap(){
         this.dataHandler.setGenMap(MetropolisGenerationContainer.cityMap.getBoundingBoxMap());
         return MetropolisGenerationContainer.cityMap.getBoundingBoxMap();
-    }
+    }*/
 
 }

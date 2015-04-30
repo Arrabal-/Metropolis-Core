@@ -36,15 +36,15 @@ public class MetropolisStart {
         this.spawnList = spawns;
         this.random = getNewRandom(world, chunkX, chunkZ);
         this.baseType = UrbanClassification.URBAN;
-        currentlyBuilding = false;
+        this.currentlyBuilding = false;
         UrbanType cityClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
         List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), false);
         List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), true);
         this.cityLayoutStart = new CityComponentPieces.Start(0, getStartVariant(random, cityClass), random, chunkX, chunkZ, avgY, tileList, structureList);
-        cityLayoutStart.maxSize = new CityLayoutPlan((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
+        this.cityLayoutStart.maxSize = new CityLayoutPlan((chunkX << 4) - (radiusX << 4), (chunkZ << 4) - (radiusZ << 4),
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
-        cityLayoutStart.citySize = cityClass;
-        cityLayoutStart.roadGrid = getRoadGridType(random);
+        this.cityLayoutStart.citySize = cityClass;
+        this.cityLayoutStart.roadGrid = getRoadGridType(random);
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -94,21 +94,21 @@ public class MetropolisStart {
 
     private boolean constructCityTile(World world, Random random, int chunkX, int chunkZ){
         String mapKey = "[" + chunkX + ", " + chunkZ + "]";
-        if (cityLayoutStart.cityComponentMap.containsKey(mapKey)){
-            currentlyBuilding = true;
+        if (this.cityLayoutStart.cityComponentMap.containsKey(mapKey)){
+            this.currentlyBuilding = true;
             CityComponent cityComponent = cityLayoutStart.cityComponentMap.get(mapKey);
             cityComponent.addComponentParts(world, random);
-            currentlyBuilding = false;
+            this.currentlyBuilding = false;
             return true;
         }
         return false;
     }
 
     public String getStartKey(){
-        return startCoord.toString();
+        return this.startCoord.toString();
     }
 
-    public boolean getCurrentlyBuilding() { return currentlyBuilding; }
+    public boolean getCurrentlyBuilding() { return this.currentlyBuilding; }
 
     public boolean getMaxBBIntersection(int xMinPos, int zMinPos, int xMaxPos, int zMaxPos){
         return this.cityLayoutStart.maxSize.intersectsWith(xMinPos, zMinPos, xMaxPos, zMaxPos);
@@ -124,11 +124,11 @@ public class MetropolisStart {
     }
 
     public int getStartX() {
-        return startCoord.chunkXPos;
+        return this.startCoord.chunkXPos;
     }
 
     public int getStartZ(){
-        return startCoord.chunkZPos;
+        return this.startCoord.chunkZPos;
     }
 
     public boolean generate(World world, Random random){
@@ -137,11 +137,12 @@ public class MetropolisStart {
         while (iterator.hasNext()){
             Map.Entry entry = (Map.Entry) iterator.next();
             CityComponent cityComponent = (CityComponent) entry.getValue();
-            flag = constructCityTile(world, random, cityComponent.getBoundingBox().startX, cityComponent.getBoundingBox().startZ);
+            CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
+            flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
         }
         //flag = constructCityTile(world, random, chunkX, chunkZ);
         //flag = placeCityStructures(world, random, chunkX, chunkZ);
-        currentlyBuilding = false;
+        this.currentlyBuilding = false;
         return flag;
     }
 }

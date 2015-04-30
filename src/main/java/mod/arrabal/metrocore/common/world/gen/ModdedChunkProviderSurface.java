@@ -72,7 +72,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
     private boolean useCities;
     private boolean canGenCity;
-    public static MetropolisBoundingBox cityBoundsGenChecker;
+    //public static MetropolisBoundingBox cityBoundsGenChecker;
 
     public ModdedChunkProviderSurface(World worldIn, long seed, boolean bMapFeatures, String generatorSettings) {
 
@@ -149,7 +149,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, x * 16, z * 16, 16, 16);
         this.replaceBlocksForBiome(x, z, chunkprimer, this.biomesForGeneration);
 
-        if(this.useCities){
+        if(this.useCities && this.canGenCity){
             this.cityGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
         }
 
@@ -327,9 +327,17 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 //        this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, (genChunkX - defaultMaxGenRadius) << 4, (genChunkZ - defaultMaxGenRadius) << 4,
 //                defaultMaxGenRadius * 32, defaultMaxGenRadius * 32);
         // check for valid city generation area
+        boolean dampenNoise = false;
         if (this.canGenCity && this.cityGenerator.isBiomeValid(this.worldObj, (genChunkX << 4) + 8, (genChunkZ << 4) + 8, (this.cityGenerator.getDefaultGenRadius(true) << 4) + 8)){
             // generate less noisy terrain
             //TODO:  figure out how to generate less noisy terrain
+            dampenNoise = true;
+        }
+        else if (this.cityGenerator.checkGenerationConflict(new MetropolisBoundingBox(genChunkX << 4, genChunkZ << 4, (genChunkX << 4) + 15, (genChunkZ << 4) + 15))){
+            dampenNoise = true;
+            this.canGenCity = false;
+        }
+        if (dampenNoise){
             this.field_147426_g = this.noiseGen6.generateNoiseOctaves(this.field_147426_g, p_147423_1_, p_147423_3_, 5, 5, (double)this.settings.depthNoiseScaleX, (double)this.settings.depthNoiseScaleZ, (double)this.settings.depthNoiseScaleExponent);
             f = this.settings.coordinateScale;
             f1 = this.settings.heightScale;
@@ -339,6 +347,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         }
         else {
             // use default noise generation
+            this.canGenCity = false;
             this.field_147426_g = this.noiseGen6.generateNoiseOctaves(this.field_147426_g, p_147423_1_, p_147423_3_, 5, 5, (double)this.settings.depthNoiseScaleX, (double)this.settings.depthNoiseScaleZ, (double)this.settings.depthNoiseScaleExponent);
             f = this.settings.coordinateScale;
             f1 = this.settings.heightScale;

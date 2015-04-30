@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.world.structure;
 
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
+import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -24,7 +25,7 @@ import java.util.Random;
  */
 public abstract class CityComponent {
 
-    protected MetropolisBoundingBox boundingBox;
+    protected CityLayoutPlan boundingBox;
     protected int typeID;
     protected int typeVariant;
     protected int coordBaseMode;

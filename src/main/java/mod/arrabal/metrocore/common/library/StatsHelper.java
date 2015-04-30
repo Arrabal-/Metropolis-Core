@@ -1,4 +1,4 @@
-package mod.arrabal.metrocore.api;
+package mod.arrabal.metrocore.common.library;
 
 
 

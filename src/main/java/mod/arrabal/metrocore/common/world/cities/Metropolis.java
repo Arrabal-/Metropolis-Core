@@ -1,6 +1,6 @@
 package mod.arrabal.metrocore.common.world.cities;
 
-import mod.arrabal.metrocore.api.StatsHelper;
+import mod.arrabal.metrocore.common.library.StatsHelper;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
@@ -66,27 +66,16 @@ public final class Metropolis {
             genRarity = 0d;
         }
         spawnBlockRadius = ConfigHandler.metropolisSpawnBlockRadius;
-        initBiomeLists();
+        //initBiomeLists();
         spawnList = new ArrayList();
         spawnPointBlock = null;
-    }
-
-
-
-    //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
-    private static CityLayoutPlan blockSpawnArea(World world, int radius){
-        int spawnX = world.getSpawnPoint().getX();
-        int spawnZ = world.getSpawnPoint().getZ();
-        int spawnMinX = spawnX - radius;
-        int spawnMinZ = spawnZ - radius;
-        return new CityLayoutPlan(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
     }
 
     // Called during world generation to calculate necessary variables and test location for suitability.  If spawning criteria are met
     // will call doGenerateMetropolisStart()
     public static boolean generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
-        double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
+        /*double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
         double xDensityCheck, zDensityCheck;
         xDensityCheck = (double)Math.abs(chunkX) % densityFactor;
         zDensityCheck = (double)Math.abs(chunkZ) % densityFactor;
@@ -101,7 +90,7 @@ public final class Metropolis {
         //EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
 
         int checkX, checkZ;
-        /*if (entityplayer != null) {
+        *//*if (entityplayer != null) {
             checkX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
             checkZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
 
@@ -109,7 +98,7 @@ public final class Metropolis {
         else {
             checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift));
             checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift));
-        }*/
+        }*//*
         checkX = chunkX;
         checkZ = chunkZ;
         if (checkForSpawnConflict(world, checkX, checkZ)){
@@ -149,156 +138,9 @@ public final class Metropolis {
                 LogHelper.debug("Failed generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
                         genMaxX + ", " + genMaxZ + "]. Ground height deviation:  " + devY + sString);
             }
-        }
+        }*/
         return false;
     }
-
-    @SuppressWarnings("unchecked")
-    public void generateMetropolisStart(World world, int chunkX, int chunkZ, int avgY, int xGenRadius, int zGenRadius){
-        if (this.spawnList.isEmpty()){
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySkeleton.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityZombie.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySpider.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
-        }
-        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, avgY, xGenRadius, zGenRadius, this.spawnList);
-        WorldGenerationHandler.getGenContainerFromWorld(world).addToStartMap(start);
-    }
-
-    private static boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
-        if (spawnPointBlock == null){
-            spawnPointBlock = blockSpawnArea(world, spawnBlockRadius);
-        }
-        return spawnPointBlock.isVecInside(chunkX << 4, 64, chunkZ << 4);
-    }
-
-    private static boolean checkForGenerationConflict(int minPosX, int minPosZ, int maxPosX, int maxPosZ, MetropolisGenerationContainer handler){
-        return handler.doConflictCheck(new CityLayoutPlan(minPosX, minPosZ,maxPosX, maxPosZ,"GenerationCheck"));
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initializeBiomeListWithVanillaBiomes() {
-
-        //Clean-up of vanilla biome registry
-        if (!BiomeDictionary.isBiomeRegistered(BiomeGenBase.stoneBeach)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.stoneBeach, BiomeDictionary.Type.BEACH);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.iceMountains, BiomeDictionary.Type.MOUNTAIN)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.iceMountains, BiomeDictionary.Type.MOUNTAIN);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.coldBeach, BiomeDictionary.Type.BEACH)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.coldBeach, BiomeDictionary.Type.BEACH);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.extremeHillsPlus, BiomeDictionary.Type.MOUNTAIN)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.extremeHillsPlus, BiomeDictionary.Type.MOUNTAIN);
-        }
-
-        BiomeGenBase[] vanillaBiomes = BiomeGenBase.getBiomeGenArray();
-
-
-        for (int j = 0; j < vanillaBiomes.length; j++){
-            if (vanillaBiomes[j] == null) {break;}
-            BiomeDictionary.Type[] biomeTypes = BiomeDictionary.getTypesForBiome(vanillaBiomes[j]);
-            boolean pass = true;
-            for (int k = 0; k < biomeTypes.length; k++){
-                if (disallowedBiomeTypeList.contains(biomeTypes[k])){
-                    pass = false;
-                }
-            }
-            if (pass){
-                allowedBiomeList.add(vanillaBiomes[j]);
-            }
-        }
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private void  initBiomeLists(){
-        allowedBiomeList = new ArrayList();
-        disallowedBiomeTypeList = new ArrayList();
-        Collections.addAll(disallowedBiomeTypeList, disallowedBiomeTypes);
-        initializeBiomeListWithVanillaBiomes();
-        for (int i = 0; i < allowedBiomeTypes.length; i++){
-            BiomeGenBase[] biomes = BiomeDictionary.getBiomesForType(allowedBiomeTypes[i]);
-            for (int j = 0; j < biomes.length; j++){
-                if (!allowedBiomeList.contains(biomes[j])){
-                    BiomeDictionary.Type[] biomeTypes = BiomeDictionary.getTypesForBiome(biomes[j]);
-                    boolean flag = true;
-                    for (int k = 0; k < biomeTypes.length; k++){
-                        if (disallowedBiomeTypeList.contains(biomeTypes[k])){
-                            flag = false;
-                        }
-                    }
-                    if (flag){
-                        allowedBiomeList.add(biomes[j]);
-                    }
-
-                }
-            }
-        }
-    }
-
-    protected static boolean isBiomeValid(World worldObj, int posX, int posZ, int radius) {
-        return worldObj.getWorldChunkManager().areBiomesViable(posX, posZ, radius, allowedBiomeList);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static boolean isVillageNear(World world, int posX, int posY, int posZ, int genRadius){
-        if(world.villageCollectionObj != null){
-            for (Village village : (List<Village>) world.villageCollectionObj.getVillageList()){
-                if (Math.sqrt(village.getCenter().distanceSq(posX, posY, posZ)) < village.getVillageRadius() + genRadius) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public static int[] getGroundHeightMap(World world, int minX, int minZ, int maxX, int maxZ, int sampleSize){
-        //Attempting to improve efficiency by only taking a sample of the height map
-        int[] heightMap;
-        Chunk testChunk;
-        if (sampleSize > 0) {
-            heightMap = new int[sampleSize];
-            Random heightCheck = new Random(world.getTotalWorldTime());
-            for (int i = 0; i < sampleSize; i++) {
-                int newX = heightCheck.nextInt(maxX - minX) + minX;
-                int newZ = heightCheck.nextInt(maxZ - minZ) + minZ;
-                BlockPos newPos = new BlockPos(newX, 0, newZ);
-                testChunk = world.getChunkFromBlockCoords(newPos);
-                if (world.isBlockLoaded(newPos, false)){
-                    heightMap[i] = testChunk.getHeight(newPos) - 1;
-                } else LogHelper.info("Chunk not loaded when trying to check heightmap");
-                //world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
-            }
-        } else {
-            int blocks = (maxX - minX + 1) * (maxZ - minZ + 1);
-            heightMap = new int[blocks];
-            int index = 0;
-            for (int i = minX; i < maxX + 1; i++) {
-                for (int j = minZ; j < maxZ + 1; j++) {
-                    BlockPos newPos = new BlockPos(i,0,j);
-                    testChunk = world.getChunkFromBlockCoords(newPos);
-                    if (world.isBlockLoaded(newPos, false)){
-                        heightMap[index] =  world.getChunkFromBlockCoords(newPos).getHeight(newPos) - 1;
-                    } else LogHelper.info("Chunk not loaded when trying to check heightmap");
-                    index += 1;
-                }
-            }
-        }
-        return heightMap;
-    }
-
-    private static Random  getNewRandom(World world, int chunkX, int chunkZ){
-        Random random = new Random(world.getSeed());
-        long l = (long) ((chunkX / (double) ModOptions.metropolisMinDistanceBetween) * (random.nextLong()+ 1L));
-        long l2 = (long) ((chunkZ / (double) ModOptions.metropolisMinDistanceBetween) * (random.nextLong() + 1L));
-        long l3 = (l * l2) * (random.nextLong()+1L);
-        random.setSeed(l3 ^ world.getSeed());
-        return random;
-    }
-
 }
 
 
