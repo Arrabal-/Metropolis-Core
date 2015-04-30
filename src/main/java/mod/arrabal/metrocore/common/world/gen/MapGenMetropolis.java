@@ -46,7 +46,7 @@ public class MapGenMetropolis extends MapGenBase {
 
     private MetropolisDataHandler dataHandler;
     private CityBoundsSaveData cityMap;
-    private List spawnList;
+    private List spawnList = new ArrayList();
     private ChunkCoordIntPair currentStart;
 
     public MetropolisBoundingBox spawnPointBlock;
@@ -124,9 +124,9 @@ public class MapGenMetropolis extends MapGenBase {
         }
         double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
         double xDensityCheck, zDensityCheck;
-        xDensityCheck = (double)Math.abs(chunkX) % densityFactor;
-        zDensityCheck = (double)Math.abs(chunkZ) % densityFactor;
-        if (genDensity == 0 || (xDensityCheck != 0.0d) || (zDensityCheck != 0.0d)){
+        xDensityCheck = (double)Math.abs(chunkX + this.rand.nextInt(4)) % densityFactor;
+        zDensityCheck = (double)Math.abs(chunkZ + this.rand.nextInt(4)) % densityFactor;
+        if (genDensity == 0 || ((xDensityCheck != 0.0d) && (zDensityCheck != 0.0d))){
             LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
             return false;
         }
@@ -225,7 +225,7 @@ public class MapGenMetropolis extends MapGenBase {
 
 
         for (int j = 0; j < vanillaBiomes.length; j++){
-            if (vanillaBiomes[j] == null) {break;}
+            if (vanillaBiomes[j] == null) {continue;}
             BiomeDictionary.Type[] biomeTypes = BiomeDictionary.getTypesForBiome(vanillaBiomes[j]);
             boolean pass = true;
             for (int k = 0; k < biomeTypes.length; k++){
@@ -360,7 +360,7 @@ public class MapGenMetropolis extends MapGenBase {
         }
         LogHelper.info("Completed building city layout with start at " + start.getStartKey());
         this.dataHandler.addToBoundingBoxMap(start.cityLayoutStart.cityPlan);
-        this.cityMap.saveBoundingBoxData(start.cityLayoutStart.cityPlan);
+        this.cityMap. saveBoundingBoxData(start.cityLayoutStart.cityPlan);
     }
 
     protected void generateCityTile(World worldIn, MetropolisStart start, int buildX, int buildZ, int startChunkX, int startChunkZ, ChunkPrimer chunkPrimer){

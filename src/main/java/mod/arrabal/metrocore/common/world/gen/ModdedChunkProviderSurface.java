@@ -140,6 +140,76 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
     }
 
     @Override
+    public void setBlocksInChunk(int chunkX, int chunkZ, ChunkPrimer chunkPrimer)
+    {
+        this.biomesForGeneration = this.worldObj.getWorldChunkManager().getBiomesForGeneration(this.biomesForGeneration, chunkX * 4 - 2, chunkZ * 4 - 2, 10, 10);
+        this.func_147423_a(chunkX * 4, 0, chunkZ * 4);
+
+        for (int k = 0; k < 4; ++k)
+        {
+            int l = k * 5;
+            int i1 = (k + 1) * 5;
+
+            for (int j1 = 0; j1 < 4; ++j1)
+            {
+                int k1 = (l + j1) * 33;
+                int l1 = (l + j1 + 1) * 33;
+                int i2 = (i1 + j1) * 33;
+                int j2 = (i1 + j1 + 1) * 33;
+
+                for (int k2 = 0; k2 < 32; ++k2)
+                {
+                    double d0 = 0.125D;
+                    double d1 = this.field_147434_q[k1 + k2];
+                    double d2 = this.field_147434_q[l1 + k2];
+                    double d3 = this.field_147434_q[i2 + k2];
+                    double d4 = this.field_147434_q[j2 + k2];
+                    double d5 = (this.field_147434_q[k1 + k2 + 1] - d1) * d0;
+                    double d6 = (this.field_147434_q[l1 + k2 + 1] - d2) * d0;
+                    double d7 = (this.field_147434_q[i2 + k2 + 1] - d3) * d0;
+                    double d8 = (this.field_147434_q[j2 + k2 + 1] - d4) * d0;
+
+                    for (int l2 = 0; l2 < 8; ++l2)
+                    {
+                        double d9 = 0.25D;
+                        double d10 = d1;
+                        double d11 = d2;
+                        double d12 = (d3 - d1) * d9;
+                        double d13 = (d4 - d2) * d9;
+
+                        for (int i3 = 0; i3 < 4; ++i3)
+                        {
+                            double d14 = 0.25D;
+                            double d16 = (d11 - d10) * d14;
+                            double d15 = d10 - d16;
+
+                            for (int j3 = 0; j3 < 4; ++j3)
+                            {
+                                if ((d15 += d16) > 0.0D)
+                                {
+                                    chunkPrimer.setBlockState(k * 4 + i3, k2 * 8 + l2, j1 * 4 + j3, Blocks.stone.getDefaultState());
+                                }
+                                else if (k2 * 8 + l2 < this.settings.seaLevel)
+                                {
+                                    chunkPrimer.setBlockState(k * 4 + i3, k2 * 8 + l2, j1 * 4 + j3, this.field_177476_s.getDefaultState());
+                                }
+                            }
+
+                            d10 += d12;
+                            d11 += d13;
+                        }
+
+                        d1 += d5;
+                        d2 += d6;
+                        d3 += d7;
+                        d4 += d8;
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
     public Chunk provideChunk(int x, int z)
     {
         this.rand.setSeed((long)x * 341873128712L + (long)z * 132897987541L);

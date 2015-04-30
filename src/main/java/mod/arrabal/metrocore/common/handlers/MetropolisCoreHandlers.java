@@ -22,7 +22,7 @@ import java.util.List;
 public class MetropolisCoreHandlers {
 
     public static void preInit() {
-        GameRegistry.registerWorldGenerator(new WorldGenerationHandler(), 1000000);
+        //GameRegistry.registerWorldGenerator(new WorldGenerationHandler(), 1000000);
         registerNetworkEventHandlers();
         registerWorldEventHandlers();
         registerFMLEventHandlers();
@@ -31,6 +31,7 @@ public class MetropolisCoreHandlers {
 
     public static void init(){
         registerGuiHandlers();
+        swapOverworldWorldProvider();
     }
 
     private static void registerNetworkEventHandlers() {
