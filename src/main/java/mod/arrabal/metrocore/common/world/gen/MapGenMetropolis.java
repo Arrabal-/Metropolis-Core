@@ -81,6 +81,26 @@ public class MapGenMetropolis extends MapGenBase {
 
     public boolean buildMetropolis(World world, Random random, ChunkCoordIntPair chunkCoords){
 
+        if (this.dataHandler.startMapContainsKey(chunkCoords.toString())){
+            MetropolisStart start = this.dataHandler.getStartFromKey(chunkCoords.toString());
+            if (!start.getCurrentlyBuilding()){
+                return start.generate(world, random);
+            }
+        }else {
+            MetropolisStart start = null;
+            boolean validGenChunk = false;
+            Iterator iterator = this.dataHandler.startMap.entrySet().iterator();
+            while (iterator.hasNext() && !validGenChunk){
+                Map.Entry entry = (Map.Entry) iterator.next();
+                start = (MetropolisStart) entry.getValue();
+                if (start.getMaxBBIntersection(chunkCoords.getXStart(), chunkCoords.getZStart(), chunkCoords.getXEnd(), chunkCoords.getZEnd())){
+                    validGenChunk = true;
+                }
+            }
+            if (validGenChunk && !start.getCurrentlyBuilding()) {
+                return start.generate(world, random);
+            }
+        }
         return false;
     }
 
