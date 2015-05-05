@@ -1,15 +1,9 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
-import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
-import mod.arrabal.metrocore.common.world.cities.*;
-import net.minecraft.world.World;
+import mod.arrabal.metrocore.common.world.gen.OverrideBiomeDecorator;
 import net.minecraftforge.event.terraingen.*;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by Arrabal on 6/24/2014.

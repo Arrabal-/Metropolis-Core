@@ -535,4 +535,8 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
             }
         }
     }
+
+    public boolean doCityGenerationCheck(ChunkCoordIntPair chunkPos, int range){
+        return this.cityGenerator.checkGenerationConflict(chunkPos, range);
+    }
 }

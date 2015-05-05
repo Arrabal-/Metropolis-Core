@@ -1,4 +1,4 @@
-package mod.arrabal.metrocore.common.world.cities;
+package mod.arrabal.metrocore.common.world.gen;
 
 import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;

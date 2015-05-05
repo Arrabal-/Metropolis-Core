@@ -122,20 +122,18 @@ public class MapGenMetropolis extends MapGenBase {
             this.generatingZone = null;
             return false;
         }
-        double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
+        /*double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
         double xDensityCheck, zDensityCheck;
-        xDensityCheck = (double)Math.abs(chunkX + this.rand.nextInt(4)) % densityFactor;
-        zDensityCheck = (double)Math.abs(chunkZ + this.rand.nextInt(4)) % densityFactor;
+        int rarityFactor = (int) (1/genRarity);
+        Random rarityCheck = new Random(world.getTotalWorldTime());
+        xDensityCheck = (double)Math.abs(chunkX + rarityCheck.nextInt(rarityFactor)) % densityFactor;
+        zDensityCheck = (double)Math.abs(chunkZ + rarityCheck.nextInt(rarityFactor)) % densityFactor;
         if (genDensity == 0 || ((xDensityCheck != 0.0d) && (zDensityCheck != 0.0d))){
             LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
             return false;
         }
-        Random rarityCheck = new Random(world.getTotalWorldTime());
-        if (rarityCheck.nextDouble() <= genRarity){
-            return true;
-        }
-        LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to rarity check");
-        return false;
+        return true;*/
+        return chunkX == 96 && chunkZ == 96;
     }
 
     private boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
@@ -149,7 +147,7 @@ public class MapGenMetropolis extends MapGenBase {
         boolean conflict = false;
         if (!this.dataHandler.isGenMapEmpty()){
             Iterator iterator = this.dataHandler.urbanGenerationMap.entrySet().iterator();
-            while (iterator.hasNext()){
+            while (iterator.hasNext() && !conflict){
                 Map.Entry entry = (Map.Entry) iterator.next();
                 MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
                 conflict = value.intersectsWith(cityBounds) ||
@@ -157,6 +155,20 @@ public class MapGenMetropolis extends MapGenBase {
             }
         }
         return conflict;
+    }
+
+    public boolean checkGenerationConflict(ChunkCoordIntPair chunkPos,  int range){
+        boolean intersection = false;
+        MetropolisBoundingBox boundingBox = new MetropolisBoundingBox(chunkPos.getXStart(), chunkPos.getZStart(), chunkPos.getXEnd() + range * 16, chunkPos.getZEnd() + range * 16);
+        if (!this.dataHandler.isGenMapEmpty()){
+            Iterator iterator = this.dataHandler.urbanGenerationMap.entrySet().iterator();
+            while (iterator.hasNext() && !intersection){
+                Map.Entry entry = (Map.Entry) iterator.next();
+                MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
+                intersection = value.intersectsWith(boundingBox);
+            }
+        }
+        return intersection;
     }
 /*
     private boolean checkFailedGenerationAttempt(MetropolisBoundingBox cityBounds){
