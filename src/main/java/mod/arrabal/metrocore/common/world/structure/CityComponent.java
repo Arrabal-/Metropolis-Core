@@ -3,6 +3,9 @@ package mod.arrabal.metrocore.common.world.structure;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockDirt;
+import net.minecraft.block.BlockGrass;
+import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -12,6 +15,8 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.WeightedRandomChestContent;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.Iterator;
 import java.util.List;
@@ -375,6 +380,26 @@ public abstract class CityComponent {
         }
     }
 
+    protected void clearAllBlocksCurrentPositionUpwards(World world, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox, boolean clearWater)
+    {
+        int l = this.getXWithOffset(posX, posZ);
+        int i1 = this.getYWithOffset(posY);
+        int j1 = this.getZWithOffset(posX, posZ);
+
+        BlockPos blockpos = new BlockPos(l, i1, j1);
+
+        if (boundingBox.isVecInside(l, i1, j1))
+        {
+            while (world.getBlockState(blockpos) != Blocks.air.getDefaultState() && blockpos.getY() < 255)
+            {
+                if (clearWater || (world.getBlockState(blockpos) != Blocks.water.getDefaultState())){
+                    world.setBlockState(blockpos, Blocks.air.getDefaultState(), 2);
+                }
+                blockpos = blockpos.up();
+            }
+        }
+    }
+
     protected void fillCurrentPositionBlocksDownward(World world, IBlockState placeBlock, int meta, int posX, int posY, int posZ,
                                  MetropolisBoundingBox boundingBox)
     {
@@ -455,6 +480,41 @@ public abstract class CityComponent {
         {
             ItemDoor.placeDoor(world, blockpos, facing.rotateYCCW(), doorBlock);
         }
+    }
+
+    public BlockPos getTopBlock(World world, BlockPos pos)
+    {
+        Chunk chunk = world.getChunkFromBlockCoords(pos);
+        BlockPos blockpos1;
+        BlockPos blockpos2;
+
+        for (blockpos1 = new BlockPos(pos.getX(), chunk.getTopFilledSegment() + 16, pos.getZ()); blockpos1.getY() >= 0; blockpos1 = blockpos2)
+        {
+            blockpos2 = blockpos1.down();
+            IBlockState blockState = chunk.getBlockState(blockpos2);
+            BiomeGenBase blockBiome = chunk.getBiome(new BlockPos(blockpos2), world.getWorldChunkManager());
+            if (blockState == blockBiome.topBlock || blockState == blockBiome.fillerBlock
+                    || blockState == Blocks.sand.getDefaultState()
+                    || blockState == Blocks.gravel.getDefaultState()
+                    || blockState == Blocks.clay.getDefaultState()
+                    || blockState == Blocks.grass.getDefaultState()
+                    || blockState == Blocks.grass.getDefaultState().withProperty(BlockGrass.SNOWY, Boolean.valueOf(true))
+                    || blockState == Blocks.dirt.getDefaultState()
+                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL)
+                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT)
+                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+                    || blockState == Blocks.stone.getDefaultState()
+                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE)
+                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.DIORITE)
+                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE)){
+                break;
+            }
+
+        }
+
+        return blockpos1;
     }
 
     public String getHashKey(){

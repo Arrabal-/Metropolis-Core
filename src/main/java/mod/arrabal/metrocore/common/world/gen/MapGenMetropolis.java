@@ -133,7 +133,7 @@ public class MapGenMetropolis extends MapGenBase {
             return false;
         }
         return true;*/
-        return chunkX == 96 && chunkZ == 96;
+        return true;
     }
 
     private boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
@@ -298,9 +298,9 @@ public class MapGenMetropolis extends MapGenBase {
                 int newX = heightCheck.nextInt(maxX - minX) + minX;
                 int newZ = heightCheck.nextInt(maxZ - minZ) + minZ;
                 BlockPos newPos = new BlockPos(newX, 0, newZ);
-                testChunk = world.getChunkFromBlockCoords(newPos);
+                //testChunk = world.getChunkFromBlockCoords(newPos);
                 if (world.isBlockLoaded(newPos, false)){
-                    heightMap[i] = testChunk.getHeight(newPos) - 1;
+                    heightMap[i] = world.getChunkFromBlockCoords(newPos).getHeight(newPos) - 1;
                 } else LogHelper.info("Chunk not loaded when trying to check heightmap");
                 //world.getTopSolidOrLiquidBlock(newPos).getY() - 1;
             }
@@ -311,7 +311,7 @@ public class MapGenMetropolis extends MapGenBase {
             for (int i = minX; i < maxX + 1; i++) {
                 for (int j = minZ; j < maxZ + 1; j++) {
                     BlockPos newPos = new BlockPos(i,0,j);
-                    testChunk = world.getChunkFromBlockCoords(newPos);
+                    //testChunk = world.getChunkFromBlockCoords(newPos);
                     if (world.isBlockLoaded(newPos, false)){
                         heightMap[index] =  world.getChunkFromBlockCoords(newPos).getHeight(newPos) - 1;
                     } else LogHelper.info("Chunk not loaded when trying to check heightmap");
@@ -331,8 +331,9 @@ public class MapGenMetropolis extends MapGenBase {
             this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
             this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
         }
-        int[] heightMap = getGroundHeightMap(world, chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15, 0);
-        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, StatsHelper.getStaticMean(heightMap), xGenRadius, zGenRadius, this.spawnList);
+        //int[] heightMap = getGroundHeightMap(world, chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15, 0);
+        //MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, StatsHelper.getStaticMean(heightMap), xGenRadius, zGenRadius, this.spawnList);
+        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, 63, xGenRadius, zGenRadius, this.spawnList);
         this.dataHandler.addToStartMap(start);
         return start;
     }
@@ -371,6 +372,8 @@ public class MapGenMetropolis extends MapGenBase {
             }
         }
         LogHelper.info("Completed building city layout with start at " + start.getStartKey());
+        ModdedChunkProviderSurface moddedProvider = (ModdedChunkProviderSurface) chunkProvider;
+        moddedProvider.currentCityBounds = start.cityLayoutStart.cityPlan;
         this.dataHandler.addToBoundingBoxMap(start.cityLayoutStart.cityPlan);
         this.cityMap. saveBoundingBoxData(start.cityLayoutStart.cityPlan);
     }

@@ -11,6 +11,7 @@ import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.BiomeDecorator;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -72,7 +73,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
     private boolean useCities;
     private boolean canGenCity;
-    //public static MetropolisBoundingBox cityBoundsGenChecker;
+    public static MetropolisBoundingBox currentCityBounds;
 
     public ModdedChunkProviderSurface(World worldIn, long seed, boolean bMapFeatures, String generatorSettings) {
 
@@ -137,6 +138,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         this.noiseGen5 = (NoiseGeneratorOctaves)noiseGens[4];
         this.noiseGen6 = (NoiseGeneratorOctaves)noiseGens[5];
         this.mobSpawnerNoise = (NoiseGeneratorOctaves)noiseGens[6];
+        this.currentCityBounds = null;
     }
 
     @Override
@@ -225,7 +227,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
         if (this.settings.useCaves)
         {
-            this.caveGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            //this.caveGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useRavines)
@@ -288,10 +290,6 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(chunkProvider, worldObj, rand, x, z, flag));
 
-        if (this.useCities){
-            cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
-        }
-
         if (this.settings.useMineShafts && this.mapFeaturesEnabled)
         {
             this.mineshaftGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
@@ -315,6 +313,10 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         if (this.settings.useMonuments && this.mapFeaturesEnabled)
         {
             this.oceanMonumentGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.useCities){
+            cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         flag = flag || cityGenerated;
@@ -355,8 +357,13 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
                 (new WorldGenDungeons()).generate(this.worldObj, this.rand, blockpos.add(l1, i2, j2));
             }
         }
-
+        if (this.useCities && cityGenerated){
+            ModdedBiomeDecorator modBiomeDecorator;
+            modBiomeDecorator = (ModdedBiomeDecorator) biomegenbase.theBiomeDecorator;
+            modBiomeDecorator.generatingCity = this.currentCityBounds;
+        }
         biomegenbase.decorate(this.worldObj, this.rand, new BlockPos(k, 0, l));
+        if (this.currentCityBounds != null) this.currentCityBounds = null;
         if (TerrainGen.populate(chunkProvider, worldObj, rand, x, z, flag, ANIMALS))
         {
             SpawnerAnimals.performWorldGenSpawning(this.worldObj, biomegenbase, k + 8, l + 8, 16, 16, this.rand);
@@ -538,5 +545,9 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
     public boolean doCityGenerationCheck(ChunkCoordIntPair chunkPos, int range){
         return this.cityGenerator.checkGenerationConflict(chunkPos, range);
+    }
+
+    public boolean doCityGenerationCheck(MetropolisBoundingBox checkPosition){
+        return this.cityGenerator.checkGenerationConflict(checkPosition);
     }
 }

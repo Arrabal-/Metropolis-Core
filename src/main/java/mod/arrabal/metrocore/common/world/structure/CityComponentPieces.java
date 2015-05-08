@@ -7,9 +7,11 @@ import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 
 import java.util.*;
 
@@ -370,13 +372,17 @@ public class CityComponentPieces {
         public boolean addComponentParts(World world, Random random){
             int buildX = this.boundingBox.minBlocKCoords.getX();
             int buildZ = this.boundingBox.minBlocKCoords.getZ();
+            int buildY = 255;
             for (int x = 0; x < 16; ++x){
                 for (int z = 0; z < 16; ++z){
-                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxBlockCoords.getY() + 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"clearBB"));
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
+                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"clearBB"), false);
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"placeBB"));
                 }
             }
-            this.fillWithBlocks(world, this.boundingBox,buildX, this.boundingBox.minBlocKCoords.getY(), buildZ, this.boundingBox.maxBlockCoords.getX(),
-                    this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            //this.fillWithBlocks(world, this.boundingBox,buildX, buildY - 1, buildZ, this.boundingBox.maxBlockCoords.getX(),
+            //        this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
             return true;
         }
 
@@ -596,7 +602,7 @@ public class CityComponentPieces {
             this.weightedCityComponentList = cityList;
             this.weightedBuildingList = buildingList;
             this.baseY = baseY;
-            this.baseYVariation = ((int) (1.96 * (ConfigHandler.metropolisMaxHeightVariation / Math.sqrt(50d)))) + 1;
+            this.baseYVariation = 50; //((int) (1.96 * (ConfigHandler.metropolisMaxHeightVariation / Math.sqrt(50d)))) + 1;
             this.cityPlan = new MetropolisCityPlan(chunkX << 4, baseY - baseYVariation, chunkZ << 4, (chunkX << 4) + 15, baseY + baseYVariation, (chunkZ << 4) + 15,
                     random.nextInt(4), "UrbanLayout");
             this.boundingBox = new MetropolisCityPlan(chunkX << 4, baseY -  baseYVariation, chunkZ << 4, (chunkX << 4) + 15, baseY + baseYVariation, (chunkZ << 4) + 15,
@@ -681,13 +687,17 @@ public class CityComponentPieces {
         public boolean addComponentParts(World world, Random random){
             int buildX = this.boundingBox.minBlocKCoords.getX();
             int buildZ = this.boundingBox.minBlocKCoords.getZ();
+            int buildY = 255;
             for (int x = 0; x < 16; ++x){
                 for (int z = 0; z < 16; ++z){
-                    this.clearCurrentPositionBlocksUpwards(world, buildX + x, this.boundingBox.maxBlockCoords.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"clearBB"));
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
+                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
                 }
             }
-            this.fillWithBlocks(world, this.boundingBox, buildX, this.boundingBox.minBlocKCoords.getY(), buildZ, this.boundingBox.maxBlockCoords.getX(),
-                    this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            //this.fillWithBlocks(world, this.boundingBox, buildX, buildY - 1, buildZ, this.boundingBox.maxBlockCoords.getX(),
+            //        this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
             return true;
         }
 
