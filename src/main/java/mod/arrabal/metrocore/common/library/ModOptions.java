@@ -19,6 +19,6 @@ public class ModOptions {
     public static void init(){
         metropolisMinDistanceBetween = (int) ((1d/ ConfigHandler.metropolisGenDensity) * BASE_DIST_BETWEEN_CITY/2d);
         metropolisMaxCitySpawnSpread = 2 * (ConfigHandler.metropolisMaxGenRadius * 16) + 16;
-        metropolisCenterSpawnShift = 0; //((2 * metropolisMaxCitySpawnSpread) + metropolisMinDistanceBetween) >> 4;
+        metropolisCenterSpawnShift = ((2 * metropolisMaxCitySpawnSpread) + metropolisMinDistanceBetween) >> 4;
     }
 }

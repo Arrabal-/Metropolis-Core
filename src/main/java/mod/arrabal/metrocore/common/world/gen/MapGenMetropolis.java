@@ -11,6 +11,7 @@ import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import net.minecraft.entity.monster.*;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
@@ -53,7 +54,7 @@ public class MapGenMetropolis extends MapGenBase {
     public MetropolisBoundingBox generatingZone;
     //public ConcurrentHashMap<String, MetropolisBoundingBox> generatedCities = new ConcurrentHashMap<>();
     public ConcurrentHashMap<String, MetropolisStart> startMap = new ConcurrentHashMap<>();
-//    public ConcurrentHashMap<String, MetropolisBoundingBox> genCheckedZones = new ConcurrentHashMap<>();
+    public ConcurrentHashMap<String, MetropolisBoundingBox> genCheckedZones = new ConcurrentHashMap<>();
 
 
 
@@ -79,12 +80,17 @@ public class MapGenMetropolis extends MapGenBase {
         this.initBiomeLists();
     }
 
-    public boolean buildMetropolis(World world, Random random, ChunkCoordIntPair chunkCoords){
+    public boolean buildMetropolis(World world, Random random, ChunkCoordIntPair chunkCoords, ModdedChunkProviderSurface provider){
 
         if (this.dataHandler.startMapContainsKey(chunkCoords.toString())){
             MetropolisStart start = this.dataHandler.getStartFromKey(chunkCoords.toString());
             if (!start.getCurrentlyBuilding()){
-                return start.generate(world, random);
+                boolean flag = start.generate(world, random);
+                if (flag){
+                    provider.queuedCityGens.remove(start.getStartKey());
+                    provider.currentCityBounds = start.cityLayoutStart.cityPlan;
+                }
+                return flag;
             }
         }else {
             MetropolisStart start = null;
@@ -98,7 +104,13 @@ public class MapGenMetropolis extends MapGenBase {
                 }
             }
             if (validGenChunk && !start.getCurrentlyBuilding()) {
-                return start.generate(world, random);
+                boolean flag = false;
+                flag = start.generate(world, random);
+                if (flag){
+                    provider.queuedCityGens.remove(start.getStartKey());
+                    provider.currentCityBounds = start.cityLayoutStart.cityPlan;
+                }
+                return flag;
             }
         }
         return false;
@@ -112,28 +124,28 @@ public class MapGenMetropolis extends MapGenBase {
         }
         this.initializeCityMapData(world);
         this.generatingZone = new MetropolisBoundingBox(new BlockPos((chunkX - maxGenRadius) << 4, 1, (chunkZ - maxGenRadius) << 4), new BlockPos(((chunkX + maxGenRadius) << 4) + 15, 255, ((chunkZ + maxGenRadius) << 4) + 15));
-/*        if (this.checkFailedGenerationAttempt(this.generatingZone)){
+        if (this.checkFailedGenerationAttempt(this.generatingZone)){
             LogHelper.trace("Already checked parts of the area around [" + chunkX + ", " + chunkZ + "] for city generation");
             return false;
-        }*/
+        }
         if (this.checkGenerationConflict(this.generatingZone)){
             // city already exists within this area
             LogHelper.trace("Found overlap with existing generated city within area " + this.generatingZone.toString());
             this.generatingZone = null;
             return false;
         }
-        /*double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
+        double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
         double xDensityCheck, zDensityCheck;
         int rarityFactor = (int) (1/genRarity);
         Random rarityCheck = new Random(world.getTotalWorldTime());
         xDensityCheck = (double)Math.abs(chunkX + rarityCheck.nextInt(rarityFactor)) % densityFactor;
         zDensityCheck = (double)Math.abs(chunkZ + rarityCheck.nextInt(rarityFactor)) % densityFactor;
         if (genDensity == 0 || ((xDensityCheck != 0.0d) && (zDensityCheck != 0.0d))){
-            LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
+            LogHelper.debug("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
             return false;
         }
-        return true;*/
         return true;
+        //return true;
     }
 
     private boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
@@ -145,13 +157,14 @@ public class MapGenMetropolis extends MapGenBase {
 
     public boolean checkGenerationConflict(MetropolisBoundingBox cityBounds){
         boolean conflict = false;
+        int minBlockDistance = ModOptions.metropolisMinDistanceBetween << 4;
         if (!this.dataHandler.isGenMapEmpty()){
             Iterator iterator = this.dataHandler.urbanGenerationMap.entrySet().iterator();
             while (iterator.hasNext() && !conflict){
                 Map.Entry entry = (Map.Entry) iterator.next();
                 MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
                 conflict = value.intersectsWith(cityBounds) ||
-                        value.getSquaredDistance(cityBounds, false) < (ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween);
+                        value.getSquaredDistance(cityBounds, false) < (minBlockDistance * minBlockDistance);
             }
         }
         return conflict;
@@ -170,16 +183,30 @@ public class MapGenMetropolis extends MapGenBase {
         }
         return intersection;
     }
-/*
+
+    public ChunkCoordIntPair getOffsetCitySpawn(World world, Random random, int chunkX, int chunkZ){
+        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
+        int genX, genZ;
+        if (entityplayer != null){
+            genX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
+            genZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
+        } else {
+            genX = chunkX;
+            genZ = chunkZ;
+        }
+        return new ChunkCoordIntPair(genX, genZ);
+    }
+
     private boolean checkFailedGenerationAttempt(MetropolisBoundingBox cityBounds){
         boolean conflict = false;
+        int minBlockDistance = ModOptions.metropolisMinDistanceBetween << 4;
         if (!this.genCheckedZones.isEmpty()){
             Iterator iterator = this.genCheckedZones.entrySet().iterator();
             while (iterator.hasNext()){
                 Map.Entry entry = (Map.Entry) iterator.next();
                 MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
                 conflict = value.intersectsWith(cityBounds) ||
-                        value.getSquaredDistance(cityBounds, false) < (ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween);
+                        value.getSquaredDistance(cityBounds, false) < (minBlockDistance * minBlockDistance);
                 if (conflict){
                     value.expandTo(cityBounds);
                     entry.setValue(value);
@@ -187,7 +214,7 @@ public class MapGenMetropolis extends MapGenBase {
             }
         }
         return conflict;
-    }*/
+    }
 
     //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
     private MetropolisBoundingBox blockSpawnArea(World world, int radius){
@@ -373,7 +400,7 @@ public class MapGenMetropolis extends MapGenBase {
         }
         LogHelper.info("Completed building city layout with start at " + start.getStartKey());
         ModdedChunkProviderSurface moddedProvider = (ModdedChunkProviderSurface) chunkProvider;
-        moddedProvider.currentCityBounds = start.cityLayoutStart.cityPlan;
+        moddedProvider.queuedCityGens.put(start.getStartKey(), start.cityLayoutStart.cityPlan);
         this.dataHandler.addToBoundingBoxMap(start.cityLayoutStart.cityPlan);
         this.cityMap. saveBoundingBoxData(start.cityLayoutStart.cityPlan);
     }

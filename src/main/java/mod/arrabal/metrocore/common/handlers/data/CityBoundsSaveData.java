@@ -103,9 +103,9 @@ public class CityBoundsSaveData extends WorldSavedData
     }
 
     public void saveBoundingBoxData(MetropolisBoundingBox mBB){
-        xMin.add(mBB.minBlocKCoords.getX());
+        xMin.add(mBB.minBlockCoords.getX());
         xMax.add(mBB.maxBlockCoords.getX());
-        zMin.add(mBB.minBlocKCoords.getZ());
+        zMin.add(mBB.minBlockCoords.getZ());
         zMax.add(mBB.maxBlockCoords.getZ());
         xCenter.add(mBB.getCenterX());
         zCenter.add(mBB.getCenterZ());

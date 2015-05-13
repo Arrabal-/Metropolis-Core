@@ -53,7 +53,7 @@ public class CityLayoutPlan extends MetropolisBoundingBox {
 
     @Override
     public String toString() {
-        return this.minBlocKCoords.getX() + " " + this.minBlocKCoords.getY() + " " + this.minBlocKCoords.getZ() +
+        return this.minBlockCoords.getX() + " " + this.minBlockCoords.getY() + " " + this.minBlockCoords.getZ() +
                 " " + this.maxBlockCoords.getX() + " " + this.maxBlockCoords.getY() + " " + this.maxBlockCoords.getZ() +
                 " " + this.name + " " + this.startX + " " + this.startZ + " " + this.facing;
     }

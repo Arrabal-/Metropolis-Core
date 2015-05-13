@@ -1,6 +1,7 @@
 package mod.arrabal.metrocore.common.world.gen;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.library.ModOptions;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
@@ -25,7 +26,10 @@ import net.minecraftforge.event.terraingen.InitMapGenEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
@@ -73,6 +77,8 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 
     private boolean useCities;
     private boolean canGenCity;
+    private boolean genNewCity;
+    public ConcurrentHashMap<String, MetropolisBoundingBox> queuedCityGens;
     public static MetropolisBoundingBox currentCityBounds;
 
     public ModdedChunkProviderSurface(World worldIn, long seed, boolean bMapFeatures, String generatorSettings) {
@@ -139,6 +145,8 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         this.noiseGen6 = (NoiseGeneratorOctaves)noiseGens[5];
         this.mobSpawnerNoise = (NoiseGeneratorOctaves)noiseGens[6];
         this.currentCityBounds = null;
+        this.queuedCityGens = new ConcurrentHashMap<>();
+        this.genNewCity = false;
     }
 
     @Override
@@ -216,13 +224,19 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
     {
         this.rand.setSeed((long)x * 341873128712L + (long)z * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
-        this.canGenCity = cityGenerator.canGenerateMetropolis(this.worldObj, this.rand, x, z);
+        ChunkCoordIntPair cityStartCoords = this.cityGenerator.getOffsetCitySpawn(this.worldObj, rand, x, z);
+        if (cityStartCoords.chunkXPos == x && cityStartCoords.chunkZPos == z){
+            this.genNewCity = false;
+        } else {
+            this.genNewCity = cityGenerator.canGenerateMetropolis(this.worldObj, rand, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos);
+        }
+        this.canGenCity = this.isInQueuedCity(x, z);
         this.setBlocksInChunk(x, z, chunkprimer);
         this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, x * 16, z * 16, 16, 16);
         this.replaceBlocksForBiome(x, z, chunkprimer, this.biomesForGeneration);
 
-        if(this.useCities && this.canGenCity){
-            this.cityGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+        if(this.useCities && this.genNewCity){
+            this.cityGenerator.func_175792_a(this, this.worldObj, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos, chunkprimer);
         }
 
         if (this.settings.useCaves)
@@ -272,6 +286,21 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         return chunk;
     }
 
+    private boolean isInQueuedCity(int x, int z){
+        boolean inQueue = false;
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        MetropolisBoundingBox cityChunk = new MetropolisBoundingBox(chunkCoord.getXStart(), chunkCoord.getZStart(), chunkCoord.getXEnd(), chunkCoord.getZEnd());
+        if (!this.queuedCityGens.isEmpty()){
+            Iterator iterator = this.queuedCityGens.entrySet().iterator();
+            while (iterator.hasNext() && !inQueue){
+                Map.Entry entry = (Map.Entry) iterator.next();
+                MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
+                inQueue = value.intersectsWith(cityChunk);
+            }
+        }
+        return inQueue;
+    }
+
     @Override
     public void populate(IChunkProvider chunkProvider, int x, int z)
     {
@@ -316,7 +345,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         }
 
         if (this.useCities){
-            cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
+            cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair, this);
         }
 
         flag = flag || cityGenerated;

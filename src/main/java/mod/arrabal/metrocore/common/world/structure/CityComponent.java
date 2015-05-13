@@ -82,11 +82,11 @@ public abstract class CityComponent {
 
     protected boolean isLiquidInCityBoundingBox(World world, MetropolisBoundingBox boundingBox)
     {
-        BlockPos bbMin = boundingBox.minBlocKCoords;
+        BlockPos bbMin = boundingBox.minBlockCoords;
         BlockPos bbMax = boundingBox.maxBlockCoords;
-        int i = Math.max(this.boundingBox.minBlocKCoords.getX() - 1, bbMin.getX());
-        int j = Math.max(this.boundingBox.minBlocKCoords.getY() - 1, bbMin.getY());
-        int k = Math.max(this.boundingBox.minBlocKCoords.getZ() - 1, bbMin.getZ());
+        int i = Math.max(this.boundingBox.minBlockCoords.getX() - 1, bbMin.getX());
+        int j = Math.max(this.boundingBox.minBlockCoords.getY() - 1, bbMin.getY());
+        int k = Math.max(this.boundingBox.minBlockCoords.getZ() - 1, bbMin.getZ());
         int l = Math.min(this.boundingBox.maxBlockCoords.getX() + 1, bbMax.getX());
         int i1 = Math.min(this.boundingBox.maxBlockCoords.getY() + 1, bbMax.getY());
         int j1 = Math.min(this.boundingBox.maxBlockCoords.getZ() + 1,bbMax.getZ());
@@ -149,11 +149,11 @@ public abstract class CityComponent {
         {
             case 0:
             case 1:
-                return this.boundingBox.minBlocKCoords.getX() + offsetX;
+                return this.boundingBox.minBlockCoords.getX() + offsetX;
             case 2:
                 return this.boundingBox.maxBlockCoords.getX() - offsetZ;
             case 3:
-                return this.boundingBox.minBlocKCoords.getX() + offsetZ;
+                return this.boundingBox.minBlockCoords.getX() + offsetZ;
             default:
                 return offsetX;
         }
@@ -162,7 +162,7 @@ public abstract class CityComponent {
     // Gets a relative y position in the bounding box based on offset value for y and the coordBaseMode
     protected int getYWithOffset(int offsetY)
     {
-        return this.coordBaseMode == -1 ? offsetY : offsetY + this.boundingBox.minBlocKCoords.getY();
+        return this.coordBaseMode == -1 ? offsetY : offsetY + this.boundingBox.minBlockCoords.getY();
     }
 
     // Gets a relative z position in the bounding box based on offset values for x, z, and the coordBaseMode
@@ -173,10 +173,10 @@ public abstract class CityComponent {
             case 0:
                 return this.boundingBox.maxBlockCoords.getZ() - offsetZ;
             case 1:
-                return this.boundingBox.minBlocKCoords.getZ() + offsetZ;
+                return this.boundingBox.minBlockCoords.getZ() + offsetZ;
             case 2:
             case 3:
-                return this.boundingBox.minBlocKCoords.getZ() + offsetX;
+                return this.boundingBox.minBlockCoords.getZ() + offsetX;
             default:
                 return offsetZ;
         }
@@ -493,22 +493,23 @@ public abstract class CityComponent {
             blockpos2 = blockpos1.down();
             IBlockState blockState = chunk.getBlockState(blockpos2);
             BiomeGenBase blockBiome = chunk.getBiome(new BlockPos(blockpos2), world.getWorldChunkManager());
-            if (blockState == blockBiome.topBlock || blockState == blockBiome.fillerBlock
-                    || blockState == Blocks.sand.getDefaultState()
-                    || blockState == Blocks.gravel.getDefaultState()
-                    || blockState == Blocks.clay.getDefaultState()
-                    || blockState == Blocks.grass.getDefaultState()
-                    || blockState == Blocks.grass.getDefaultState().withProperty(BlockGrass.SNOWY, Boolean.valueOf(true))
-                    || blockState == Blocks.dirt.getDefaultState()
-                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
-                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL)
-                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
-                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT)
-                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
-                    || blockState == Blocks.stone.getDefaultState()
-                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE)
-                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.DIORITE)
-                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE)){
+            if (blockState == blockBiome.topBlock
+//                    || blockState == Blocks.sand.getDefaultState()
+//                    || blockState == Blocks.gravel.getDefaultState()
+//                    || blockState == Blocks.clay.getDefaultState()
+//                    || blockState == Blocks.grass.getDefaultState()
+//                    || blockState == Blocks.grass.getDefaultState().withProperty(BlockGrass.SNOWY, Boolean.valueOf(true))
+//                    || blockState == Blocks.dirt.getDefaultState()
+//                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+//                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL)
+//                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.PODZOL).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+//                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT)
+//                    || blockState == Blocks.dirt.getDefaultState().withProperty(BlockDirt.VARIANT, BlockDirt.DirtType.COARSE_DIRT).withProperty(BlockDirt.SNOWY, Boolean.valueOf(true))
+//                    || blockState == Blocks.stone.getDefaultState()
+//                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE)
+//                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.DIORITE)
+//                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE)
+                        ){
                 break;
             }
 
@@ -518,7 +519,7 @@ public abstract class CityComponent {
     }
 
     public String getHashKey(){
-        BlockPos minVals = this.boundingBox.minBlocKCoords;
+        BlockPos minVals = this.boundingBox.minBlockCoords;
         BlockPos maxVals = this.boundingBox.maxBlockCoords;
         return minVals.getX() + " " + minVals.getY()  + " " + minVals.getZ() + " " +
                 maxVals.getX() + " " + maxVals.getY() + " " + maxVals.getZ();
