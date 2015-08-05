@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.common.world.gen;
 
+import mod.arrabal.metrocore.common.init.Biomes;
 import mod.arrabal.metrocore.common.library.StatsHelper;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.handlers.data.CityBoundsSaveData;
@@ -36,21 +37,14 @@ public class MapGenMetropolis extends MapGenBase {
     private static int minDistanceBetween;
     private static int minGenRadius;
     private static int maxGenRadius;
-    private static List allowedBiomeList;
-    private static List disallowedBiomeTypeList;
-    private static BiomeDictionary.Type[] allowedBiomeTypes = {
-            BiomeDictionary.Type.MESA, BiomeDictionary.Type.FOREST, BiomeDictionary.Type.PLAINS,
-            BiomeDictionary.Type.SANDY, BiomeDictionary.Type.SNOWY,BiomeDictionary.Type.WASTELAND};
-    private static BiomeDictionary.Type[] disallowedBiomeTypes = {BiomeDictionary.Type.MOUNTAIN, BiomeDictionary.Type.SWAMP,
-            BiomeDictionary.Type.OCEAN, BiomeDictionary.Type.BEACH, BiomeDictionary.Type.NETHER, BiomeDictionary.Type.END,
-            BiomeDictionary.Type.MUSHROOM, BiomeDictionary.Type.HILLS};
-
     private MetropolisDataHandler dataHandler;
     private CityBoundsSaveData cityMap;
-    private List spawnList = new ArrayList();
     private ChunkCoordIntPair currentStart;
+    private BiomeGenBase[] biomesToGen;
+    private List<BiomeGenBase> cityBiomes;
+    private CityComponent lastBuiltComponent;
+    //private int cityTilesToGen;
 
-    public MetropolisBoundingBox spawnPointBlock;
     public MetropolisBoundingBox generatingZone;
     //public ConcurrentHashMap<String, MetropolisBoundingBox> generatedCities = new ConcurrentHashMap<>();
     public ConcurrentHashMap<String, MetropolisStart> startMap = new ConcurrentHashMap<>();
@@ -77,7 +71,8 @@ public class MapGenMetropolis extends MapGenBase {
         spawnBlockRadius = ConfigHandler.metropolisSpawnBlockRadius;
         genRarity = ConfigHandler.metropolisGenRarity;
         this.dataHandler = new MetropolisDataHandler();
-        this.initBiomeLists();
+        this.cityBiomes = new ArrayList<>();
+        this.cityBiomes.add(Biomes.plainsMetro);
     }
 
     public boolean buildMetropolis(World world, Random random, ChunkCoordIntPair chunkCoords, ModdedChunkProviderSurface provider){
@@ -118,53 +113,32 @@ public class MapGenMetropolis extends MapGenBase {
 
     public boolean canGenerateMetropolis(World world, Random random, int chunkX, int chunkZ){
 
-        if (this.checkForSpawnConflict(world, chunkX, chunkZ)){
-            LogHelper.trace("Spawn point conflict at chunk [" + chunkX + ", " + chunkZ + "]");
-            return false;
-        }
         this.initializeCityMapData(world);
-        this.generatingZone = new MetropolisBoundingBox(new BlockPos((chunkX - maxGenRadius) << 4, 1, (chunkZ - maxGenRadius) << 4), new BlockPos(((chunkX + maxGenRadius) << 4) + 15, 255, ((chunkZ + maxGenRadius) << 4) + 15));
-        if (this.checkFailedGenerationAttempt(this.generatingZone)){
-            LogHelper.trace("Already checked parts of the area around [" + chunkX + ", " + chunkZ + "] for city generation");
-            return false;
-        }
-        if (this.checkGenerationConflict(this.generatingZone)){
-            // city already exists within this area
-            LogHelper.trace("Found overlap with existing generated city within area " + this.generatingZone.toString());
+        this.generatingZone = new MetropolisBoundingBox(new BlockPos(chunkX << 4, 1, chunkZ << 4), new BlockPos((chunkX << 4) + 15, 255, (chunkZ << 4) + 15));
+        MetropolisBoundingBox spawnArea = new MetropolisBoundingBox(world.getSpawnPoint(), world.getSpawnPoint().add(16, 0, 16));
+        if ((this.generatingZone.getSquaredDistance(spawnArea, true) < (spawnBlockRadius * spawnBlockRadius)) || this.checkGenerationConflict(this.generatingZone)){
+            // Failed distance check
+            LogHelper.trace("Too close to existing city or spawn zone " + this.generatingZone.toString());
             this.generatingZone = null;
             return false;
         }
-        double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
-        double xDensityCheck, zDensityCheck;
-        int rarityFactor = (int) (1/genRarity);
-        Random rarityCheck = new Random(world.getTotalWorldTime());
-        xDensityCheck = (double)Math.abs(chunkX + rarityCheck.nextInt(rarityFactor)) % densityFactor;
-        zDensityCheck = (double)Math.abs(chunkZ + rarityCheck.nextInt(rarityFactor)) % densityFactor;
-        if (genDensity == 0 || ((xDensityCheck != 0.0d) && (zDensityCheck != 0.0d))){
-            LogHelper.debug("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
-            return false;
-        }
+        LogHelper.debug("Can generate Metropolis at [" + chunkX + ", " + chunkZ + "]");
         return true;
-        //return true;
-    }
-
-    private boolean checkForSpawnConflict(World world, int chunkX, int chunkZ){
-        if (this.spawnPointBlock == null){
-            this.spawnPointBlock = this.blockSpawnArea(world, spawnBlockRadius);
-        }
-        return this.spawnPointBlock.isVecInside(chunkX << 4, 64, chunkZ << 4);
     }
 
     public boolean checkGenerationConflict(MetropolisBoundingBox cityBounds){
+        return checkGenerationConflict(cityBounds,  ModOptions.metropolisMinDistanceBetween); //blocks
+    }
+
+    public boolean checkGenerationConflict(MetropolisBoundingBox cityBounds, int blocks){
         boolean conflict = false;
-        int minBlockDistance = ModOptions.metropolisMinDistanceBetween << 4;
         if (!this.dataHandler.isGenMapEmpty()){
             Iterator iterator = this.dataHandler.urbanGenerationMap.entrySet().iterator();
             while (iterator.hasNext() && !conflict){
                 Map.Entry entry = (Map.Entry) iterator.next();
                 MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
-                conflict = value.intersectsWith(cityBounds) ||
-                        value.getSquaredDistance(cityBounds, false) < (minBlockDistance * minBlockDistance);
+                conflict = value.intersectsWith(cityBounds);
+                if (blocks > 0) conflict = conflict || value.getSquaredDistance(cityBounds, false) < (blocks * blocks);
             }
         }
         return conflict;
@@ -184,47 +158,6 @@ public class MapGenMetropolis extends MapGenBase {
         return intersection;
     }
 
-    public ChunkCoordIntPair getOffsetCitySpawn(World world, Random random, int chunkX, int chunkZ){
-        EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
-        int genX, genZ;
-        if (entityplayer != null){
-            genX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
-            genZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
-        } else {
-            genX = chunkX;
-            genZ = chunkZ;
-        }
-        return new ChunkCoordIntPair(genX, genZ);
-    }
-
-    private boolean checkFailedGenerationAttempt(MetropolisBoundingBox cityBounds){
-        boolean conflict = false;
-        int minBlockDistance = ModOptions.metropolisMinDistanceBetween << 4;
-        if (!this.genCheckedZones.isEmpty()){
-            Iterator iterator = this.genCheckedZones.entrySet().iterator();
-            while (iterator.hasNext()){
-                Map.Entry entry = (Map.Entry) iterator.next();
-                MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
-                conflict = value.intersectsWith(cityBounds) ||
-                        value.getSquaredDistance(cityBounds, false) < (minBlockDistance * minBlockDistance);
-                if (conflict){
-                    value.expandTo(cityBounds);
-                    entry.setValue(value);
-                }
-            }
-        }
-        return conflict;
-    }
-
-    //Called prior to initial world generation to block out the area around the spawn point to prevent city generation too close to spawn.
-    private MetropolisBoundingBox blockSpawnArea(World world, int radius){
-        int spawnX = world.getSpawnPoint().getX();
-        int spawnZ = world.getSpawnPoint().getZ();
-        int spawnMinX = spawnX - radius;
-        int spawnMinZ = spawnZ - radius;
-        return new MetropolisBoundingBox(spawnMinX, spawnMinZ, spawnMinX + 2*radius, spawnMinZ + 2*radius, "SpawnPointBlock");
-    }
-
     private void initializeCityMapData(World worldIn){
         // check to see if cityMap is initialized
         if (this.cityMap == null){
@@ -241,72 +174,6 @@ public class MapGenMetropolis extends MapGenBase {
                 this.dataHandler.urbanGenerationMap = this.cityMap.getBoundingBoxMap();
             }
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initializeBiomeListWithVanillaBiomes() {
-
-        //Clean-up of vanilla biome registry
-        if (!BiomeDictionary.isBiomeRegistered(BiomeGenBase.stoneBeach)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.stoneBeach, BiomeDictionary.Type.BEACH);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.iceMountains, BiomeDictionary.Type.MOUNTAIN)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.iceMountains, BiomeDictionary.Type.MOUNTAIN);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.coldBeach, BiomeDictionary.Type.BEACH)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.coldBeach, BiomeDictionary.Type.BEACH);
-        }
-        if (!BiomeDictionary.isBiomeOfType(BiomeGenBase.extremeHillsPlus, BiomeDictionary.Type.MOUNTAIN)){
-            BiomeDictionary.registerBiomeType(BiomeGenBase.extremeHillsPlus, BiomeDictionary.Type.MOUNTAIN);
-        }
-
-        BiomeGenBase[] vanillaBiomes = BiomeGenBase.getBiomeGenArray();
-
-
-        for (int j = 0; j < vanillaBiomes.length; j++){
-            if (vanillaBiomes[j] == null) {continue;}
-            BiomeDictionary.Type[] biomeTypes = BiomeDictionary.getTypesForBiome(vanillaBiomes[j]);
-            boolean pass = true;
-            for (int k = 0; k < biomeTypes.length; k++){
-                if (disallowedBiomeTypeList.contains(biomeTypes[k])){
-                    pass = false;
-                }
-            }
-            if (pass){
-                allowedBiomeList.add(vanillaBiomes[j]);
-            }
-        }
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private void  initBiomeLists(){
-        allowedBiomeList = new ArrayList();
-        disallowedBiomeTypeList = new ArrayList();
-        Collections.addAll(disallowedBiomeTypeList, disallowedBiomeTypes);
-        initializeBiomeListWithVanillaBiomes();
-        for (int i = 0; i < allowedBiomeTypes.length; i++){
-            BiomeGenBase[] biomes = BiomeDictionary.getBiomesForType(allowedBiomeTypes[i]);
-            for (int j = 0; j < biomes.length; j++){
-                if (!allowedBiomeList.contains(biomes[j])){
-                    BiomeDictionary.Type[] biomeTypes = BiomeDictionary.getTypesForBiome(biomes[j]);
-                    boolean flag = true;
-                    for (int k = 0; k < biomeTypes.length; k++){
-                        if (disallowedBiomeTypeList.contains(biomeTypes[k])){
-                            flag = false;
-                        }
-                    }
-                    if (flag){
-                        allowedBiomeList.add(biomes[j]);
-                    }
-
-                }
-            }
-        }
-    }
-
-    public boolean isBiomeValid(World worldIn, int posX, int posZ, int radius) {
-        return worldIn.getWorldChunkManager().areBiomesViable(posX, posZ, radius, allowedBiomeList);
     }
 
     public int getDefaultGenRadius(boolean getMax){
@@ -350,19 +217,40 @@ public class MapGenMetropolis extends MapGenBase {
     }
 
     @SuppressWarnings("unchecked")
-    public MetropolisStart generateMetropolisStart(World world, int chunkX, int chunkZ, int xGenRadius, int zGenRadius){
-        if (this.spawnList.isEmpty()){
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySkeleton.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityZombie.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntitySpider.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityCreeper.class, 100, 4, 4));
-            this.spawnList.add(new BiomeGenBase.SpawnListEntry(EntityEnderman.class, 10, 1, 4));
-        }
+    public MetropolisStart generateMetropolisStart(World world, int chunkX, int chunkZ, int xGenRadius, int zGenRadius, int maxComponents){
         //int[] heightMap = getGroundHeightMap(world, chunkX << 4, chunkZ << 4, (chunkX << 4) + 15, (chunkZ << 4) + 15, 0);
         //MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, StatsHelper.getStaticMean(heightMap), xGenRadius, zGenRadius, this.spawnList);
-        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, 63, xGenRadius, zGenRadius, this.spawnList);
+        MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, 63, xGenRadius, zGenRadius, maxComponents);
         this.dataHandler.addToStartMap(start);
         return start;
+    }
+
+    private Map initStageMap(int stage){
+        Map stageMap = new HashMap<Integer, StageCoords>();
+        Integer mapKey = new Integer(0);
+        for (int i = (stage * -1); i <= stage; i++)
+            for (int j = (stage * -1); j <= stage; j++){
+                if ((Math.abs(i) != stage) && (Math.abs(j) == stage)){
+                    StageCoords stageValue = new StageCoords(i,j);
+                    stageMap.put(mapKey, stageValue);
+                    mapKey =  mapKey + 1;
+                } else if (Math.abs(i) == stage) {
+                    StageCoords stageValue = new StageCoords(i,j);
+                    stageMap.put(mapKey, stageValue);
+                    mapKey =  mapKey + 1;
+                }
+            }
+        return stageMap;
+    }
+
+    private ChunkCoordIntPair getCoordsToBuild(Map stageMap, int mapIndex){
+        //Integer mapKey = new Integer(mapIndex);
+        if (stageMap.containsKey(mapIndex)){
+            StageCoords buildCoords = (StageCoords) stageMap.get(mapIndex);
+            stageMap.remove(mapIndex);
+            return new ChunkCoordIntPair(buildCoords.chunkX, buildCoords.chunkZ);
+        }
+        return null;
     }
 
     @Override
@@ -370,33 +258,58 @@ public class MapGenMetropolis extends MapGenBase {
         int k = this.range;
         this.worldObj = worldIn;
         this.rand.setSeed(worldIn.getSeed());
-        int genRadiusX = this.rand.nextInt(k) + this.minGenRadius;
-        int genRadiusZ = this.rand.nextInt(k) + this.minGenRadius;
-        genRadiusX = (genRadiusZ > 3 && genRadiusX < 4) ? genRadiusX + 1 : genRadiusX;
-        genRadiusZ = (genRadiusX > 3 && genRadiusZ < 4) ? genRadiusZ + 1 : genRadiusZ;
+        int genXDim = this.rand.nextInt((maxGenRadius * 2) - (minGenRadius * 2)) + (minGenRadius * 2);
+        int genZDim = this.rand.nextInt((maxGenRadius * 2) - (minGenRadius * 2)) + (minGenRadius * 2);
+        int cityTilesToGen = genXDim * genZDim;
+        // (minGenRadius * 2) * (minGenRadius * 2) + this.rand.nextInt((maxGenRadius * 2) * (maxGenRadius * 2));
+        int genRadiusX = maxGenRadius;
+        int genRadiusZ = maxGenRadius;
         long l = this.rand.nextLong();
         long i1 = this.rand.nextLong();
         // set the city start first
-        MetropolisStart start = this.generateMetropolisStart(worldIn, chunkX, chunkZ, genRadiusX, genRadiusZ);
+        MetropolisStart start = this.generateMetropolisStart(worldIn, chunkX, chunkZ, genRadiusX, genRadiusZ, cityTilesToGen);
         this.currentStart = new ChunkCoordIntPair(chunkX, chunkZ);
         String hashKey = start.getStartKey();
         start.cityLayoutStart.cityComponentMap.put(hashKey,start.cityLayoutStart);
+        start.cityLayoutStart.reduceTilesToBuild();
         start.cityLayoutStart.buildComponent(start.cityLayoutStart, this.rand);
         LogHelper.debug("Starting build city map with start at " + hashKey);
         LogHelper.debug("Max gen radius (x,z): " + start.getMaxGenRadius(true) + " " + start.getMaxGenRadius(false));
         LogHelper.debug("BaseY: " + start.getBaseY());
         LogHelper.debug("City Class: " + start.cityLayoutStart.citySize + " " + "Road Grid: " + start.cityLayoutStart.roadGrid);
-        int radiusIterations = Math.max(start.getMaxGenRadius(true), start.getMaxGenRadius(false));
-        for (int iteration = 2; iteration <= radiusIterations; iteration++) {
-            for (int buildX = -iteration; buildX <= iteration; buildX++){
-                for (int buildZ = -iteration; buildZ <= iteration; buildZ++){
-                    if ((Math.abs(buildX) < iteration && Math.abs(buildZ) < iteration) || (Math.abs(buildX) > start.getMaxGenRadius(true)) || (Math.abs(buildZ) > start.getMaxGenRadius(false))) continue;
-                    long l1 = (long)buildX * l;
-                    long i2 = (long)buildZ * i1;
-                    this.rand.setSeed(l1 ^ i2 ^ worldIn.getSeed());
-                    this.generateCityTile(worldIn, start, buildX, buildZ, chunkX, chunkZ, chunkPrimer);
-                }
+        //TODO:  Completely rewrite procedure for building city tile map
+        int genDepth = this.rand.nextInt(5);
+        int stageTracker = 2;
+        Map currentStage = this.initStageMap(stageTracker);
+        Map nextStage = this.initStageMap(stageTracker + 1);
+        ChunkCoordIntPair buildCoords;
+        CityComponent lastTile = null;
+        while (start.cityLayoutStart.getTilesLeftToBuild() > 0){
+            this.doOrganicGrowth(lastTile, genDepth, worldIn, start, chunkX, chunkZ, chunkPrimer);
+            if (currentStage.isEmpty()){
+                stageTracker++;
+                currentStage = this.initStageMap(stageTracker);
+                nextStage = this.initStageMap(stageTracker + 1);
             }
+            boolean flag = this.rand.nextBoolean();
+            Map mapToQuerry = flag ? currentStage : nextStage;
+            int mapQuerry = flag ? this.rand.nextInt(stageTracker * 8) : this.rand.nextInt((stageTracker + 1) * 8);
+            do {
+                do {
+                    buildCoords = this.getCoordsToBuild(mapToQuerry, mapQuerry);
+                    if (mapQuerry == 0) mapQuerry = flag ? stageTracker * 8 : (stageTracker + 1) * 8;
+                    else mapQuerry--;
+                } while (buildCoords == null);
+                if (mapToQuerry.isEmpty()){
+                    mapToQuerry = flag ? nextStage : currentStage;
+                    mapQuerry = flag ? this.rand.nextInt((stageTracker + 1) * 8) : this.rand.nextInt(stageTracker * 8);
+                }
+                this.rand.setSeed(((long)buildCoords.chunkXPos * l) ^ ((long)buildCoords.chunkZPos * i1) ^ worldIn.getSeed());
+            } while (!this.generateCityTile(worldIn, start, buildCoords.chunkXPos, buildCoords.chunkZPos, chunkX, chunkZ, chunkPrimer)
+                    || (currentStage.isEmpty() && nextStage.isEmpty()));
+            lastTile = this.lastBuiltComponent;
+
+
         }
         LogHelper.info("Completed building city layout with start at " + start.getStartKey());
         ModdedChunkProviderSurface moddedProvider = (ModdedChunkProviderSurface) chunkProvider;
@@ -405,21 +318,58 @@ public class MapGenMetropolis extends MapGenBase {
         this.cityMap. saveBoundingBoxData(start.cityLayoutStart.cityPlan);
     }
 
-    protected void generateCityTile(World worldIn, MetropolisStart start, int buildX, int buildZ, int startChunkX, int startChunkZ, ChunkPrimer chunkPrimer){
+    protected boolean generateCityTile(World worldIn, MetropolisStart start, int buildX, int buildZ, int startChunkX, int startChunkZ, ChunkPrimer chunkPrimer) {
 
         CityComponent cityComponent;
         int worldX, worldZ;
         worldX = start.getStartX() + buildX;
         worldZ = start.getStartZ() + buildZ;
         String newChunkKey = "[" + worldX + ", " + worldZ + "]";
+        this.biomesToGen = worldIn.getWorldChunkManager().loadBlockGeneratorData(this.biomesToGen, worldX * 16, worldZ * 16, 16, 16);
+        boolean validBiome = false;
+        for (int i = 0; i < this.biomesToGen.length; i++)
+            if (this.cityBiomes.contains(this.biomesToGen[i])) validBiome = true;
+        if (!validBiome || start.cityLayoutStart.getTilesLeftToBuild() <= 0) return false;
         if (start.cityLayoutStart.cityComponentMap.containsKey(newChunkKey)) {
             cityComponent = start.cityLayoutStart.cityComponentMap.get(newChunkKey);
             cityComponent.buildComponent(start.cityLayoutStart, this.rand);
-        }
-        else{
-            // found empty city tile.  Need to generate new tile.  Should take place after chained generation of tiles
+            this.lastBuiltComponent = cityComponent;
+        } else {
+            // found empty city tile.  Need to generate new tile.
             LogHelper.debug("Found empty city tile during component build at " + newChunkKey);
             start.cityLayoutStart.buildComponent(start.cityLayoutStart, this.rand, buildX, buildZ);
+            // start new chained generation
+            this.generateCityTile(worldIn, start, worldX, worldZ, startChunkX, startChunkZ, chunkPrimer);
+        }
+        return true;
+    }
+
+    private void doOrganicGrowth(CityComponent lastComponent, int growthStages, World worldIn, MetropolisStart start, int startX, int startZ, ChunkPrimer chunkPrimer){
+        if (lastComponent == null || growthStages == 0) return;
+        int buildX, buildZ;
+        int offsetX = 0;
+        int offsetZ = 0;
+        while (growthStages > 0){
+            buildX = lastComponent.getChunkPosition().getX() >> 4;
+            buildZ = lastComponent.getChunkPosition().getZ() >> 4;
+            while (offsetX == 0 && offsetZ == 0) {
+                offsetX = this.rand.nextInt(3) - 1;
+                offsetZ = this.rand.nextInt(3) - 1;
+            }
+            this.generateCityTile(worldIn, start, buildX + offsetX, buildZ + offsetZ, startX, startZ, chunkPrimer);
+            growthStages--;
+            lastComponent = this.lastBuiltComponent;
+        }
+    }
+
+    private class StageCoords {
+
+        public int chunkX;
+        public int chunkZ;
+
+        StageCoords(int x, int z){
+            this.chunkX = x;
+            this.chunkZ = z;
         }
     }
 }

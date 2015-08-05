@@ -88,7 +88,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         this.stoneNoise = new double[256];
         this.caveGenerator = new ModdedMapGenCaves();
         this.strongholdGenerator = new MapGenStronghold();
-        this.villageGenerator = new ModdedMapGenVillage();
+        this.villageGenerator = new MapGenVillage();
         this.mineshaftGenerator = new MapGenMineshaft();
         this.scatteredFeatureGenerator = new ModdedMapGenScatteredFeature();
         this.ravineGenerator = new ModdedMapGenRavine();
@@ -144,7 +144,7 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         this.noiseGen5 = (NoiseGeneratorOctaves)noiseGens[4];
         this.noiseGen6 = (NoiseGeneratorOctaves)noiseGens[5];
         this.mobSpawnerNoise = (NoiseGeneratorOctaves)noiseGens[6];
-        this.currentCityBounds = null;
+        ModdedChunkProviderSurface.currentCityBounds = null;
         this.queuedCityGens = new ConcurrentHashMap<>();
         this.genNewCity = false;
     }
@@ -201,7 +201,11 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
                                 }
                                 else if (k2 * 8 + l2 < this.settings.seaLevel)
                                 {
-                                    chunkPrimer.setBlockState(k * 4 + i3, k2 * 8 + l2, j1 * 4 + j3, this.field_177476_s.getDefaultState());
+                                    //if (!this.canGenCity) {
+                                        chunkPrimer.setBlockState(k * 4 + i3, k2 * 8 + l2, j1 * 4 + j3, this.field_177476_s.getDefaultState());
+                                    //} else {
+                                        //chunkPrimer.setBlockState(k * 4 + i3, k2 * 8 + l2, j1 * 4 + j3, Blocks.stone.getDefaultState());
+                                    //}
                                 }
                             }
 
@@ -224,20 +228,15 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
     {
         this.rand.setSeed((long)x * 341873128712L + (long)z * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
-        ChunkCoordIntPair cityStartCoords = this.cityGenerator.getOffsetCitySpawn(this.worldObj, rand, x, z);
-        if (cityStartCoords.chunkXPos == x && cityStartCoords.chunkZPos == z){
-            this.genNewCity = false;
-        } else {
-            this.genNewCity = cityGenerator.canGenerateMetropolis(this.worldObj, rand, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos);
-        }
+        //ChunkCoordIntPair cityStartCoords = this.cityGenerator.getOffsetCitySpawn(this.worldObj, rand, x, z);
+        //this.genNewCity = cityGenerator.canGenerateMetropolis(this.worldObj, rand, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos);
+        //if(this.useCities && this.genNewCity && this.cityGenerator.isBiomeValid(this.worldObj, cityStartCoords.getCenterXPos(), cityStartCoords.getCenterZPosition(), (this.cityGenerator.getDefaultGenRadius(true) << 4) + 8)){
+        //    this.cityGenerator.func_175792_a(this, this.worldObj, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos, chunkprimer);
+        //}
         this.canGenCity = this.isInQueuedCity(x, z);
         this.setBlocksInChunk(x, z, chunkprimer);
         this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, x * 16, z * 16, 16, 16);
         this.replaceBlocksForBiome(x, z, chunkprimer, this.biomesForGeneration);
-
-        if(this.useCities && this.genNewCity){
-            this.cityGenerator.func_175792_a(this, this.worldObj, cityStartCoords.chunkXPos, cityStartCoords.chunkZPos, chunkprimer);
-        }
 
         if (this.settings.useCaves)
         {
@@ -389,10 +388,10 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         if (this.useCities && cityGenerated){
             ModdedBiomeDecorator modBiomeDecorator;
             modBiomeDecorator = (ModdedBiomeDecorator) biomegenbase.theBiomeDecorator;
-            modBiomeDecorator.generatingCity = this.currentCityBounds;
+            modBiomeDecorator.generatingCity = ModdedChunkProviderSurface.currentCityBounds;
         }
         biomegenbase.decorate(this.worldObj, this.rand, new BlockPos(k, 0, l));
-        if (this.currentCityBounds != null) this.currentCityBounds = null;
+        if (ModdedChunkProviderSurface.currentCityBounds != null) ModdedChunkProviderSurface.currentCityBounds = null;
         if (TerrainGen.populate(chunkProvider, worldObj, rand, x, z, flag, ANIMALS))
         {
             SpawnerAnimals.performWorldGenSpawning(this.worldObj, biomegenbase, k + 8, l + 8, 16, 16, this.rand);
@@ -424,6 +423,33 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
         BlockFalling.fallInstantly = false;
     }
 
+    private double getDampeningFactor(int chunkX, int chunkZ){
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(chunkX, chunkZ);
+        boolean foundNearest = false;
+        int distance = 0;
+        double dampFactor = 1.0;
+        MetropolisBoundingBox cityChunk = new MetropolisBoundingBox(chunkCoord.getXStart(), chunkCoord.getZStart(), chunkCoord.getXEnd(), chunkCoord.getZEnd());
+        if (!this.queuedCityGens.isEmpty()){
+            Iterator iterator = this.queuedCityGens.entrySet().iterator();
+            while (iterator.hasNext() && !foundNearest){
+                Map.Entry entry = (Map.Entry) iterator.next();
+                MetropolisBoundingBox value = (MetropolisBoundingBox) entry.getValue();
+                distance = value.getSquaredDistance(cityChunk, false);
+                if (distance < ((ModOptions.metropolisMinDistanceBetween * ModOptions.metropolisMinDistanceBetween))){ //blocks
+                    foundNearest = true;
+                }
+            }
+        }
+        if (foundNearest){
+            if (distance < 25601){
+                double d1 = Math.sqrt(distance) / 16.0d;
+                dampFactor = Math.cos(0.35d * (d1 - 1))+1;
+            }
+        }
+
+        return dampFactor;
+    }
+
     private void func_147423_a(int p_147423_1_, int p_147423_2_, int p_147423_3_)
     {
         int genChunkX = p_147423_1_ / 4;
@@ -434,22 +460,50 @@ public class ModdedChunkProviderSurface extends ChunkProviderGenerate {
 //                defaultMaxGenRadius * 32, defaultMaxGenRadius * 32);
         // check for valid city generation area
         boolean dampenNoise = false;
-        if (this.canGenCity && this.cityGenerator.isBiomeValid(this.worldObj, (genChunkX << 4) + 8, (genChunkZ << 4) + 8, (this.cityGenerator.getDefaultGenRadius(true) << 4) + 8)){
+        double dFactor = 1.0d;
+        double dDampen1 = 1.0d; // Controls main y noise frequency.  < 1 =
+        double dDampen2 = 1.0d;
+        double dDampen3 = 1.0d;
+        double dDampen4 = 1.0d; // controls shape of terrain.  < 1 = more gradual hills / rolling terrain
+        double dDampen5 = 1.0d; // controls shape of mid-range terrain.  < 1 = intermediate peaks are more gradual / rolling
+        double dDampen6 = 1.0d; // controls shape of mid-range terrain noise.  < 1 = intermediate peaks are more gradual / rolling
+        double dDampen7 = 1.0d; // amount of noise off of base height.  < 1 = terrain is closer to base y level
+        double dDampen8 = 1.0d;
+        if (this.canGenCity){
             // generate less noisy terrain
             //TODO:  figure out how to generate less noisy terrain
             dampenNoise = true;
         }
-        else if (this.cityGenerator.checkGenerationConflict(new MetropolisBoundingBox(genChunkX << 4, genChunkZ << 4, (genChunkX << 4) + 15, (genChunkZ << 4) + 15))){
+        else {
+            dFactor = getDampeningFactor(genChunkX, genChunkZ);
+            if (dFactor > 1.0d) {
+                dampenNoise = true;
+                //TODO: Need a function with a more gradual transition at the front end
+                dDampen1 = (dDampen1 != 1.0d) ? dDampen1 - (dFactor * (dDampen1 / 2.0d)) : 1.0d;
+                dDampen2 = (dDampen2 != 1.0d) ? dDampen2 - (dFactor * (dDampen2 / 2.0d)) : 1.0d;
+                dDampen3 = (dDampen3 != 1.0d) ? dDampen3 - (dFactor * (dDampen3 / 2.0d)) : 1.0d;
+                dDampen4 = (dDampen4 != 1.0d) ? dDampen4 - (dFactor * (dDampen4 / 2.0d)) : 1.0d;
+                dDampen5 = (dDampen5 != 1.0d) ? dDampen5 - (dFactor * (dDampen5 / 2.0d)) : 1.0d;
+                dDampen6 = (dDampen6 != 1.0d) ? dDampen6 - (dFactor * (dDampen6 / 2.0d)) : 1.0d;
+                dDampen7 = (dDampen7 != 1.0d) ? dDampen7 - (dFactor * (dDampen7 / 2.0d)) : 1.0d;
+                dDampen8 = (dDampen8 != 1.0d) ? dDampen8 - (dFactor * (dDampen8 / 2.0d)) : 1.0d;
+            }
+        }
+        if (this.cityGenerator.checkGenerationConflict(new MetropolisBoundingBox(genChunkX << 4, genChunkZ << 4, (genChunkX << 4) + 15, (genChunkZ << 4) + 15), 32)){
+            //TODO:  call to check to see if chunk in generation area should not include valid distance until next city
             dampenNoise = true;
             this.canGenCity = false;
         }
         if (dampenNoise){
-            this.field_147426_g = this.noiseGen6.generateNoiseOctaves(this.field_147426_g, p_147423_1_, p_147423_3_, 5, 5, (double)this.settings.depthNoiseScaleX, (double)this.settings.depthNoiseScaleZ, (double)this.settings.depthNoiseScaleExponent);
+            this.field_147426_g = this.noiseGen6.generateNoiseOctaves(this.field_147426_g, p_147423_1_, p_147423_3_, 5, 5, (double)this.settings.depthNoiseScaleX * dDampen7, (double)this.settings.depthNoiseScaleZ * dDampen7, (double)this.settings.depthNoiseScaleExponent * dDampen8);
             f = this.settings.coordinateScale;
             f1 = this.settings.heightScale;
-            this.field_147427_d = this.field_147429_l.generateNoiseOctaves(this.field_147427_d, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)(f / this.settings.mainNoiseScaleX), (double)(f1 / this.settings.mainNoiseScaleY), (double)(f / this.settings.mainNoiseScaleZ));
-            this.field_147428_e = this.field_147431_j.generateNoiseOctaves(this.field_147428_e, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)f, (double)f1, (double)f);
-            this.field_147425_f = this.field_147432_k.generateNoiseOctaves(this.field_147425_f, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)f, (double)f1, (double)f);
+            //Main shape of terrain.  Reduce x, y & z noise scale
+            this.field_147427_d = this.field_147429_l.generateNoiseOctaves(this.field_147427_d, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)(f / this.settings.mainNoiseScaleX) * dDampen4, (double)(f1 / this.settings.mainNoiseScaleY) * dDampen1, (double)(f / this.settings.mainNoiseScaleZ) * dDampen4);
+            // Intermediate noise of terrain.
+            this.field_147428_e = this.field_147431_j.generateNoiseOctaves(this.field_147428_e, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)f * dDampen6, (double)f1 * dDampen2, (double)f * dDampen6);
+            //
+            this.field_147425_f = this.field_147432_k.generateNoiseOctaves(this.field_147425_f, p_147423_1_, p_147423_2_, p_147423_3_, 5, 33, 5, (double)f * dDampen5, (double)f1 * dDampen3, (double)f * dDampen5);
         }
         else {
             // use default noise generation

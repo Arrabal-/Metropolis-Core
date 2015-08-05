@@ -1,9 +1,11 @@
 package mod.arrabal.metrocore.common.handlers;
 
 import mod.arrabal.metrocore.MetropolisCore;
+import mod.arrabal.metrocore.common.init.Biomes;
 import mod.arrabal.metrocore.common.world.gen.ModdedMapGenCaves;
 import mod.arrabal.metrocore.common.world.gen.ModdedWorldProviderSurface;
 import mod.arrabal.metrocore.network.GuiHandler;
+import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -34,6 +36,10 @@ public class MetropolisCoreHandlers {
         swapOverworldWorldProvider();
     }
 
+    public static void postInit(){
+        registerBiomes();
+    }
+
     private static void registerNetworkEventHandlers() {
 
     }
@@ -61,6 +67,10 @@ public class MetropolisCoreHandlers {
                 DimensionManager.registerProviderType(0, ModdedWorldProviderSurface.class, false);
             }
         }
+    }
+
+    private static void registerBiomes(){
+        BiomeDictionary.registerBiomeType(Biomes.plainsMetro, BiomeDictionary.Type.PLAINS);
     }
 
 }

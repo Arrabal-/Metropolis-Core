@@ -34,7 +34,7 @@ group= "mod.arrabal.metrocore" // http://maven.apache.org/guides/mini/guide-nami
 archivesBaseName = "MetropolisCore"
 
 minecraft {
-    version = "1.8-11.14.1.1350"
+    version = "1.8-11.14.3.1502"
     runDir = "run"
 
     // the mappings can be changed at any time, and must be in the following format.
@@ -83,6 +83,12 @@ processResources
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
+    }
+}
+
+jar {
+    manifest {
+        attributes 'FMLAT': 'metropoliscore_at.cfg'
     }
 }
 

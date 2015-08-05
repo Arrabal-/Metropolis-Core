@@ -4,6 +4,7 @@ import mod.arrabal.metrocore.common.block.BlockMetroCore;
 import mod.arrabal.metrocore.common.block.BlockMetroCoreDoor;
 import mod.arrabal.metrocore.common.block.BlockMetroCoreSlab;
 import net.minecraft.item.Item;
+import net.minecraft.world.biome.BiomeGenBase;
 
 /**
  * Created by Arrabal on 6/26/2014.
@@ -20,4 +21,8 @@ public interface IProxy {
     public void registerItemForMeshing(Item item, int meta, String name);
 
     public void registerSounds();
+
+    //server methods
+    public void addBiomes();
+
 }

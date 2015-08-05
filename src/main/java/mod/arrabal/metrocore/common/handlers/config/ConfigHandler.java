@@ -44,11 +44,11 @@ public class ConfigHandler {
         try {
             //mod options
             overrideCraftingModDependency = config.get(ModRef.CATEGORY_MOD_MECHANICS, "DependencyOverrides", false,
-                    "Enable to allow crafting recipes without MetropolisResources mod.  Having mod installed deprecates this setting").getBoolean(false);
+                    "Enable to allow crafting recipes without MetropolisResources mod.  Having mod installed deprecates this setting").setRequiresMcRestart(true).getBoolean(false);
             enableDebugMessages = config.get(ModRef.CATEGORY_MOD_MECHANICS, "DebugMode", "off",
                     "Enable to generate internal debug messages.", validDebugValues).getString();
             enableCityCreation = config.get(ModRef.CATEGORY_MOD_MECHANICS, "EnableCityGeneration", true,
-                    "Disable to prevent ANY cities from spawning in the world.  This is a core mod feature, so only disable if you really mean it.").getBoolean(true);
+                    "Disable to prevent ANY cities from spawning in the world.  This is a core mod feature, so only disable if you really mean it.").setRequiresMcRestart(true).getBoolean(true);
 
             // Add configuration options here
             metropolisSpawnBlockRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "SpawnAreaBlocked", 160,

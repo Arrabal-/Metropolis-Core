@@ -1,5 +1,9 @@
 package mod.arrabal.metrocore;
 
+import mod.arrabal.metrocore.common.init.Biomes;
+import mod.arrabal.metrocore.common.world.biome.BiomeLoader;
+import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -45,6 +49,8 @@ public class MetropolisCore {
         tabMetroCoreItems = CreativeTabsMetroCore.tabMetroCoreItems;
         Blocks.init();
         Items.init();
+        final BiomeLoader biomes = new BiomeLoader();
+        biomes.register();
         proxy.registerSounds();
     }
 
@@ -61,7 +67,7 @@ public class MetropolisCore {
     //Actions taken after mods have loaded
     @Mod.EventHandler
     public static void postInit(FMLPostInitializationEvent event) {
-
+        MetropolisCoreHandlers.postInit();
     }
 
     @Mod.EventHandler

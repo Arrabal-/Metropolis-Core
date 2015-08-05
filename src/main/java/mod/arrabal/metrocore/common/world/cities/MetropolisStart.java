@@ -20,24 +20,24 @@ public class MetropolisStart {
     private int maxXGenRadius, maxZGenRadius;
     private int baseY;
     private UrbanClassification baseType;
-    private List spawnList;
     private boolean currentlyBuilding;
     private Random random;
+    private int maxComponents;
     public CityComponentPieces.Start cityLayoutStart;
 
 
     public MetropolisStart() {}
 
-    public MetropolisStart(World world, int chunkX, int chunkZ, int avgY, int radiusX, int radiusZ, List spawns){
+    public MetropolisStart(World world, int chunkX, int chunkZ, int avgY, int radiusX, int radiusZ, int maxCityComponents){
         this.startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
         this.maxXGenRadius = radiusX;
         this.maxZGenRadius = radiusZ;
         this.baseY = avgY;
-        this.spawnList = spawns;
         this.random = getNewRandom(world, chunkX, chunkZ);
         this.baseType = UrbanClassification.URBAN;
         this.currentlyBuilding = false;
-        UrbanType cityClass = getUrbanClass(this.maxXGenRadius,this.maxZGenRadius);
+        this.maxComponents = maxCityComponents;
+        UrbanType cityClass = getUrbanClass();
         List tileList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), false);
         List structureList = CityComponentPieces.getCityComponentWeightsLists(random, cityClass, Math.min(radiusX, radiusZ), true);
         this.cityLayoutStart = new CityComponentPieces.Start(0, getStartVariant(random, cityClass), random, chunkX, chunkZ, avgY, tileList, structureList);
@@ -45,17 +45,16 @@ public class MetropolisStart {
                 (chunkX << 4) + 15 + (radiusX << 4), (chunkZ << 4) + 15 + (radiusZ << 4), "MaxDimensions");
         this.cityLayoutStart.citySize = cityClass;
         this.cityLayoutStart.roadGrid = getRoadGridType(random);
+        this.cityLayoutStart.setMaxCityTiles(this.maxComponents);
     }
 
     public enum UrbanClassification {ROAD, URBAN}
     public enum UrbanType {TOWN, CITY, METROPOLIS, ROAD, HIGHWAY}
     public enum RoadGrid {ROAD_INSTANCE, GRID, WEB, SPRAWL, MIXED}
 
-    private UrbanType getUrbanClass(int radiusX, int radiusZ){
-        int genArea = radiusX * radiusZ;
-        int sizeThreshold = (ConfigHandler.metropolisMaxGenRadius * ConfigHandler.metropolisMaxGenRadius) / 5;
-        if (genArea < 2 * sizeThreshold) { return UrbanType.TOWN;}
-        if (genArea < 4 * sizeThreshold) { return UrbanType.CITY;}
+    private UrbanType getUrbanClass() {
+        if (this.maxComponents <= 25) return UrbanType.TOWN;
+        if (this.maxComponents < 50 ) return UrbanType.CITY;
         return UrbanType.METROPOLIS;
     }
 

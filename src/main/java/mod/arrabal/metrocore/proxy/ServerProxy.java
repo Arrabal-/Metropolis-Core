@@ -1,9 +1,12 @@
 package mod.arrabal.metrocore.proxy;
 
 import mod.arrabal.metrocore.common.block.BlockMetroCore;
-import mod.arrabal.metrocore.common.block.BlockMetroCoreDoor;
 import mod.arrabal.metrocore.common.block.BlockMetroCoreSlab;
+import mod.arrabal.metrocore.common.init.Biomes;
 import net.minecraft.item.Item;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.biome.BiomeGenBase;
+import net.minecraftforge.common.BiomeManager;
 
 /**
  * Created by Arrabal on 6/26/2014.
@@ -25,5 +28,4 @@ public class ServerProxy extends CommonProxy {
 
     @Override
     public void registerSounds() {}
-
 }

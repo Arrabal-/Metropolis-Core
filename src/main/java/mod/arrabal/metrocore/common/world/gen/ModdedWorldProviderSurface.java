@@ -4,7 +4,7 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.IChunkProvider;
 
 /**
- * Created by Evan on 4/21/2015.
+ * Created by Arrabal on 4/21/2015.
  */
 public class ModdedWorldProviderSurface extends WorldProvider {
 
@@ -21,7 +21,7 @@ public class ModdedWorldProviderSurface extends WorldProvider {
     @Override
     public IChunkProvider createChunkGenerator(){
 
-        return new ModdedChunkProviderSurface(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getWorldInfo().getGeneratorOptions());
+        return new MetropolisChunkProviderGenerate(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getWorldInfo().getGeneratorOptions());
     }
 
 }

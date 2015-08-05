@@ -1,7 +1,11 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
+import mod.arrabal.metrocore.common.init.Biomes;
 import mod.arrabal.metrocore.common.world.gen.ModdedBiomeDecorator;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.event.terraingen.*;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -14,13 +18,22 @@ public class TerrainGenEventHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onCreateDecoratorEvent(BiomeEvent.CreateDecorator event){
-        event.newBiomeDecorator = new ModdedBiomeDecorator();
+        //event.newBiomeDecorator = new ModdedBiomeDecorator();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDecorateBiomeEvent(DecorateBiomeEvent.Decorate event){
         if (event.type != DecorateBiomeEvent.Decorate.EventType.CUSTOM){
 
+        }
+    }
+
+    @SubscribeEvent
+    public void onPopulateChunkEvent(PopulateChunkEvent.Populate event){
+        if (event.type == PopulateChunkEvent.Populate.EventType.LAKE || event.type == PopulateChunkEvent.Populate.EventType.LAVA){
+            BlockPos blockpos = new BlockPos(event.chunkX * 16, 0, event.chunkZ * 16);
+            BiomeGenBase biomeGenBase = event.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+            if (biomeGenBase == Biomes.plainsMetro) event.setResult(Event.Result.DENY);
         }
     }
 }
