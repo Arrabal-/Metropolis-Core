@@ -69,8 +69,8 @@ public class BiomeGenPlainsMetro extends BiomeGenPlains {
                     {
                         if (l <= 0)
                         {
-                            iblockstate = ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.TERRACOTTA); // testing //null;
-                            iblockstate1 = ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.TERRACOTTA); //Blocks.stone.getDefaultState();
+                            iblockstate = this.topBlock; // testing //null;
+                            iblockstate1 = this.fillerBlock; //Blocks.stone.getDefaultState();
                         }
                         else if (k1 >= 59 && k1 <= 64)
                         {

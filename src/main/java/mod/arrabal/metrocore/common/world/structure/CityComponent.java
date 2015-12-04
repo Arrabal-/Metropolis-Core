@@ -34,12 +34,14 @@ public abstract class CityComponent {
     protected int typeID;
     protected int typeVariant;
     protected int coordBaseMode;
+    public boolean mappingComplete;
 
     public CityComponent() {}
 
     protected CityComponent(int componentType){
         this.typeID = componentType;
         this.coordBaseMode = -1;
+        this.mappingComplete = false;
     }
 
     public abstract void buildComponent(CityComponent cityTile, Random random);
@@ -493,7 +495,10 @@ public abstract class CityComponent {
             blockpos2 = blockpos1.down();
             IBlockState blockState = chunk.getBlockState(blockpos2);
             BiomeGenBase blockBiome = chunk.getBiome(new BlockPos(blockpos2), world.getWorldChunkManager());
-            if (blockState == blockBiome.topBlock
+            if (blockState != blockBiome.topBlock && chunk.getBlock(blockpos2).getDefaultState() != Blocks.dirt.getDefaultState()){
+                world.destroyBlock(blockpos2, false);
+            }
+            else if (blockState == blockBiome.topBlock
 //                    || blockState == Blocks.sand.getDefaultState()
 //                    || blockState == Blocks.gravel.getDefaultState()
 //                    || blockState == Blocks.clay.getDefaultState()

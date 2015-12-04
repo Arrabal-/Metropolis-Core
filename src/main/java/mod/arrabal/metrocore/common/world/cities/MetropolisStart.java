@@ -1,6 +1,8 @@
 package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
+import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.world.gen.MapGenStructureIO;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -92,6 +94,7 @@ public class MetropolisStart {
     }
 
     private boolean constructCityTile(World world, Random random, int chunkX, int chunkZ){
+        LogHelper.debug("CALL TO MetropolisStart.constructCityTile TO ADD COMPONENT PARTS");
         String mapKey = "[" + chunkX + ", " + chunkZ + "]";
         if (this.cityLayoutStart.cityComponentMap.containsKey(mapKey)){
             this.currentlyBuilding = true;
@@ -130,17 +133,29 @@ public class MetropolisStart {
         return this.startCoord.chunkZPos;
     }
 
-    public boolean generate(World world, Random random){
+    public boolean generate(World world, Random random, ChunkCoordIntPair chunkCoords){
+        LogHelper.debug("CALL TO MetropolisStart.generate TO CONSTRUCT CITY TILE");
+        if (MapGenStructureIO.currentBuildCity.isEmpty()){
+            LogHelper.debug("Passed an empty currentBuildCity hash map");
+            return false;
+        }
         boolean flag = false;
-        Iterator iterator = cityLayoutStart.cityComponentMap.entrySet().iterator();
+        CityComponent cityComponent = MapGenStructureIO.currentBuildCity.get(chunkCoords.toString());
+        if (cityComponent == null) return flag;
+        CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
+        flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
+        if (flag) MapGenStructureIO.currentBuildCity.remove(chunkCoords.toString());
+
+        /*Iterator iterator = cityLayoutStart.cityComponentMap.entrySet().iterator();
         while (iterator.hasNext()){
             Map.Entry entry = (Map.Entry) iterator.next();
             CityComponent cityComponent = (CityComponent) entry.getValue();
             CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
             flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
-        }
+        }*/
         //flag = constructCityTile(world, random, chunkX, chunkZ);
         //flag = placeCityStructures(world, random, chunkX, chunkZ);
+
         this.currentlyBuilding = false;
         return flag;
     }

@@ -75,70 +75,7 @@ public final class Metropolis {
     // will call doGenerateMetropolisStart()
     public static boolean generateMetropolis(Random random, int chunkX, int chunkZ,  World world, MetropolisGenerationContainer handler){
 
-        /*double densityFactor = (double) ModOptions.metropolisMinDistanceBetween;
-        double xDensityCheck, zDensityCheck;
-        xDensityCheck = (double)Math.abs(chunkX) % densityFactor;
-        zDensityCheck = (double)Math.abs(chunkZ) % densityFactor;
-        if (genDensity == 0 || ((double)Math.abs(chunkX) % densityFactor != 0.0d) || ((double)Math.abs(chunkZ) % densityFactor != 0.0d)){
-            LogHelper.trace("Kicking out generation attempt at " + chunkX + ", " + chunkZ + " due to density factor");
-            return false;
-        }
-
-
-        random = getNewRandom(world, chunkX, chunkZ);
-
-        //EntityPlayer entityplayer = world.getClosestPlayer(chunkX << 4, 64d, chunkZ << 4, (ModOptions.metropolisCenterSpawnShift + maxGenRadius) << 4);
-
-        int checkX, checkZ;
-        *//*if (entityplayer != null) {
-            checkX = chunkX - entityplayer.chunkCoordX > 0 ? chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift);
-            checkZ = chunkZ - entityplayer.chunkCoordZ > 0 ? chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift);
-
-        }
-        else {
-            checkX = (random.nextInt(2) == 0 ? chunkX - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkX + random.nextInt(ModOptions.metropolisCenterSpawnShift));
-            checkZ = (random.nextInt(2) == 0 ? chunkZ - random.nextInt(ModOptions.metropolisCenterSpawnShift) : chunkZ + random.nextInt(ModOptions.metropolisCenterSpawnShift));
-        }*//*
-        checkX = chunkX;
-        checkZ = chunkZ;
-        if (checkForSpawnConflict(world, checkX, checkZ)){
-            LogHelper.trace("Spawn point conflict at chunk [" + checkX + ", " + checkZ + "]");
-            return false;
-        }
-        if (isBiomeValid(world, (checkX << 4) + 8, (checkZ << 4) + 8, (minGenRadius << 4)/2 + 8)){
-
-            int genRadiusX = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
-            int genRadiusZ = random.nextInt(maxGenRadius - minGenRadius + 1) + minGenRadius;
-            genRadiusX = (genRadiusZ > 3 && genRadiusX < 4) ? genRadiusX + 1 : genRadiusX;
-            genRadiusZ = (genRadiusX > 3 && genRadiusZ < 4) ? genRadiusZ + 1 : genRadiusZ;
-            int genMinX = (checkX << 4) - (genRadiusX << 4);
-            int genMaxX = (checkX << 4) + 15 + (genRadiusX << 4);
-            int genMinZ = (checkZ << 4) - (genRadiusZ << 4);
-            int genMaxZ = (checkZ << 4) + 15 + (genRadiusZ << 4);
-            if (checkForGenerationConflict(genMinX, genMinZ, genMaxX, genMaxZ, handler)){
-                LogHelper.trace("Existing urban area intersects with or is within " + densityFactor + " chunks of [" + genMinX + ", " + genMinZ + "] to [" +
-                        genMaxX + ", " + genMaxZ + "]");
-                return false;
-            }
-            int[] heightMap = getGroundHeightMap(world, genMinX, genMinZ, genMaxX, genMaxZ, 50);
-            int checkY = StatsHelper.getStaticMean(heightMap);
-            int devY = StatsHelper.getStaticStandardDeviation(heightMap, checkY);
-            Random rarityCheck = new Random(world.getTotalWorldTime());
-            if (devY <= ConfigHandler.metropolisMaxHeightVariation && rarityCheck.nextDouble() <= genRarity) {
-                LogHelper.debug("Successful generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
-                        genMaxX + ", " + genMaxZ + "]. Mean Height:  " + checkY + ".  Ground height deviation:  " + devY);
-                //handler.addToGenerationMap(new MetropolisBaseBB(genMinX, genMinZ, genMaxX, genMaxZ, "BlacklistZone"));
-                handler.doGenerateMetropolisStart(world, checkX, checkZ, checkY, genRadiusX, genRadiusZ);
-                handler.currentStart = new ChunkCoordIntPair(checkX, checkZ);
-                return true;
-            }
-            else {
-                String sString = "";
-                if (devY <= ConfigHandler.metropolisMaxHeightVariation) { sString = "  Failure due to genRarity check.";}
-                LogHelper.debug("Failed generation check centered at chunk [" + checkX + ", " + checkZ + "], position [" + genMinX + ", " + genMinZ + "] to [" +
-                        genMaxX + ", " + genMaxZ + "]. Ground height deviation:  " + devY + sString);
-            }
-        }*/
+        LogHelper.debug("CALL TO DEPRECATED Metropolis.generateMetropolis!");
         return false;
     }
 }

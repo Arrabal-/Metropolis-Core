@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.common.world.structure;
 
+import mod.arrabal.metrocore.common.block.BlockCement;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.ModBlocks;
 import mod.arrabal.metrocore.common.library.LogHelper;
@@ -7,6 +8,7 @@ import mod.arrabal.metrocore.common.library.ModRef;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
+import mod.arrabal.metrocore.common.world.gen.MapGenStructureIO;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -332,6 +334,7 @@ public class CityComponentPieces {
                 cityComponent1 = getNextCityComponentXZ(this.startPiece, random, 0, 1, startPiece.baseY - startPiece.baseYVariation, startPiece.baseY + startPiece.baseYVariation, false);
                 if (cityComponent1 != null){
                     this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent1);
                     this.joinedTileMap.intersections.set(0,(CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityPlan.expandTo(cityComponent1.boundingBox);
                     this.reduceTilesToBuild();
@@ -343,6 +346,7 @@ public class CityComponentPieces {
                 cityComponent2 = getNextCityComponentXZ(this.startPiece, random, -1, 0, startPiece.baseY - startPiece.baseYVariation, startPiece.baseY + startPiece.baseYVariation, false);
                 if (cityComponent2 != null){
                     this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent2);
+                    MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent2);
                     this.joinedTileMap.intersections.set(1,(CityComponentPieces.Metropolis) cityComponent2);
                     this.startPiece.cityPlan.expandTo(cityComponent2.boundingBox);
                     this.reduceTilesToBuild();
@@ -354,6 +358,7 @@ public class CityComponentPieces {
                 cityComponent3 = getNextCityComponentXZ(this.startPiece, random, 0, -1, startPiece.baseY - startPiece.baseYVariation, startPiece.baseY + startPiece.baseYVariation, false);
                 if (cityComponent3 != null){
                     this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent3);
+                    MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent3);
                     this.joinedTileMap.intersections.set(2,(CityComponentPieces.Metropolis) cityComponent3);
                     this.startPiece.cityPlan.expandTo(cityComponent3.boundingBox);
                     this.reduceTilesToBuild();
@@ -365,11 +370,14 @@ public class CityComponentPieces {
                 cityComponent4 = getNextCityComponentXZ(this.startPiece, random, 1, 0, startPiece.baseY - startPiece.baseYVariation, startPiece.baseY + startPiece.baseYVariation, false);
                 if (cityComponent4 != null){
                     this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent4);
+                    MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent4);
                     this.joinedTileMap.intersections.set(3,(CityComponentPieces.Metropolis) cityComponent4);
                     this.startPiece.cityPlan.expandTo(cityComponent4.boundingBox);
                     this.reduceTilesToBuild();
                 }
             }
+
+            this.mappingComplete = true;
 
         }
 
@@ -381,6 +389,7 @@ public class CityComponentPieces {
             CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) cityTile, random, xShift, zShift, startPiece.baseY - startPiece.baseYVariation, startPiece.baseY + startPiece.baseYVariation, false);
             if (cityComponent != null){
                 this.startPiece.cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+                MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
                 this.startPiece.cityPlan.expandTo(cityComponent.boundingBox);
                 this.reduceTilesToBuild();
             }
@@ -389,25 +398,28 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
+            /*
             int buildX = this.boundingBox.minBlockCoords.getX();
             int buildZ = this.boundingBox.minBlockCoords.getZ();
             Chunk thisChunk = world.getChunkFromChunkCoords(this.boundingBox.minBlockCoords.getX() >> 4, this.boundingBox.minBlockCoords.getZ() >> 4);
             int buildY = 255;
             for (int x = 0; x < 16; ++x){
                 for (int z = 0; z < 16; ++z){
+
                     BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
                     buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
-                    this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
+                    //this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
                     BiomeGenBase blockBiome = thisChunk.getBiome(topBlock, world.getWorldChunkManager());
                     //if (thisChunk.getBlockState(topBlock) == blockBiome.topBlock){
-                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
-                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 2, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"placeBB"));
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.RED), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState().withProperty(BlockCement.VARIANT_PROP, BlockCement.CementType.RED), 0, buildX + x, topBlock.getY() - 2, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"placeBB"));
                     //}
 
                 }
             }
             //this.fillWithBlocks(world, this.boundingBox,buildX, buildY - 1, buildZ, this.boundingBox.maxBlockCoords.getX(),
             //        this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            */
             return true;
         }
 
@@ -587,6 +599,7 @@ public class CityComponentPieces {
                     String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityPlan.expandTo(cityComponent1.boundingBox);
                     this.reduceTilesToBuild();
                 } else LogHelper.debug("Failed to build new tile adjacent to City Square");
@@ -681,6 +694,10 @@ public class CityComponentPieces {
                     cityComponentMap.put("[" + (chunkX - 1) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
                     cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
                     cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX + 1) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX - 1) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
+                    MapGenStructureIO.currentBuildCity.put("[" + chunkX + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
+                    MapGenStructureIO.currentBuildCity.put("[" + chunkX + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
                     cityPlan.expandTo(cityComponent1.boundingBox);
                     cityPlan.expandTo(cityComponent2.boundingBox);
                     cityPlan.expandTo(cityComponent3.boundingBox);
@@ -697,6 +714,10 @@ public class CityComponentPieces {
                     cityComponentMap.put("[" + (chunkX - 2) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
                     cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 2) + "]", (CityComponentPieces.Metropolis) cityComponent3);
                     cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 2) + "]", (CityComponentPieces.Metropolis) cityComponent4);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX + 2) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX - 2) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
+                    MapGenStructureIO.currentBuildCity.put("[" + chunkX + ", " + (chunkZ + 2) + "]", (CityComponentPieces.Metropolis) cityComponent3);
+                    MapGenStructureIO.currentBuildCity.put("[" + chunkX + ", " + (chunkZ - 2) + "]", (CityComponentPieces.Metropolis) cityComponent4);
                     cityPlan.expandTo(cityComponent1.boundingBox);
                     cityPlan.expandTo(cityComponent2.boundingBox);
                     cityPlan.expandTo(cityComponent3.boundingBox);
@@ -712,6 +733,10 @@ public class CityComponentPieces {
                     cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent2);
                     cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
                     cityComponentMap.put("[" + (chunkX + 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX + 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX - 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent2);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX - 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
+                    MapGenStructureIO.currentBuildCity.put("[" + (chunkX + 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
                     cityPlan.expandTo(cityComponent1.boundingBox);
                     cityPlan.expandTo(cityComponent2.boundingBox);
                     cityPlan.expandTo(cityComponent3.boundingBox);
@@ -736,6 +761,7 @@ public class CityComponentPieces {
             CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) start, random, xShift, zShift, baseY - baseYVariation, baseY + baseYVariation, false);
             if (cityComponent != null){
                 cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+                MapGenStructureIO.currentBuildCity.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
                 cityPlan.expandTo(cityComponent.boundingBox);
             }
             else LogHelper.debug("Failed to build new component at " + newChunkKey);
@@ -743,6 +769,7 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
+            /*
             int buildX = this.boundingBox.minBlockCoords.getX();
             int buildZ = this.boundingBox.minBlockCoords.getZ();
             Chunk thisChunk = world.getChunkFromChunkCoords(this.boundingBox.minBlockCoords.getX() >> 4, this.boundingBox.minBlockCoords.getZ() >> 4);
@@ -751,7 +778,7 @@ public class CityComponentPieces {
                 for (int z = 0; z < 16; ++z){
                     BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
                     buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
-                    this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
+                    //this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
                     BiomeGenBase blockBiome = thisChunk.getBiome(topBlock, world.getWorldChunkManager());
                     //if (thisChunk.getBlockState(topBlock) == blockBiome.topBlock){
                         this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
@@ -761,6 +788,7 @@ public class CityComponentPieces {
             }
             //this.fillWithBlocks(world, this.boundingBox, buildX, buildY - 1, buildZ, this.boundingBox.maxBlockCoords.getX(),
             //        this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            */
             return true;
         }
 
@@ -849,6 +877,7 @@ public class CityComponentPieces {
                     String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityPlan.expandTo(cityComponent1.boundingBox);
                     this.reduceTilesToBuild();
                 } else LogHelper.debug("Failed to build new tile adjacent to City Park");
@@ -1006,6 +1035,7 @@ public class CityComponentPieces {
                     String mapKey = "[" + (chunkX + buildX) + ", " + (chunkZ + buildZ) + "]";
                     this.joinedTileMap.intersections.set(newTile, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityComponentMap.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
+                    MapGenStructureIO.currentBuildCity.put(mapKey, (CityComponentPieces.Metropolis) cityComponent1);
                     this.startPiece.cityPlan.expandTo(cityComponent1.boundingBox);
                     this.reduceTilesToBuild();
                 } else LogHelper.debug("Failed to build new tile adjacent to Avenue");

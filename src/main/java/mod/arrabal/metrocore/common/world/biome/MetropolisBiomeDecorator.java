@@ -1,6 +1,8 @@
 package mod.arrabal.metrocore.common.world.biome;
 
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
+import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
+import mod.arrabal.metrocore.common.world.gen.MapGenMetropolis;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.Material;
@@ -26,11 +28,21 @@ import static net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate.Ev
  */
 public class MetropolisBiomeDecorator extends BiomeDecorator{
 
-    public MetropolisBoundingBox generatingCity;
+    private boolean inCityArea;
 
     public MetropolisBiomeDecorator(){
         super();
-        generatingCity = null;
+        this.inCityArea = false;
+    }
+
+    private boolean isInCitySpawnArea(BlockPos blockpos, MetropolisStart start){
+        if (start != null){
+            if (start.cityLayoutStart.cityPlan.isVecInside(blockpos)) {
+                this.inCityArea = true;
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -68,11 +80,7 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.diamondGen = new WorldGenMinable(Blocks.diamond_ore.getDefaultState(), this.chunkProviderSettings.diamondSize);
             this.lapisGen = new WorldGenMinable(Blocks.lapis_ore.getDefaultState(), this.chunkProviderSettings.lapisSize);
 
-            boolean genInCityArea = true; //temp set to always true
-            if (this.generatingCity != null){
-                genInCityArea = this.generatingCity.isVecInside(blockPos);
-            }
-            if (genInCityArea){
+            if (this.isInCitySpawnArea(blockPos, MapGenMetropolis.currentGeneratingStart)){
                 this.bigMushroomsPerChunk = 0;
                 this.cactiPerChunk = 0;
                 this.deadBushPerChunk = 0;
@@ -87,6 +95,7 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.genDecorations(biomeGenBase);
             this.currentWorld = null;
             this.randomGenerator = null;
+            this.inCityArea = false;
         }
     }
 
@@ -243,7 +252,7 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             }
         }
 
-        if (doGen && this.randomGenerator.nextInt(4) == 0)
+        if (doGen && this.randomGenerator.nextInt(4) == 0 && !this.inCityArea)
         {
             j = this.randomGenerator.nextInt(16) + 8;
             k = this.randomGenerator.nextInt(16) + 8;
@@ -251,7 +260,7 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.mushroomBrownGen.generate(this.currentWorld, this.randomGenerator, this.field_180294_c.add(j, l, k));
         }
 
-        if (doGen && this.randomGenerator.nextInt(8) == 0)
+        if (doGen && this.randomGenerator.nextInt(8) == 0 && !this.inCityArea)
         {
             j = this.randomGenerator.nextInt(16) + 8;
             k = this.randomGenerator.nextInt(16) + 8;
@@ -268,16 +277,17 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.reedGen.generate(this.currentWorld, this.randomGenerator, this.field_180294_c.add(k, i1, l));
         }
 
-        for (j = 0; doGen && j < 10; ++j)
-        {
-            k = this.randomGenerator.nextInt(16) + 8;
-            l = this.randomGenerator.nextInt(16) + 8;
-            i1 = nextInt(this.currentWorld.getHeight(this.field_180294_c.add(k, 0, l)).getY() * 2);
-            this.reedGen.generate(this.currentWorld, this.randomGenerator, this.field_180294_c.add(k, i1, l));
+        if (!this.inCityArea) {
+            for (j = 0; doGen && j < 10; ++j) {
+                k = this.randomGenerator.nextInt(16) + 8;
+                l = this.randomGenerator.nextInt(16) + 8;
+                i1 = nextInt(this.currentWorld.getHeight(this.field_180294_c.add(k, 0, l)).getY() * 2);
+                this.reedGen.generate(this.currentWorld, this.randomGenerator, this.field_180294_c.add(k, i1, l));
+            }
         }
 
         doGen = TerrainGen.decorate(currentWorld, randomGenerator, field_180294_c, PUMPKIN);
-        if (doGen && this.randomGenerator.nextInt(32) == 0)
+        if (doGen && this.randomGenerator.nextInt(32) == 0 && !this.inCityArea)
         {
             j = this.randomGenerator.nextInt(16) + 8;
             k = this.randomGenerator.nextInt(16) + 8;

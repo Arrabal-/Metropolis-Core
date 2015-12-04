@@ -1,8 +1,11 @@
 package mod.arrabal.metrocore.common.handlers.world;
 
+import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.Biomes;
+import mod.arrabal.metrocore.common.world.gen.MetropolisChunkProviderGenerate;
 import mod.arrabal.metrocore.common.world.gen.ModdedBiomeDecorator;
 import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraftforge.event.terraingen.*;
 import net.minecraftforge.fml.common.eventhandler.Event;
@@ -35,5 +38,11 @@ public class TerrainGenEventHandler {
             BiomeGenBase biomeGenBase = event.world.getBiomeGenForCoords(blockpos.add(16, 0, 16));
             if (biomeGenBase == Biomes.plainsMetro) event.setResult(Event.Result.DENY);
         }
+
+    }
+
+    @SubscribeEvent
+    public void onPostPopulateChunkEvent(PopulateChunkEvent.Post event){
+
     }
 }

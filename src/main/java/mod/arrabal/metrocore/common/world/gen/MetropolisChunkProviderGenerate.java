@@ -2,51 +2,49 @@ package mod.arrabal.metrocore.common.world.gen;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.Biomes;
+import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
+import mod.arrabal.metrocore.common.world.biome.MetropolisBiomeDecorator;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.ChunkCoordIntPair;
+import net.minecraft.world.SpawnerAnimals;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeGenBase;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.*;
+import net.minecraft.world.gen.feature.WorldGenDungeons;
+import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
+import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ICE;
 
 /**
  * Created by Arrabal on 7/15/2015.
  */
 public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
-    /** RNG. */
-    //private Random rand;
-    //private World worldObj;
     /** are map structures going to be generated (e.g. strongholds) */
     private final boolean mapFeaturesEnabled;
-    //private ChunkProviderSettings settings;
-    //private Block field_177476_s;
-    //private MapGenBase caveGenerator;
     private MapGenBase caveGenerator2;
-    /** Holds Stronghold Generator */
-    //private MapGenStronghold strongholdGenerator;
-    /** Holds Village Generator */
-    //private MapGenVillage villageGenerator;
-    /** Holds Mineshaft Generator */
-    //private MapGenMineshaft mineshaftGenerator;
-    //private MapGenScatteredFeature scatteredFeatureGenerator;
     private MapGenScatteredFeature scatteredFeatureGenerator2;
-    /** Holds ravine generator */
-    //private MapGenBase ravineGenerator;
     private MapGenBase ravineGenerator2;
-    //private StructureOceanMonument oceanMonumentGenerator;
     private MapGenMetropolis cityGenerator;
-    /** The biomes that are used to generate the chunk */
-    //private BiomeGenBase[] biomesForGeneration;
+
     private List<BiomeGenBase> cityBiomes;
     private final boolean useCities;
     private boolean canGenCity;
@@ -56,29 +54,11 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         super(worldIn, worldSeed, bMapFeaturesEnabled, customWorldType);
         this.cityBiomes = new ArrayList<>();
         this.cityBiomes.add(Biomes.plainsMetro);
-        //this.caveGenerator = new MapGenCaves();
-        //this.strongholdGenerator = new MapGenStronghold();
-        //this.villageGenerator = new MapGenVillage();
-        //this.mineshaftGenerator = new MapGenMineshaft();
-        //this.scatteredFeatureGenerator = new MapGenScatteredFeature();
-        //this.ravineGenerator = new MapGenRavine();
-        //this.oceanMonumentGenerator = new StructureOceanMonument();
         this.caveGenerator2 = new ModdedMapGenCaves();
         this.ravineGenerator2 = new ModdedMapGenRavine();
         this.scatteredFeatureGenerator2 = new ModdedMapGenScatteredFeature();
         this.cityGenerator = new MapGenMetropolis();
-        /*{
-            caveGenerator = TerrainGen.getModdedMapGen(caveGenerator, CAVE);
-            strongholdGenerator = (MapGenStronghold)TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
-            villageGenerator = (MapGenVillage)TerrainGen.getModdedMapGen(villageGenerator, VILLAGE);
-            mineshaftGenerator = (MapGenMineshaft)TerrainGen.getModdedMapGen(mineshaftGenerator, MINESHAFT);
-            scatteredFeatureGenerator = (MapGenScatteredFeature)TerrainGen.getModdedMapGen(scatteredFeatureGenerator, SCATTERED_FEATURE);
-            ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, RAVINE);
-            oceanMonumentGenerator = (StructureOceanMonument)TerrainGen.getModdedMapGen(oceanMonumentGenerator, OCEAN_MONUMENT);
-        }*/
-        //this.worldObj = worldIn;
         this.mapFeaturesEnabled = bMapFeaturesEnabled;
-        //this.rand = new Random(worldSeed);
 
         /*if (customWorldType != null)
         {
@@ -145,6 +125,7 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         }
 
         if (this.useCities && this.canGenCity){
+            LogHelper.debug("CALL IN CHUNK PROVIDER provideChunk to INSTANTIATE METROPOLIS START");
             this.cityGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
         }
 
@@ -158,6 +139,123 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
         chunk.generateSkylightMap();
         return chunk;
+    }
+
+    @Override
+    public void populate(IChunkProvider chunkProvider, int chunkX, int chunkZ)
+    {
+        BlockFalling.fallInstantly = true;
+        int k = chunkX * 16;
+        int l = chunkZ * 16;
+        BlockPos blockpos = new BlockPos(k, 0, l);
+        BiomeGenBase biomegenbase = this.worldObj.getBiomeGenForCoords(blockpos.add(16, 0, 16));
+        this.rand.setSeed(this.worldObj.getSeed());
+        long i1 = this.rand.nextLong() / 2L * 2L + 1L;
+        long j1 = this.rand.nextLong() / 2L * 2L + 1L;
+        this.rand.setSeed((long) chunkX * i1 + (long) chunkZ * j1 ^ this.worldObj.getSeed());
+        boolean flag = false;
+        boolean cityGenerated = false;
+        ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(chunkX, chunkZ);
+
+        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Pre(chunkProvider, worldObj, rand, chunkX, chunkZ, flag));
+
+        if (this.settings.useMineShafts && this.mapFeaturesEnabled)
+        {
+            this.mineshaftGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.settings.useVillages && this.mapFeaturesEnabled)
+        {
+            flag = this.villageGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.settings.useStrongholds && this.mapFeaturesEnabled)
+        {
+            this.strongholdGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.settings.useTemples && this.mapFeaturesEnabled)
+        {
+            this.scatteredFeatureGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.settings.useMonuments && this.mapFeaturesEnabled)
+        {
+            this.oceanMonumentGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        if (this.useCities) {
+            cityGenerated = this.cityGenerator. buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
+        }
+
+        int k1;
+        int l1;
+        int i2;
+
+        if (biomegenbase != BiomeGenBase.desert && biomegenbase != BiomeGenBase.desertHills && this.settings.useWaterLakes && !flag && this.rand.nextInt(this.settings.waterLakeChance) == 0
+                && TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, LAKE))
+        {
+            k1 = this.rand.nextInt(16) + 8;
+            l1 = this.rand.nextInt(256);
+            i2 = this.rand.nextInt(16) + 8;
+            (new WorldGenLakes(Blocks.water)).generate(this.worldObj, this.rand, blockpos.add(k1, l1, i2));
+        }
+
+        if (TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, LAVA) && !flag && this.rand.nextInt(this.settings.lavaLakeChance / 10) == 0 && this.settings.useLavaLakes)
+        {
+            k1 = this.rand.nextInt(16) + 8;
+            l1 = this.rand.nextInt(this.rand.nextInt(248) + 8);
+            i2 = this.rand.nextInt(16) + 8;
+
+            if (l1 < 63 || this.rand.nextInt(this.settings.lavaLakeChance / 8) == 0)
+            {
+                (new WorldGenLakes(Blocks.lava)).generate(this.worldObj, this.rand, blockpos.add(k1, l1, i2));
+            }
+        }
+
+        if (this.settings.useDungeons)
+        {
+            boolean doGen = TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, DUNGEON);
+            for (k1 = 0; doGen && k1 < this.settings.dungeonChance; ++k1)
+            {
+                l1 = this.rand.nextInt(16) + 8;
+                i2 = this.rand.nextInt(256);
+                int j2 = this.rand.nextInt(16) + 8;
+                (new WorldGenDungeons()).generate(this.worldObj, this.rand, blockpos.add(l1, i2, j2));
+            }
+        }
+
+        biomegenbase.decorate(this.worldObj, this.rand, new BlockPos(k, 0, l));
+        if (TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, ANIMALS))
+        {
+            SpawnerAnimals.performWorldGenSpawning(this.worldObj, biomegenbase, k + 8, l + 8, 16, 16, this.rand);
+        }
+        blockpos = blockpos.add(8, 0, 8);
+
+        boolean doGen = TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, ICE);
+        for (k1 = 0; doGen && k1 < 16; ++k1)
+        {
+            for (l1 = 0; l1 < 16; ++l1)
+            {
+                BlockPos blockpos1 = this.worldObj.getPrecipitationHeight(blockpos.add(k1, 0, l1));
+                BlockPos blockpos2 = blockpos1.down();
+
+                if (this.worldObj.canBlockFreezeWater(blockpos2))
+                {
+                    this.worldObj.setBlockState(blockpos2, Blocks.ice.getDefaultState(), 2);
+                }
+
+                if (this.worldObj.canSnowAt(blockpos1, true))
+                {
+                    this.worldObj.setBlockState(blockpos1, Blocks.snow_layer.getDefaultState(), 2);
+                }
+            }
+        }
+
+        MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(chunkProvider, worldObj, rand, chunkX, chunkZ, flag));
+
+        if (this.cityGenerator.generatingZone != null) this.cityGenerator.generatingZone = null;
+        BlockFalling.fallInstantly = false;
     }
 
     @Override
@@ -200,7 +298,9 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         }
 
         if (this.useCities && validForCity){
+            LogHelper.debug("CALL IN CHUNK PROVIDER recreateStructures to INSTANTIATE METROPOLIS START");
             this.cityGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
         }
     }
+
 }

@@ -51,8 +51,9 @@ public class ConfigHandler {
                     "Disable to prevent ANY cities from spawning in the world.  This is a core mod feature, so only disable if you really mean it.").setRequiresMcRestart(true).getBoolean(true);
 
             // Add configuration options here
-            metropolisSpawnBlockRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "SpawnAreaBlocked", 160,
-                    "Sets the radius (in BLOCKS) of the area around the spawn point that is marked as invalid for city generation").getInt(160);
+            metropolisSpawnBlockRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "SpawnAreaBlocked", 576,
+                    "Sets the radius (in BLOCKS) of the area around the spawn point that is marked as invalid for city generation.  Default setting is minimum radius.").getInt(576);
+            if (metropolisSpawnBlockRadius < 576) metropolisSpawnBlockRadius = 576;
             metropolisMinGenRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "MinGenRadius", 2,
                     "Sets the minimum allowable size (radius), in CHUNKS, for a generated city").getInt(2);
             metropolisMaxGenRadius = config.get(ModRef.CATEGORY_CITY_GENERATION, "MaxGenRadius", 5,
