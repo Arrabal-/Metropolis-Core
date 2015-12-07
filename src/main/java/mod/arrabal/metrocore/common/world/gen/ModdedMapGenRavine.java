@@ -15,7 +15,7 @@ import net.minecraft.world.gen.MapGenRavine;
 public class ModdedMapGenRavine extends MapGenRavine {
 
     /*@Override
-    public void func_175792_a(IChunkProvider p_175792_1_, World worldIn, int p_175792_3_, int p_175792_4_, ChunkPrimer p_175792_5_)
+    public void generate(IChunkProvider p_175792_1_, World worldIn, int p_175792_3_, int p_175792_4_, ChunkPrimer p_175792_5_)
     {
         int k = this.range;
         IChunkProvider chunkProvider = (ModdedChunkProviderSurface) p_175792_1_;

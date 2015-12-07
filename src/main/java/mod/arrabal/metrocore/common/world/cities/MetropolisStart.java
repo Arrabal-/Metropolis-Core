@@ -3,6 +3,7 @@ package mod.arrabal.metrocore.common.world.cities;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
 import mod.arrabal.metrocore.common.world.gen.MapGenStructureIO;
+import mod.arrabal.metrocore.common.world.gen.MetropolisChunkProviderGenerate;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -135,16 +136,17 @@ public class MetropolisStart {
 
     public boolean generate(World world, Random random, ChunkCoordIntPair chunkCoords){
         LogHelper.debug("CALL TO MetropolisStart.generate TO CONSTRUCT CITY TILE");
-        if (MapGenStructureIO.currentBuildCity.isEmpty()){
-            LogHelper.debug("Passed an empty currentBuildCity hash map");
+
+        if (cityLayoutStart.cityComponentMap.isEmpty()){
+            LogHelper.debug("Passed an empty city layout hash map");
             return false;
         }
         boolean flag = false;
-        CityComponent cityComponent = MapGenStructureIO.currentBuildCity.get(chunkCoords.toString());
+        CityComponent cityComponent = cityLayoutStart.cityComponentMap.get(chunkCoords.toString());
         if (cityComponent == null) return flag;
         CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
         flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
-        if (flag) MapGenStructureIO.currentBuildCity.remove(chunkCoords.toString());
+        if (flag) cityLayoutStart.cityComponentMap.remove(chunkCoords.toString());
 
         /*Iterator iterator = cityLayoutStart.cityComponentMap.entrySet().iterator();
         while (iterator.hasNext()){

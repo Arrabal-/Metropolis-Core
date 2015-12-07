@@ -3,9 +3,6 @@ package mod.arrabal.metrocore.common.world.gen;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.Biomes;
 import mod.arrabal.metrocore.common.library.LogHelper;
-import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
-import mod.arrabal.metrocore.common.world.biome.MetropolisBiomeDecorator;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -26,10 +23,7 @@ import net.minecraftforge.event.terraingen.TerrainGen;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 
-import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.*;
 import static net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ICE;
 
@@ -70,6 +64,10 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         this.canGenCity = false;
     }
 
+    public MapGenMetropolis getCityGenerator(){
+        return this.cityGenerator;
+    }
+
     @Override
     public Chunk provideChunk(int x, int z)
     {
@@ -82,51 +80,50 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         for (int i = 0; i < this.biomesForGeneration.length; i++)
             if (this.cityBiomes.contains(this.biomesForGeneration[i])){
                 inCityBiome = true;
-                this.canGenCity = cityGenerator.canGenerateMetropolis(this.worldObj, this.rand, x, z);
                 break;
-            } else this.canGenCity = false;
+            }
 
 
         if (this.settings.useCaves)
         {
-            if (inCityBiome) this.caveGenerator2.func_175792_a(this, this.worldObj, x, z, chunkprimer);
-            else this.caveGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            if (inCityBiome) this.caveGenerator2.generate(this, this.worldObj, x, z, chunkprimer);
+            else this.caveGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useRavines)
         {
-            if (inCityBiome) this.ravineGenerator2.func_175792_a(this, this.worldObj, x, z, chunkprimer);
-            else this.ravineGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            if (inCityBiome) this.ravineGenerator2.generate(this, this.worldObj, x, z, chunkprimer);
+            else this.ravineGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useMineShafts && this.mapFeaturesEnabled)
         {
-            this.mineshaftGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            this.mineshaftGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useVillages && this.mapFeaturesEnabled)
         {
-            this.villageGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            this.villageGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useStrongholds && this.mapFeaturesEnabled)
         {
-            this.strongholdGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            this.strongholdGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useTemples && this.mapFeaturesEnabled && !inCityBiome)
         {
-            this.scatteredFeatureGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            this.scatteredFeatureGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         if (this.settings.useMonuments && this.mapFeaturesEnabled)
         {
-            this.oceanMonumentGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+            this.oceanMonumentGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
-        if (this.useCities && this.canGenCity){
-            LogHelper.debug("CALL IN CHUNK PROVIDER provideChunk to INSTANTIATE METROPOLIS START");
-            this.cityGenerator.func_175792_a(this, this.worldObj, x, z, chunkprimer);
+        if (this.useCities){
+            LogHelper.trace("CALL IN CHUNK PROVIDER provideChunk to INSTANTIATE METROPOLIS START");
+            this.cityGenerator.generate(this, this.worldObj, x, z, chunkprimer);
         }
 
         Chunk chunk = new Chunk(this.worldObj, chunkprimer, x, z);
@@ -161,31 +158,31 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
         if (this.settings.useMineShafts && this.mapFeaturesEnabled)
         {
-            this.mineshaftGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+            this.mineshaftGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         if (this.settings.useVillages && this.mapFeaturesEnabled)
         {
-            flag = this.villageGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+            flag = this.villageGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         if (this.settings.useStrongholds && this.mapFeaturesEnabled)
         {
-            this.strongholdGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+            this.strongholdGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         if (this.settings.useTemples && this.mapFeaturesEnabled)
         {
-            this.scatteredFeatureGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+            this.scatteredFeatureGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         if (this.settings.useMonuments && this.mapFeaturesEnabled)
         {
-            this.oceanMonumentGenerator.func_175794_a(this.worldObj, this.rand, chunkcoordintpair);
+            this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         if (this.useCities) {
-            cityGenerated = this.cityGenerator. buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
+            cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
         }
 
         int k1;
@@ -273,33 +270,33 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
         if (this.settings.useMineShafts && this.mapFeaturesEnabled)
         {
-            this.mineshaftGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            this.mineshaftGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
         }
 
         if (this.settings.useVillages && this.mapFeaturesEnabled)
         {
-            this.villageGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            this.villageGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
         }
 
         if (this.settings.useStrongholds && this.mapFeaturesEnabled)
         {
-            this.strongholdGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            this.strongholdGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
         }
 
         if (this.settings.useTemples && this.mapFeaturesEnabled)
         {
-            if (inCityBiome) this.scatteredFeatureGenerator2.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
-            else this.scatteredFeatureGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            if (inCityBiome) this.scatteredFeatureGenerator2.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
+            else this.scatteredFeatureGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
         }
 
         if (this.settings.useMonuments && this.mapFeaturesEnabled)
         {
-            this.oceanMonumentGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            this.oceanMonumentGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
         }
 
         if (this.useCities && validForCity){
             LogHelper.debug("CALL IN CHUNK PROVIDER recreateStructures to INSTANTIATE METROPOLIS START");
-            this.cityGenerator.func_175792_a(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
+            this.cityGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
         }
     }
 

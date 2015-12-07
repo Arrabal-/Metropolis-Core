@@ -3,6 +3,7 @@ package mod.arrabal.metrocore.common.world.biome;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import mod.arrabal.metrocore.common.world.gen.MapGenMetropolis;
+import mod.arrabal.metrocore.common.world.gen.MetropolisChunkProviderGenerate;
 import net.minecraft.block.BlockFlower;
 import net.minecraft.block.BlockStone;
 import net.minecraft.block.material.Material;
@@ -59,11 +60,11 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
 
             if (s != null)
             {
-                this.chunkProviderSettings = ChunkProviderSettings.Factory.func_177865_a(s).func_177864_b();
+                this.chunkProviderSettings = ChunkProviderSettings.Factory.jsonToFactory(s).func_177864_b();
             }
             else
             {
-                this.chunkProviderSettings = ChunkProviderSettings.Factory.func_177865_a("").func_177864_b();
+                this.chunkProviderSettings = ChunkProviderSettings.Factory.jsonToFactory("").func_177864_b();
             }
 
             this.randomGenerator = random;
@@ -80,7 +81,8 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.diamondGen = new WorldGenMinable(Blocks.diamond_ore.getDefaultState(), this.chunkProviderSettings.diamondSize);
             this.lapisGen = new WorldGenMinable(Blocks.lapis_ore.getDefaultState(), this.chunkProviderSettings.lapisSize);
 
-            if (this.isInCitySpawnArea(blockPos, MapGenMetropolis.currentGeneratingStart)){
+            MetropolisChunkProviderGenerate provider = (MetropolisChunkProviderGenerate) this.currentWorld.getChunkProvider();
+            if (this.isInCitySpawnArea(blockPos, provider.getCityGenerator().getCurrentGeneratingStart())){
                 this.bigMushroomsPerChunk = 0;
                 this.cactiPerChunk = 0;
                 this.deadBushPerChunk = 0;

@@ -49,7 +49,7 @@ public class MetropolisCoreHandlers {
     }
 
     private static void registerFMLEventHandlers(){
-        FMLCommonHandler.instance().bus().register(new ConfigHandler());
+        MinecraftForge.EVENT_BUS.register(new ConfigHandler());
     }
 
     private static void registerGuiHandlers(){

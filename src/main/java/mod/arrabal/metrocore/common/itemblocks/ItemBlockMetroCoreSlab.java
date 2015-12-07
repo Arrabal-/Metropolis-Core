@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 /**
- * Created by Evan on 1/21/2015.
+ * Created by Arrabal on 1/21/2015.
  */
 public class ItemBlockMetroCoreSlab extends ItemBlockMetroCoreWithVariants {
 
@@ -132,7 +132,7 @@ public class ItemBlockMetroCoreSlab extends ItemBlockMetroCoreWithVariants {
 
             if (comparable == variantInStack)
             {
-                IBlockState iblockstate1 = this.doubleSlab.getDefaultState().withProperty(this.singleSlab.getVariantProperty(), comparable);
+                IBlockState iblockstate1 = this.doubleSlab.getDefaultState().withProperty((IProperty)this.singleSlab.getVariantProperty(), comparable);
 
                 if (worldIn.checkNoEntityCollision(this.doubleSlab.getCollisionBoundingBox(worldIn, pos, iblockstate1)) && worldIn.setBlockState(pos, iblockstate1, 3))
                 {
