@@ -1,5 +1,6 @@
 package mod.arrabal.metrocore.common.world.biome;
 
+import mod.arrabal.metrocore.common.handlers.world.TerrainGenEventHandler;
 import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import mod.arrabal.metrocore.common.world.gen.MapGenMetropolis;
@@ -25,7 +26,7 @@ import static net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate.Ev
 import static net.minecraftforge.event.terraingen.DecorateBiomeEvent.Decorate.EventType.LAKE_WATER;
 
 /**
- * Created by Evan on 7/14/2015.
+ * Created by Arrabal on 7/14/2015.
  */
 public class MetropolisBiomeDecorator extends BiomeDecorator{
 
@@ -36,14 +37,8 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
         this.inCityArea = false;
     }
 
-    private boolean isInCitySpawnArea(BlockPos blockpos, MetropolisStart start){
-        if (start != null){
-            if (start.cityLayoutStart.cityPlan.isVecInside(blockpos)) {
-                this.inCityArea = true;
-                return true;
-            }
-        }
-        return false;
+    public void setInCityArea(boolean inCity){
+        this.inCityArea = inCity;
     }
 
     @Override
@@ -81,8 +76,7 @@ public class MetropolisBiomeDecorator extends BiomeDecorator{
             this.diamondGen = new WorldGenMinable(Blocks.diamond_ore.getDefaultState(), this.chunkProviderSettings.diamondSize);
             this.lapisGen = new WorldGenMinable(Blocks.lapis_ore.getDefaultState(), this.chunkProviderSettings.lapisSize);
 
-            MetropolisChunkProviderGenerate provider = (MetropolisChunkProviderGenerate) this.currentWorld.getChunkProvider();
-            if (this.isInCitySpawnArea(blockPos, provider.getCityGenerator().getCurrentGeneratingStart())){
+            if (this.inCityArea){
                 this.bigMushroomsPerChunk = 0;
                 this.cactiPerChunk = 0;
                 this.deadBushPerChunk = 0;

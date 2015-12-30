@@ -1,12 +1,14 @@
 package mod.arrabal.metrocore.common.world.gen;
 
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldType;
 import net.minecraft.world.chunk.IChunkProvider;
 
 /**
  * Created by Arrabal on 4/21/2015.
  */
 public class ModdedWorldProviderSurface extends WorldProvider {
+
 
     @Override
     public String getDimensionName() {
@@ -19,9 +21,11 @@ public class ModdedWorldProviderSurface extends WorldProvider {
     }
 
     @Override
-    public IChunkProvider createChunkGenerator(){
+    public IChunkProvider createChunkGenerator() {
 
-        return new MetropolisChunkProviderGenerate(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getWorldInfo().getGeneratorOptions());
+        if (this.worldObj.getWorldInfo().getTerrainType() == WorldType.DEFAULT) {
+            return new MetropolisChunkProviderGenerate(worldObj, worldObj.getSeed(), worldObj.getWorldInfo().isMapFeaturesEnabled(), worldObj.getWorldInfo().getGeneratorOptions());
+        }
+        return super.createChunkGenerator();
     }
-
 }

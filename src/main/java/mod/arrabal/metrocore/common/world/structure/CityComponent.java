@@ -495,10 +495,16 @@ public abstract class CityComponent {
             blockpos2 = blockpos1.down();
             IBlockState blockState = chunk.getBlockState(blockpos2);
             BiomeGenBase blockBiome = chunk.getBiome(new BlockPos(blockpos2), world.getWorldChunkManager());
-            if (blockState != blockBiome.topBlock && chunk.getBlock(blockpos2).getDefaultState() != Blocks.dirt.getDefaultState()){
+            Material blockMaterial = chunk.getBlock(blockpos2).getMaterial();
+            if (blockState != blockBiome.topBlock && blockState != blockBiome.fillerBlock
+                    && blockMaterial != Material.ground
+                    && blockMaterial != Material.sand
+                    && blockMaterial != Material.rock){
+            //if (blockState != blockBiome.topBlock && chunk.getBlock(blockpos2).getDefaultState() != Blocks.dirt.getDefaultState()){
                 world.destroyBlock(blockpos2, false);
             }
-            else if (blockState == blockBiome.topBlock
+            else break;
+                //if (blockState == blockBiome.topBlock
 //                    || blockState == Blocks.sand.getDefaultState()
 //                    || blockState == Blocks.gravel.getDefaultState()
 //                    || blockState == Blocks.clay.getDefaultState()
@@ -514,9 +520,9 @@ public abstract class CityComponent {
 //                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.ANDESITE)
 //                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.DIORITE)
 //                    || blockState == Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE)
-                        ){
-                break;
-            }
+//                        ){
+//                break;
+//            }
 
         }
 

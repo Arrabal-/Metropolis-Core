@@ -2,12 +2,14 @@ package mod.arrabal.metrocore.common.world.cities;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.world.biome.CityBiomeManager;
 import mod.arrabal.metrocore.common.world.gen.MapGenStructureIO;
 import mod.arrabal.metrocore.common.world.gen.MetropolisChunkProviderGenerate;
 import mod.arrabal.metrocore.common.world.structure.CityComponent;
 import mod.arrabal.metrocore.common.world.structure.CityComponentPieces;
 import net.minecraft.world.ChunkCoordIntPair;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.BiomeGenBase;
 
 import java.util.*;
 
@@ -31,7 +33,7 @@ public class MetropolisStart {
 
     public MetropolisStart() {}
 
-    public MetropolisStart(World world, int chunkX, int chunkZ, int avgY, int radiusX, int radiusZ, int maxCityComponents){
+    public MetropolisStart(World world, int chunkX, int chunkZ, int avgY, int radiusX, int radiusZ, int maxRadius, int maxCityComponents){
         this.startCoord = new ChunkCoordIntPair(chunkX, chunkZ);
         this.maxXGenRadius = radiusX;
         this.maxZGenRadius = radiusZ;
@@ -49,6 +51,7 @@ public class MetropolisStart {
         this.cityLayoutStart.citySize = cityClass;
         this.cityLayoutStart.roadGrid = getRoadGridType(random);
         this.cityLayoutStart.setMaxCityTiles(this.maxComponents);
+        this.makeBuildableChunkMap(world, chunkX, chunkZ, maxRadius);
     }
 
     public enum UrbanClassification {ROAD, URBAN}
@@ -94,6 +97,7 @@ public class MetropolisStart {
         return random;
     }
 
+    //this method is redundant to the generate method
     private boolean constructCityTile(World world, Random random, int chunkX, int chunkZ){
         LogHelper.debug("CALL TO MetropolisStart.constructCityTile TO ADD COMPONENT PARTS");
         String mapKey = "[" + chunkX + ", " + chunkZ + "]";
@@ -134,31 +138,36 @@ public class MetropolisStart {
         return this.startCoord.chunkZPos;
     }
 
+    private void makeBuildableChunkMap(World world, int originX, int originZ, int maxBuildRadius){
+        BiomeGenBase[] biomesForGeneration = null;
+        int maxExceptionBiome = 64;
+        int exceptionBiomes;
+        for (int i = originX - maxBuildRadius; i <= originX + maxBuildRadius; i++)
+            for (int j = originZ - maxBuildRadius; j <= originZ + maxBuildRadius; j++){
+                if (i == originX && j == originZ){
+                    this.cityLayoutStart.buildableChunks.add("[" + i + ", " + j + "}");
+                }
+                else{
+                    biomesForGeneration = world.getWorldChunkManager().loadBlockGeneratorData(biomesForGeneration, i * 16, j * 16, 16, 16);
+                    exceptionBiomes = 0;
+                    for (int k = 0; k < biomesForGeneration.length; k++){
+                        if (CityBiomeManager.getInvalidBiomes().contains(biomesForGeneration[k])){
+                            exceptionBiomes++;
+                            if (exceptionBiomes > maxExceptionBiome) break;
+                        }
+                    }
+                    if (exceptionBiomes <= maxExceptionBiome){
+                        this.cityLayoutStart.buildableChunks.add("[" + i + ", " + j + "}");
+                    }
+                }
+            }
+    }
+
     public boolean generate(World world, Random random, ChunkCoordIntPair chunkCoords){
-        LogHelper.debug("CALL TO MetropolisStart.generate TO CONSTRUCT CITY TILE");
 
-        if (cityLayoutStart.cityComponentMap.isEmpty()){
-            LogHelper.debug("Passed an empty city layout hash map");
-            return false;
-        }
         boolean flag = false;
-        CityComponent cityComponent = cityLayoutStart.cityComponentMap.get(chunkCoords.toString());
-        if (cityComponent == null) return flag;
-        CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
-        flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
-        if (flag) cityLayoutStart.cityComponentMap.remove(chunkCoords.toString());
-
-        /*Iterator iterator = cityLayoutStart.cityComponentMap.entrySet().iterator();
-        while (iterator.hasNext()){
-            Map.Entry entry = (Map.Entry) iterator.next();
-            CityComponent cityComponent = (CityComponent) entry.getValue();
-            CityLayoutPlan cityPlan = (CityLayoutPlan) cityComponent.getBoundingBox();
-            flag = this.constructCityTile(world, random, cityPlan.startX, cityPlan.startZ);
-        }*/
-        //flag = constructCityTile(world, random, chunkX, chunkZ);
-        //flag = placeCityStructures(world, random, chunkX, chunkZ);
-
-        this.currentlyBuilding = false;
+        flag = constructCityTile(world, random, chunkCoords.chunkXPos, chunkCoords.chunkZPos);
+        //flag = flag && constructCityStructures()
         return flag;
     }
 }

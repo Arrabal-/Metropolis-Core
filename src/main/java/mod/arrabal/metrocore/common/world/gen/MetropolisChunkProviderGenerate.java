@@ -3,6 +3,9 @@ package mod.arrabal.metrocore.common.world.gen;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.Biomes;
 import mod.arrabal.metrocore.common.library.LogHelper;
+import mod.arrabal.metrocore.common.world.biome.CityBiomeManager;
+import mod.arrabal.metrocore.common.world.biome.MetropolisBiomeDecorator;
+import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
@@ -39,15 +42,12 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
     private MapGenBase ravineGenerator2;
     private MapGenMetropolis cityGenerator;
 
-    private List<BiomeGenBase> cityBiomes;
     private final boolean useCities;
     private boolean canGenCity;
 
     public MetropolisChunkProviderGenerate(World worldIn, long worldSeed, boolean bMapFeaturesEnabled, String customWorldType) {
 
         super(worldIn, worldSeed, bMapFeaturesEnabled, customWorldType);
-        this.cityBiomes = new ArrayList<>();
-        this.cityBiomes.add(Biomes.plainsMetro);
         this.caveGenerator2 = new ModdedMapGenCaves();
         this.ravineGenerator2 = new ModdedMapGenRavine();
         this.scatteredFeatureGenerator2 = new ModdedMapGenScatteredFeature();
@@ -68,6 +68,15 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         return this.cityGenerator;
     }
 
+    private boolean getInCityBiome(int chunkX, int chunkZ){
+        this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
+        for (int i = 0; i < this.biomesForGeneration.length; i++)
+            if (!CityBiomeManager.getCityBiomes().contains(this.biomesForGeneration[i])){
+                return false;
+            }
+        return true;
+    }
+
     @Override
     public Chunk provideChunk(int x, int z)
     {
@@ -76,13 +85,14 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         this.setBlocksInChunk(x, z, chunkprimer);
         this.biomesForGeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, x * 16, z * 16, 16, 16);
         this.replaceBlocksForBiome(x, z, chunkprimer, this.biomesForGeneration);
-        boolean inCityBiome = false;
+
+        boolean inCityBiome = true;
+        //this check needs to be moved until after the generation coordinates are determined
         for (int i = 0; i < this.biomesForGeneration.length; i++)
-            if (this.cityBiomes.contains(this.biomesForGeneration[i])){
-                inCityBiome = true;
+            if (CityBiomeManager.getInvalidBiomes().contains(this.biomesForGeneration[i])){
+                inCityBiome = false;
                 break;
             }
-
 
         if (this.settings.useCaves)
         {
@@ -123,7 +133,15 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
         if (this.useCities){
             LogHelper.trace("CALL IN CHUNK PROVIDER provideChunk to INSTANTIATE METROPOLIS START");
-            this.cityGenerator.generate(this, this.worldObj, x, z, chunkprimer);
+            ChunkCoordIntPair genCoords = this.cityGenerator.getStartGenCoords(this.worldObj, x, z);
+            boolean pause;
+            if (genCoords.chunkXPos == -52 && genCoords.chunkZPos == 14){
+                pause = true;
+            }
+            if (!this.cityGenerator.checkInSpawnZone(this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos)
+                    && this.getInCityBiome(genCoords.chunkXPos, genCoords.chunkZPos)){
+                this.cityGenerator.generate(this, this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos, chunkprimer);
+            }
         }
 
         Chunk chunk = new Chunk(this.worldObj, chunkprimer, x, z);
@@ -181,7 +199,7 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
             this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
-        if (this.useCities) {
+        if (this.useCities && CityBiomeManager.getCityBiomes().contains(biomegenbase)) {
             cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
         }
 
@@ -222,6 +240,10 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
             }
         }
 
+        if (cityGenerated && CityBiomeManager.getCityBiomes().contains(biomegenbase)){
+            MetropolisBiomeDecorator biomeDecorator = (MetropolisBiomeDecorator) biomegenbase.theBiomeDecorator;
+            biomeDecorator.setInCityArea(true);
+        }
         biomegenbase.decorate(this.worldObj, this.rand, new BlockPos(k, 0, l));
         if (TerrainGen.populate(chunkProvider, worldObj, rand, chunkX, chunkZ, flag, ANIMALS))
         {
@@ -251,6 +273,7 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
 
         MinecraftForge.EVENT_BUS.post(new PopulateChunkEvent.Post(chunkProvider, worldObj, rand, chunkX, chunkZ, flag));
 
+        this.cityGenerator.clearCurrentGeneratingStart();
         if (this.cityGenerator.generatingZone != null) this.cityGenerator.generatingZone = null;
         BlockFalling.fallInstantly = false;
     }
@@ -259,14 +282,13 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
     public void recreateStructures(Chunk chunk, int chunkX, int chunkZ)
     {
         BiomeGenBase[] biomesforgeneration = this.worldObj.getWorldChunkManager().loadBlockGeneratorData(this.biomesForGeneration, chunkX * 16, chunkZ * 16, 16, 16);
-        boolean inCityBiome = false;
-        boolean validForCity = false;
+        boolean inCityBiome = true;
+
         for (int i = 0; i < biomesforgeneration.length; i++)
-            if (this.cityBiomes.contains(biomesforgeneration[i])){
-                inCityBiome = true;
-                validForCity = cityGenerator.canGenerateMetropolis(this.worldObj, this.rand, chunkX, chunkZ);
+            if (CityBiomeManager.getInvalidBiomes().contains(biomesforgeneration[i])){
+                inCityBiome = false;
                 break;
-            } else validForCity = false;
+            }
 
         if (this.settings.useMineShafts && this.mapFeaturesEnabled)
         {
@@ -294,9 +316,13 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
             this.oceanMonumentGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer)null);
         }
 
-        if (this.useCities && validForCity){
+        if (this.useCities){
             LogHelper.debug("CALL IN CHUNK PROVIDER recreateStructures to INSTANTIATE METROPOLIS START");
-            this.cityGenerator.generate(this, this.worldObj, chunkX, chunkZ, (ChunkPrimer) null);
+            ChunkCoordIntPair genCoords = this.cityGenerator.getStartGenCoords(this.worldObj,chunkX, chunkZ);
+            if (!this.cityGenerator.checkInSpawnZone(this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos)
+                    && this.getInCityBiome(genCoords.chunkXPos, genCoords.chunkZPos)){
+                this.cityGenerator.generate(this, this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos, (ChunkPrimer) null);
+            }
         }
     }
 

@@ -11,7 +11,6 @@ import net.minecraft.world.World;
  */
 public class MetropolisGenerationContainer {
 
-    private Metropolis generator;
     private ChunkGenerationLogger chunkLogger;
     private static CityBoundsSaveData cityMap;
     public MapGenMetropolis cityGenerator;
@@ -33,7 +32,6 @@ public class MetropolisGenerationContainer {
             MetropolisGenerationContainer.cityMap = new CityBoundsSaveData("metropolisCityBounds");
             world.getPerWorldStorage().setData("metropolisCityBounds",MetropolisGenerationContainer.cityMap);
         }
-        this.generator = new Metropolis();
     }
 
 }

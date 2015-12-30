@@ -2,6 +2,7 @@ package mod.arrabal.metrocore.common.handlers.world;
 
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.init.Biomes;
+import mod.arrabal.metrocore.common.world.biome.MetropolisBiomeDecorator;
 import mod.arrabal.metrocore.common.world.gen.MetropolisChunkProviderGenerate;
 import mod.arrabal.metrocore.common.world.gen.ModdedBiomeDecorator;
 import net.minecraft.util.BlockPos;
@@ -17,17 +18,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public class TerrainGenEventHandler {
 
+    //private static boolean decoratingCityAreaEvent = false;
+
     public TerrainGenEventHandler() {}
+
+    //public static void decoratingCityArea(boolean setTrue) {
+    //    decoratingCityAreaEvent = setTrue;
+    //}
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onCreateDecoratorEvent(BiomeEvent.CreateDecorator event){
-        //event.newBiomeDecorator = new ModdedBiomeDecorator();
+        //event.newBiomeDecorator = new MetropolisBiomeDecorator();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onDecorateBiomeEvent(DecorateBiomeEvent.Decorate event){
         if (event.type != DecorateBiomeEvent.Decorate.EventType.CUSTOM){
-
+            if (event.type == DecorateBiomeEvent.Decorate.EventType.GRASS && event.world.getBiomeGenForCoords(event.pos) == Biomes.plainsMetro){
+                event.setResult(Event.Result.DENY);
+            }
         }
     }
 

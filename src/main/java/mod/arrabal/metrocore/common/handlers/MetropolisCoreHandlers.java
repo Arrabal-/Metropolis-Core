@@ -2,21 +2,15 @@ package mod.arrabal.metrocore.common.handlers;
 
 import mod.arrabal.metrocore.MetropolisCore;
 import mod.arrabal.metrocore.common.init.Biomes;
-import mod.arrabal.metrocore.common.world.gen.ModdedMapGenCaves;
+import mod.arrabal.metrocore.common.world.biome.CityBiomeManager;
 import mod.arrabal.metrocore.common.world.gen.ModdedWorldProviderSurface;
 import mod.arrabal.metrocore.network.GuiHandler;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.handlers.config.ConfigHandler;
 import mod.arrabal.metrocore.common.handlers.world.TerrainGenEventHandler;
-import mod.arrabal.metrocore.common.handlers.world.WorldGenerationHandler;
 import net.minecraftforge.common.MinecraftForge;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Arrabal on 2/19/14.
@@ -38,6 +32,7 @@ public class MetropolisCoreHandlers {
 
     public static void postInit(){
         registerBiomes();
+        CityBiomeManager.init();
     }
 
     private static void registerNetworkEventHandlers() {

@@ -8,6 +8,7 @@ import net.minecraft.block.BlockSlab;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import mod.arrabal.metrocore.common.library.ModRef;
 import net.minecraft.block.Block;
@@ -85,13 +86,13 @@ public class Blocks {
             for (IBlockState state : slab.baseStates) {
                 String stateName = slab.getStateName(state, true);
                 name = slab.isDouble() ? name.replace("double_", "") : name;
-                ModelBakery.addVariantName(Item.getItemFromBlock(block), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                ModelBakery.registerItemVariants(Item.getItemFromBlock(block), new ResourceLocation(ModRef.MOD_ID, stateName + "_" + name));
                 MetropolisCore.proxy.registerBlockForMeshing(slab, slab.getMetaFromState(state), stateName + "_" + name);
             }
         } else {
             GameRegistry.registerBlock(slab, name);
             name = slab.isDouble() ? name.replace("double_", "") : name;
-            ModelBakery.addVariantName(Item.getItemFromBlock(slab), ModRef.MOD_ID + ":" + name);
+            ModelBakery.registerItemVariants(Item.getItemFromBlock(slab), new ResourceLocation(ModRef.MOD_ID, name));
             MetropolisCore.proxy.registerBlockForMeshing(slab, 0, name);
         }
         return slab;
@@ -108,12 +109,12 @@ public class Blocks {
                 GameRegistry.registerBlock(MCblock, ItemBlockMetroCoreWithVariants.class, name);
                 for (IBlockState state : MCblock.baseStates) {
                     String stateName = MCblock.getStateName(state, true);
-                    ModelBakery.addVariantName(Item.getItemFromBlock(MCblock), ModRef.MOD_ID + ":" + stateName + "_" + name);
+                    ModelBakery.registerItemVariants(Item.getItemFromBlock(MCblock), new ResourceLocation(ModRef.MOD_ID, stateName + "_" + name));
                     MetropolisCore.proxy.registerBlockForMeshing(MCblock, MCblock.getMetaFromState(state), stateName + "_" + name);
                 }
             } else {
                 GameRegistry.registerBlock(MCblock, name);
-                ModelBakery.addVariantName(Item.getItemFromBlock(MCblock), ModRef.MOD_ID + ":" + name);
+                ModelBakery.registerItemVariants(Item.getItemFromBlock(MCblock), new ResourceLocation(ModRef.MOD_ID,name));
                 MetropolisCore.proxy.registerBlockForMeshing(MCblock, 0, name);
             }
             return MCblock;

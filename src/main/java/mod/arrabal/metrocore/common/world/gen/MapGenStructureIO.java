@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Created by Evan on 8/6/2015.
+ * Created by Arrabal on 8/6/2015.
  */
 public class MapGenStructureIO {
 

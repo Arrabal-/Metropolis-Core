@@ -9,6 +9,9 @@ import mod.arrabal.metrocore.common.world.MetropolisBoundingBox;
 import mod.arrabal.metrocore.common.world.cities.CityLayoutPlan;
 import mod.arrabal.metrocore.common.world.cities.MetropolisStart;
 import mod.arrabal.metrocore.common.world.gen.MapGenStructureIO;
+import net.minecraft.block.BlockSlab;
+import net.minecraft.block.BlockStone;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.ChunkCoordIntPair;
@@ -393,13 +396,30 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
+
+            int buildX = this.boundingBox.minBlockCoords.getX();
+            int buildZ = this.boundingBox.minBlockCoords.getZ();
+            int buildY = 255;
+            for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
+                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
+                            new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                }
+            }
+            buildX = this.boundingBox.getCenterX();
+            buildZ = this.boundingBox.getCenterZ();
+            buildY = 255;
+            this.fillCurrentPositionBlocksDownward(world, Blocks.glass.getDefaultState(), 0, buildX, buildY, buildZ,
+                    new MetropolisBoundingBox(new BlockPos(buildX, 1, buildZ), new BlockPos(buildX, buildY, buildZ)));
             /*
             int buildX = this.boundingBox.minBlockCoords.getX();
             int buildZ = this.boundingBox.minBlockCoords.getZ();
             Chunk thisChunk = world.getChunkFromChunkCoords(this.boundingBox.minBlockCoords.getX() >> 4, this.boundingBox.minBlockCoords.getZ() >> 4);
             int buildY = 255;
-            for (int x = 0; x < 16; ++x){
-                for (int z = 0; z < 16; ++z){
+            for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
 
                     BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
                     buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
@@ -615,6 +635,7 @@ public class CityComponentPieces {
         public HashMap<String, CityComponentPieces.Building> buildingMap;
         public List weightedCityComponentList;
         public List weightedBuildingList;
+        public List buildableChunks;
 
         public MetropolisStart.UrbanType citySize;
         public MetropolisStart.RoadGrid roadGrid;
@@ -632,6 +653,7 @@ public class CityComponentPieces {
             super(0, 0, chunkX, chunkZ, baseY, null, random);
             this.weightedCityComponentList = new ArrayList();
             this.weightedBuildingList = new ArrayList();
+            this.buildableChunks = new ArrayList();
             this.isRuins = random.nextDouble() < ConfigHandler.ruinedCityPercent;
             this.weightedCityComponentList = cityList;
             this.weightedBuildingList = buildingList;
@@ -750,26 +772,65 @@ public class CityComponentPieces {
 
         @Override
         public boolean addComponentParts(World world, Random random){
-            /*
+
+
             int buildX = this.boundingBox.minBlockCoords.getX();
             int buildZ = this.boundingBox.minBlockCoords.getZ();
-            Chunk thisChunk = world.getChunkFromChunkCoords(this.boundingBox.minBlockCoords.getX() >> 4, this.boundingBox.minBlockCoords.getZ() >> 4);
             int buildY = 255;
-            for (int x = 0; x < 16; ++x){
-                for (int z = 0; z < 16; ++z){
-                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z));
+            /* Test build -- converts all ground to cement
+            for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
                     buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
-                    //this.clearAllBlocksCurrentPositionUpwards(world, buildX + x, topBlock.getY() + 1, buildZ + z, new CityLayoutPlan(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "clearBB"), false);
-                    BiomeGenBase blockBiome = thisChunk.getBiome(topBlock, world.getWorldChunkManager());
-                    //if (thisChunk.getBlockState(topBlock) == blockBiome.topBlock){
-                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
-                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 2, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(),"placeBB"));
-                    //}
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
+                            new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
                 }
             }
-            //this.fillWithBlocks(world, this.boundingBox, buildX, buildY - 1, buildZ, this.boundingBox.maxBlockCoords.getX(),
-            //        this.boundingBox.maxBlockCoords.getY(), this.boundingBox.maxBlockCoords.getZ(), ModBlocks.blockCement.getDefaultState(),ModBlocks.blockCement.getDefaultState(),true);
+            buildX = this.boundingBox.getCenterX();
+            buildZ = this.boundingBox.getCenterZ();
+            buildY = 255;
+            this.fillCurrentPositionBlocksDownward(world, Blocks.glass.getDefaultState(), 0, buildX, buildY, buildZ,
+                    new MetropolisBoundingBox(new BlockPos(buildX, 1, buildZ), new BlockPos(buildX, buildY, buildZ)));
             */
+            for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
+                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    if ((x < 3 || x > 12) && (z < 6 || z > 8)){
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
+                                new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z,
+                                new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                    } else if ((z < 3 || z > 12) && (x < 6 || x > 8)){
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
+                                new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z,
+                                new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                    } else if ((x > 4 && x < 10) && (z > 4 && z < 10)){
+                        if ((x == 5 || x == 9) && (z == 5 || z == 9)){
+                            this.placeBlockAtCurrentPosition(world, ModBlocks.blockCementSlab.getDefaultState().withProperty(BlockSlab.HALF, BlockSlab.EnumBlockHalf.BOTTOM), 0, buildX + x,
+                                    topBlock.getY(), buildZ + z,  new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                            this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z,
+                                    new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        } else if (x == 7 && z == 7){
+                            this.fillCurrentPositionBlocksDownward(world, Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE_SMOOTH), 0, buildX + x,
+                                    topBlock.getY() + 3, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                            world.setBlockState(new BlockPos(buildX + x, topBlock.getY() + 4, buildZ + z), Blocks.sea_lantern.getDefaultState(), 2);
+                            world.setBlockState(new BlockPos(buildX + x, topBlock.getY() + 5, buildZ + z), Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE_SMOOTH), 2);
+                            world.setBlockState(new BlockPos(buildX + x, topBlock.getY() + 6, buildZ + z), Blocks.flowing_water.getDefaultState(), 2);
+                        } else if ((x > 5 && x < 9) && (z > 5 && z < 9)){
+                            world.setBlockState(new BlockPos(buildX + x, topBlock.getY(), buildZ + z), Blocks.water.getDefaultState(), 2);
+                            this.placeBlockAtCurrentPosition(world, Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE_SMOOTH), 0, buildX + x,
+                                    topBlock.getY() - 1, buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        } else {
+                            this.placeBlockAtCurrentPosition(world, Blocks.stone.getDefaultState().withProperty(BlockStone.VARIANT, BlockStone.EnumType.GRANITE_SMOOTH), 0, buildX + x,
+                                    topBlock.getY(), buildZ + z, new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                            this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z,
+                                    new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                        }
+                    }
+                }
+            }
             return true;
         }
 
