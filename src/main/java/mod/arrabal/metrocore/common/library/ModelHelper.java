@@ -4,8 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.ItemModelMesher;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -18,6 +20,10 @@ public class ModelHelper {
 
     public static void registerItem(Item item, int meta, String itemName){
         getItemModelMesher().register(item, meta, new ModelResourceLocation(itemName, "inventory"));
+    }
+
+    public static void registerItemVariants(Item item, String itemName){
+        ModelBakery.registerItemVariants(item, new ResourceLocation(ModRef.MOD_ID, itemName));
     }
 
     public static void registerBlock(Block block, int meta, String blockName){
