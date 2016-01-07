@@ -136,7 +136,7 @@ public class MapGenMetropolis extends MapGenBase {
             this.generatingZone = null;
             return false;
         }
-        LogHelper.debug("Can generate Metropolis at [" + chunkX + ", " + chunkZ + "]");
+        LogHelper.trace("Can generate Metropolis at [" + chunkX + ", " + chunkZ + "]");
         return true;
     }
 
@@ -214,6 +214,7 @@ public class MapGenMetropolis extends MapGenBase {
         MetropolisStart start = new MetropolisStart(world, chunkX, chunkZ, 63, xGen, zGen, maxRadius, maxComponents);
         this.currentStart = new ChunkCoordIntPair(chunkX, chunkZ);
         String hashKey = start.getStartKey();
+        if (this.currentStart.chunkXPos == -52 && this.currentStart.chunkZPos == 14) LogHelper.debug("Hmmmmmm.");
         LogHelper.debug("Starting build city map with start at " + hashKey);
         LogHelper.debug("Max gen radius (x,z): " + start.getMaxGenRadius(true) + " " + start.getMaxGenRadius(false));
         LogHelper.debug("BaseY: " + start.getBaseY());
@@ -264,7 +265,7 @@ public class MapGenMetropolis extends MapGenBase {
 
     @Override
     public void generate(IChunkProvider chunkProvider, World worldIn, int chunkX, int chunkZ, ChunkPrimer chunkPrimer){
-        if (this.canGenerateMetropolis(worldIn, this.rand, chunkX,chunkZ)) {
+        if (this.canGenerateMetropolis(worldIn, this.rand, chunkX, chunkZ)) {
             int k = this.range;
             this.worldObj = worldIn;
             this.rand.setSeed(worldIn.getSeed());

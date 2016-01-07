@@ -134,10 +134,6 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
         if (this.useCities){
             LogHelper.trace("CALL IN CHUNK PROVIDER provideChunk to INSTANTIATE METROPOLIS START");
             ChunkCoordIntPair genCoords = this.cityGenerator.getStartGenCoords(this.worldObj, x, z);
-            boolean pause;
-            if (genCoords.chunkXPos == -52 && genCoords.chunkZPos == 14){
-                pause = true;
-            }
             if (!this.cityGenerator.checkInSpawnZone(this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos)
                     && this.getInCityBiome(genCoords.chunkXPos, genCoords.chunkZPos)){
                 this.cityGenerator.generate(this, this.worldObj, genCoords.chunkXPos, genCoords.chunkZPos, chunkprimer);
@@ -199,7 +195,7 @@ public class MetropolisChunkProviderGenerate extends ChunkProviderGenerate {
             this.oceanMonumentGenerator.generateStructure(this.worldObj, this.rand, chunkcoordintpair);
         }
 
-        if (this.useCities && CityBiomeManager.getCityBiomes().contains(biomegenbase)) {
+        if (this.useCities /*&& CityBiomeManager.getCityBiomes().contains(biomegenbase)*/) {
             cityGenerated = this.cityGenerator.buildMetropolis(this.worldObj, this.rand, chunkcoordintpair);
         }
 

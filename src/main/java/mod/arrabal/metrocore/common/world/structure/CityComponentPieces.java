@@ -242,6 +242,7 @@ public class CityComponentPieces {
         protected boolean isRuins;
         protected CityComponentPieces.Start startPiece;
         protected BuildMap joinedTileMap;
+        protected int[][] heightMap;
 
 
         public Metropolis() {
@@ -255,6 +256,7 @@ public class CityComponentPieces {
             }
             this.minBuildingLevels = 3;
             this.joinedTileMap = new BuildMap();
+            this.heightMap = new int[16][16];
         }
 
         public void reduceTilesToBuild(int toRemove){
@@ -701,57 +703,67 @@ public class CityComponentPieces {
                 case SPRAWL:
                 case MIXED:
                 case WEB: {
-                    // add 4 avenues leading away from the start area
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX + 1, chunkZ, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX - 1, chunkZ, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponentMap.put("[" + (chunkX + 1) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent1);
-                    cityComponentMap.put("[" + (chunkX - 1) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
-                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
-                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
-                    cityPlan.expandTo(cityComponent1.boundingBox);
-                    cityPlan.expandTo(cityComponent2.boundingBox);
-                    cityPlan.expandTo(cityComponent3.boundingBox);
-                    cityPlan.expandTo(cityComponent4.boundingBox);
-                    this.reduceTilesToBuild(4);
-
-
-                    // extend the avenues a second chunk
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX + 2, chunkZ, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX - 2, chunkZ, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ + 2, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Avenue.class, random, chunkX, chunkZ - 2, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponentMap.put("[" + (chunkX + 2) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent1);
-                    cityComponentMap.put("[" + (chunkX - 2) + ", " + chunkZ + "]", (CityComponentPieces.Metropolis) cityComponent2);
-                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ + 2) + "]", (CityComponentPieces.Metropolis) cityComponent3);
-                    cityComponentMap.put("[" + chunkX + ", " + (chunkZ - 2) + "]", (CityComponentPieces.Metropolis) cityComponent4);
-                    cityPlan.expandTo(cityComponent1.boundingBox);
-                    cityPlan.expandTo(cityComponent2.boundingBox);
-                    cityPlan.expandTo(cityComponent3.boundingBox);
-                    cityPlan.expandTo(cityComponent4.boundingBox);
-                    this.reduceTilesToBuild(4);
+                    // get the 4 adjacent chunk coordinates
+                    ChunkCoordIntPair chunk1, chunk2, chunk3, chunk4;
+                    chunk1 = new ChunkCoordIntPair(chunkX + 1, chunkZ);
+                    chunk2 = new ChunkCoordIntPair(chunkX - 1, chunkZ);
+                    chunk3 = new ChunkCoordIntPair(chunkX, chunkZ + 1);
+                    chunk4  = new ChunkCoordIntPair(chunkX, chunkZ - 1);
+                    // try to add 4 avenues leading away from the start area
+                    if (this.buildableChunks.contains(chunk1.toString())){
+                        cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunk1.chunkXPos, chunk1.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk1.toString(), (CityComponentPieces.Metropolis) cityComponent1);
+                        cityPlan.expandTo(cityComponent1.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk2.toString())){
+                        cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunk2.chunkXPos, chunk2.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk2.toString(), (CityComponentPieces.Metropolis) cityComponent2);
+                        cityPlan.expandTo(cityComponent2.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk3.toString())){
+                        cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunk3.chunkXPos, chunk3.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk3.toString(), (CityComponentPieces.Metropolis) cityComponent3);
+                        cityPlan.expandTo(cityComponent3.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk4.toString())){
+                        cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start, CityComponentPieces.Avenue.class, random, chunk4.chunkXPos, chunk4.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk3.toString(), (CityComponentPieces.Metropolis) cityComponent4);
+                        cityPlan.expandTo(cityComponent4.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
 
                     // fill in the corners with alleys
-                    cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ + 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ - 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX - 1, chunkZ + 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunkX + 1, chunkZ - 1, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
-                    cityComponentMap.put("[" + (chunkX + 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent1);
-                    cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent2);
-                    cityComponentMap.put("[" + (chunkX - 1) + ", " + (chunkZ + 1) + "]", (CityComponentPieces.Metropolis) cityComponent3);
-                    cityComponentMap.put("[" + (chunkX + 1) + ", " + (chunkZ - 1) + "]", (CityComponentPieces.Metropolis) cityComponent4);
-                    cityPlan.expandTo(cityComponent1.boundingBox);
-                    cityPlan.expandTo(cityComponent2.boundingBox);
-                    cityPlan.expandTo(cityComponent3.boundingBox);
-                    cityPlan.expandTo(cityComponent4.boundingBox);
-                    this.reduceTilesToBuild(4);
-
-                    // initiate building around corner alleys
-                    cityComponent1.buildComponent(start, random);
-                    cityComponent2.buildComponent(start, random);
-                    cityComponent3.buildComponent(start, random);
-                    cityComponent4.buildComponent(start, random);
+                    chunk1 = new ChunkCoordIntPair(chunkX + 1, chunkZ + 1);
+                    chunk2 = new ChunkCoordIntPair(chunkX - 1, chunkZ - 1);
+                    chunk3 = new ChunkCoordIntPair(chunkX - 1, chunkZ + 1);
+                    chunk4 = new ChunkCoordIntPair(chunkX + 1, chunkZ - 1);
+                    if (this.buildableChunks.contains(chunk1.toString())){
+                        cityComponent1 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunk1.chunkXPos, chunk1.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk1.toString(), (CityComponentPieces.Metropolis) cityComponent1);
+                        cityPlan.expandTo(cityComponent1.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk2.toString())){
+                        cityComponent2 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunk2.chunkXPos, chunk2.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk2.toString(), (CityComponentPieces.Metropolis) cityComponent2);
+                        cityPlan.expandTo(cityComponent2.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk3.toString())){
+                        cityComponent3 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunk3.chunkXPos, chunk3.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk3.toString(), (CityComponentPieces.Metropolis) cityComponent3);
+                        cityPlan.expandTo(cityComponent3.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
+                    if (this.buildableChunks.contains(chunk4.toString())){
+                        cityComponent4 = getNextCityComponentP((CityComponentPieces.Start)start,CityComponentPieces.Alley.class, random, chunk4.chunkXPos, chunk4.chunkZPos, this.baseY - this.baseYVariation, this.baseY + this.baseYVariation, false);
+                        cityComponentMap.put(chunk4.toString(), (CityComponentPieces.Metropolis) cityComponent4);
+                        cityPlan.expandTo(cityComponent4.boundingBox);
+                        this.reduceTilesToBuild();
+                    }
                     break;
                 }
             }
@@ -762,10 +774,13 @@ public class CityComponentPieces {
             int buildX = (this.getChunkPosition().getX() >> 4) + xShift;
             int buildZ = (this.getChunkPosition().getZ() >> 4) + zShift;
             String newChunkKey = "[" + buildX + ", " + buildZ + "]";
-            CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) start, random, xShift, zShift, baseY - baseYVariation, baseY + baseYVariation, false);
-            if (cityComponent != null){
-                cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
-                cityPlan.expandTo(cityComponent.boundingBox);
+            if (this.buildableChunks.contains(newChunkKey)) {
+                CityComponent cityComponent = getNextCityComponentXZ((CityComponentPieces.Start) start, random, xShift, zShift, baseY - baseYVariation, baseY + baseYVariation, false);
+                if (cityComponent != null) {
+                    cityComponentMap.put(newChunkKey, (CityComponentPieces.Metropolis) cityComponent);
+                    cityPlan.expandTo(cityComponent.boundingBox);
+                    this.reduceTilesToBuild();
+                }
             }
             else LogHelper.debug("Failed to build new component at " + newChunkKey);
         }
@@ -776,26 +791,51 @@ public class CityComponentPieces {
 
             int buildX = this.boundingBox.minBlockCoords.getX();
             int buildZ = this.boundingBox.minBlockCoords.getZ();
-            int buildY = 255;
+            int lowestY = 255;
+            int highestY = 0;
             /* Test build -- converts all ground to cement
             for (int x = 0; x < 16; x++){
                 for (int z = 0; z < 16; z++){
                     BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
-                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    lowestY = (topBlock.getY() < lowestY) ? topBlock.getY() : lowestY;
                     this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
                             new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
                 }
             }
             buildX = this.boundingBox.getCenterX();
             buildZ = this.boundingBox.getCenterZ();
-            buildY = 255;
-            this.fillCurrentPositionBlocksDownward(world, Blocks.glass.getDefaultState(), 0, buildX, buildY, buildZ,
-                    new MetropolisBoundingBox(new BlockPos(buildX, 1, buildZ), new BlockPos(buildX, buildY, buildZ)));
+            lowestY = 255;
+            this.fillCurrentPositionBlocksDownward(world, Blocks.glass.getDefaultState(), 0, buildX, lowestY, buildZ,
+                    new MetropolisBoundingBox(new BlockPos(buildX, 1, buildZ), new BlockPos(buildX, lowestY, buildZ)));
             */
+
+            //first we are going to go over the entire chunk and remove any world gen artifacts, map the heightfield, and replace with cement 1 layer deep
             for (int x = 0; x < 16; x++){
                 for (int z = 0; z < 16; z++){
                     BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
-                    buildY = (topBlock.getY() < buildY) ? topBlock.getY() : buildY;
+                    lowestY = (topBlock.getY() < lowestY) ? topBlock.getY() : lowestY;
+                    highestY = (topBlock.getY() > highestY) ? topBlock.getY() : highestY;
+                    this.heightMap[x][z] = topBlock.getY();
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
+                            new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                    //this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY() - 1, buildZ + z,
+                    //        new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                }
+            }
+            //now replace top layer of center circle with slabs, and place second layer of cement
+            this.fillSphereWithBlocks(world, this.boundingBox, buildX, lowestY, buildZ, buildX + 15, highestY, buildZ + 15, ModBlocks.blockCementSlab.getDefaultState(), ModBlocks.blockCement.getDefaultState(), true);
+            for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
+                    this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, this.heightMap[x][z] - 1, buildZ + z,
+                            new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
+                }
+            }
+
+
+           /* for (int x = 0; x < 16; x++){
+                for (int z = 0; z < 16; z++){
+                    BlockPos topBlock = this.getTopBlock(world, new BlockPos(buildX + x, 64, buildZ + z)).down();
+                    lowestY = (topBlock.getY() < lowestY) ? topBlock.getY() : lowestY;
                     if ((x < 3 || x > 12) && (z < 6 || z > 8)){
                         this.placeBlockAtCurrentPosition(world, ModBlocks.blockCement.getDefaultState(), 0, buildX + x, topBlock.getY(), buildZ + z,
                                 new MetropolisBoundingBox(buildX, buildZ, this.boundingBox.maxBlockCoords.getX(), this.boundingBox.maxBlockCoords.getZ(), "placeBB"));
@@ -830,7 +870,7 @@ public class CityComponentPieces {
                         }
                     }
                 }
-            }
+            }*/
             return true;
         }
 

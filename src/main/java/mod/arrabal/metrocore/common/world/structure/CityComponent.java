@@ -196,6 +196,13 @@ public abstract class CityComponent {
         }
     }
 
+    protected IBlockState getBlockStateAtCurrentPosition(World world, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox){
+        int l = this.getXWithOffset(posX, posZ);
+        int i1 = this.getYWithOffset(posY);
+        int j1 = this.getZWithOffset(posX, posZ);
+        return !boundingBox.isVecInside(l, i1, j1) ? Blocks.air.getDefaultState() : world.getBlockState(new BlockPos(l, i1, j1));
+    }
+
     protected Block getBlockAtCurrentPosition(World world, int posX, int posY, int posZ, MetropolisBoundingBox boundingBox)
     {
         int l = this.getXWithOffset(posX, posZ);
@@ -330,7 +337,8 @@ public abstract class CityComponent {
         }
     }
 
-    protected void fillSphereWithBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ, IBlockState placeBlock, boolean onlyReplaceBlocks)
+    protected void fillSphereWithBlocks(World world, MetropolisBoundingBox boundingBox, int minX, int minY, int minZ, int maxX, int maxY, int maxZ,
+                                        IBlockState placeBlock, IBlockState replaceBlock, boolean ReplaceBlocksOnly)
     {
         float f = (float)(maxX - minX + 1);
         float f1 = (float)(maxY - minY + 1);
@@ -350,7 +358,13 @@ public abstract class CityComponent {
                 {
                     float f7 = ((float)i2 - f4) / (f2 * 0.5F);
 
-                    if (!onlyReplaceBlocks || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
+                    if (ReplaceBlocksOnly && this.getBlockStateAtCurrentPosition(world, l1, k1, i2, boundingBox) == replaceBlock) {
+                        float f8 = f6 * f6 + f5 * f5 + f7 * f7;
+                        if (f8 <= 1.05F) {
+                            this.placeBlockAtCurrentPosition(world, placeBlock, 0, l1, k1, i2, boundingBox);
+                        }
+                    }
+                    else if (!ReplaceBlocksOnly || this.getBlockAtCurrentPosition(world, l1, k1, i2, boundingBox).getMaterial() != Material.air)
                     {
                         float f8 = f6 * f6 + f5 * f5 + f7 * f7;
 
